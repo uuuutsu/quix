@@ -14,7 +14,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
             if (method := getattr(self, opcode.__id__, None)) is None:
                 raise NoHandlerFoundException(opcode, self)
 
-            return method(**opcode.args())
+            method(**opcode.args())
 
     @abstractmethod
     def add(self, ptr: Ptr, value: Value) -> None:
@@ -29,7 +29,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
         raise NotImplementedError
 
     @abstractmethod
-    def loop(self, ptr: Ptr, program: Program) -> None:
+    def loop(self, ptr: Ptr, program: Program[CoreOpcode]) -> None:
         raise NotImplementedError
 
     @abstractmethod

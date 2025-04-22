@@ -1,6 +1,5 @@
-
-from .base import opcode
-from .dtypes import Ptr, Value, Program, Code
+from .base import CoreOpcode, opcode
+from .dtypes import Code, Program, Ptr, Value
 
 
 @opcode
@@ -10,6 +9,6 @@ def input(ptr: Ptr) -> None: ...
 @opcode
 def output(ptr: Ptr) -> None: ...
 @opcode
-def loop(ptr: Ptr, program: Program) -> None: ...
+def loop(ptr: Ptr, program: Program[CoreOpcode]) -> None: ...
 @opcode
 def inject(ptr: Ptr, code: Code, exit: Ptr) -> None: ...

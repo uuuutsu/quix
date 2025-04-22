@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable
 from functools import wraps
-from typing import Any, ClassVar, override
+from typing import Any, ClassVar, cast, override
 
 from core.interfaces import Opcode
 from core.interfaces.opcode import OpcodeFactory
@@ -39,6 +39,6 @@ def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
     @wraps(func)
     def create(*args: P.args, **kwargs: P.kwargs) -> Opcode:
         func(*args, **kwargs)
-        return new_opcode_cls(signature.bind(*args, **kwargs))
+        return cast(Opcode, new_opcode_cls(signature.bind(*args, **kwargs)))
 
-    return create
+    return cast(OpcodeFactory[P, CoreOpcode], create)

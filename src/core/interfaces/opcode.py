@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import Any, Callable, ClassVar, Iterator, Protocol
+from collections.abc import Callable, Iterator
+from typing import Any, ClassVar, Protocol
 
 type OpcodeFactory[**P, O: Opcode] = Callable[P, O]
 

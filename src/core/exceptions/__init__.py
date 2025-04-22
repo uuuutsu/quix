@@ -4,6 +4,5 @@ __all__ = (
     "NoHandlerFoundException",
 )
 
-from visitor import NoHandlerFoundException, VisitorException
-
 from .base import CoreException
+from .visitor import NoHandlerFoundException, VisitorException
