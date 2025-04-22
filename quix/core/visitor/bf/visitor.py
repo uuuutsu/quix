@@ -15,7 +15,7 @@ class BFVisitor(CoreVisitor):
         "_ptr",
     )
 
-    def __init__(self, dest: Writable, pointer: BFPointer | None) -> None:
+    def __init__(self, dest: Writable, pointer: BFPointer | None = None) -> None:
         self._dest = dest
         self._ptr = pointer or BFPointer.default()
 
@@ -40,6 +40,7 @@ class BFVisitor(CoreVisitor):
         self._move_pointer(ptr)
         self._dest.write(BFCommands.START_LOOP)
         self.visit(program)
+        self._move_pointer(ptr)
         self._dest.write(BFCommands.END_LOOP)
 
     @override

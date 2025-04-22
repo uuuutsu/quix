@@ -15,7 +15,8 @@ class BFPointer:
 
     def move(self, new_position: Ptr, /) -> Code:
         sign = BFCommands.MOVE_LEFT if new_position < self._curr_pos else BFCommands.MOVE_RIGHT
-        return sign * abs(new_position - self._curr_pos)
+        self._curr_pos, _curr_pos = new_position, self._curr_pos
+        return sign * abs(new_position - _curr_pos)
 
     @classmethod
     def default(cls) -> Self:

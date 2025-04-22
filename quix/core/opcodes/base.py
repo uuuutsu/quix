@@ -38,6 +38,6 @@ def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
     @wraps(func)
     def create(*args: P.args, **kwargs: P.kwargs) -> Opcode:
         func(*args, **kwargs)
-        return cast(Opcode, new_opcode_cls(signature.bind(*args, **kwargs)))
+        return cast(Opcode, new_opcode_cls(signature.bind(*args, **kwargs).arguments))
 
     return cast(OpcodeFactory[P, CoreOpcode], create)
