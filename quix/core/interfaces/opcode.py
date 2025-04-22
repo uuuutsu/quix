@@ -6,6 +6,7 @@ type OpcodeFactory[**P, O: Opcode] = Callable[P, O]
 
 
 class Opcode(Protocol):
+    __slots__ = ()
     __id__: ClassVar[str]
 
     @abstractmethod

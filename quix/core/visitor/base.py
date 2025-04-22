@@ -8,6 +8,8 @@ from quix.exceptions.core import NoHandlerFoundException
 
 
 class CoreVisitor(Visitor[CoreOpcode]):
+    __slots__ = ()
+
     @override
     def visit(self, program: Program[CoreOpcode]) -> None:
         for opcode in program:
