@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import overload
 
 from quix.core.opcodes.base import CoreOpcode
@@ -54,10 +55,11 @@ class Var:
     def _concat_program(self, other: Program | CoreOpcode | Var) -> Var:
         return Var(self._ref, self._name, [*self._program, *_to_program(other)])
 
+
 @overload
-def var(name: str | None) -> Var:...
+def var(name: str | None) -> Var: ...
 @overload
-def var(name: str | None, ref: Ref) -> Var:...
+def var(name: str | None, ref: Ref) -> Var: ...
 def var(name: str | None = None, ref: Ref | None = None) -> Var:
     if ref is None:
         ref = generate_unique_id()
