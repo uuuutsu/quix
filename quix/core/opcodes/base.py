@@ -1,13 +1,15 @@
 import inspect
 from collections.abc import Callable
 from functools import wraps
-from pprint import pformat
 from typing import Any, ClassVar, cast, override
+
+from rich.repr import Result, rich_repr
 
 from quix.core.interfaces import Opcode, OpcodeFactory
 from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
 
 
+@rich_repr
 class CoreOpcode(Opcode):
     __slots__ = ("_args",)
 
@@ -24,9 +26,8 @@ class CoreOpcode(Opcode):
     def args(self) -> dict[str, Any]:
         return self._args
 
-    def __repr__(self) -> str:
-        args = ", ".join([f"{key}={pformat(value)}" for key, value in self._args.items()])
-        return f"{type(self).__name__}({args})"
+    def __rich_repr__(self) -> Result:
+        yield from self._args.items()
 
 
 def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:

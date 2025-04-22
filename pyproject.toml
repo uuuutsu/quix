@@ -1,5 +1,7 @@
 [project]
-dependencies = []
+dependencies = [
+    "rich>=14.0.0",
+]
 description = "Add your description here"
 name = "quix"
 readme = "README.md"
