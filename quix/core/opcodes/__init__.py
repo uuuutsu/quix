@@ -5,12 +5,12 @@ __all__ = (
     "output",
     "loop",
     "inject",
-    "Ptr",
+    "Ref",
     "Program",
     "Value",
     "Code",
 )
 
 from .base import CoreOpcode
-from .dtypes import Code, Program, Ptr, Value
+from .dtypes import Code, Program, Ref, Value
 from .opcodes import add, inject, input, loop, output

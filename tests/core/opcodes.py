@@ -8,8 +8,8 @@ from quix.core.opcodes import add, inject, input, loop, output
 @pytest.mark.parametrize(
     "args",
     [
-        {"ptr": 5, "value": 10},
-        {"ptr": 0, "value": -15},
+        {"ref": 5, "value": 10},
+        {"ref": 0, "value": -15},
     ],
 )
 def test_add(args: dict[str, Any]) -> None:
@@ -21,8 +21,8 @@ def test_add(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ptr": 5},
-        {"ptr": -10},
+        {"ref": 5},
+        {"ref": -10},
     ],
 )
 def test_input(args: dict[str, Any]) -> None:
@@ -34,8 +34,8 @@ def test_input(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ptr": 5},
-        {"ptr": -10},
+        {"ref": 5},
+        {"ref": -10},
     ],
 )
 def test_output(args: dict[str, Any]) -> None:
@@ -47,9 +47,9 @@ def test_output(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ptr": 5, "program": []},
-        {"ptr": -10, "program": [add(-10, 50)]},
-        {"ptr": -10, "program": [input(130)]},
+        {"ref": 5, "program": []},
+        {"ref": -10, "program": [add(-10, 50)]},
+        {"ref": -10, "program": [input(130)]},
     ],
 )
 def test_loop(args: dict[str, Any]) -> None:
@@ -61,9 +61,9 @@ def test_loop(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ptr": 5, "code": "", "exit": 30},
-        {"ptr": 0, "code": "sigma", "exit": -55},
-        {"ptr": -1, "code": "that's crazy", "exit": 100},
+        {"ref": 5, "code": "", "exit": 30},
+        {"ref": 0, "code": "sigma", "exit": -55},
+        {"ref": -1, "code": "that's crazy", "exit": 100},
     ],
 )
 def test_inject(args: dict[str, Any]) -> None:

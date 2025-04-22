@@ -3,7 +3,7 @@ from typing import override
 
 from quix.core.interfaces.visitor import Visitor
 from quix.core.opcodes import CoreOpcode
-from quix.core.opcodes.dtypes import Code, Program, Ptr, Value
+from quix.core.opcodes.dtypes import Code, Program, Ref, Value
 from quix.exceptions.core import NoHandlerFoundException
 
 
@@ -19,21 +19,21 @@ class CoreVisitor(Visitor[CoreOpcode]):
             method(**opcode.args())
 
     @abstractmethod
-    def add(self, ptr: Ptr, value: Value) -> None:
+    def add(self, ref: Ref, value: Value) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def input(self, ptr: Ptr) -> None:
+    def input(self, ref: Ref) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def output(self, ptr: Ptr) -> None:
+    def output(self, ref: Ref) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def loop(self, ptr: Ptr, program: Program) -> None:
+    def loop(self, ref: Ref, program: Program) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def inject(self, ptr: Ptr, code: Code, exit: Ptr) -> None:
+    def inject(self, ref: Ref, code: Code, exit: Ref) -> None:
         raise NotImplementedError

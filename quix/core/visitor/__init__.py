@@ -1,8 +1,3 @@
-__all__ = (
-    "CoreVisitor",
-    "BFVisitor",
-    "BFPointer",
-)
+__all__ = ("CoreVisitor",)
 
 from .base import CoreVisitor
-from .bf import BFPointer, BFVisitor

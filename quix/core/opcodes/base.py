@@ -24,7 +24,7 @@ class CoreOpcode(Opcode):
         return self._args
 
     def __str__(self) -> str:
-        return f"Opcode:{self.__id__}{self._args}"
+        return f"{type(self).__name__}{self._args}"
 
 
 def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
