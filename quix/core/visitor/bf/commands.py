@@ -2,14 +2,14 @@ from enum import StrEnum
 
 
 class BFCommands(StrEnum):
-    INC: str = "+"
-    DEC: str = "-"
+    INC = "+"
+    DEC = "-"
 
-    MOVE_LEFT: str = "<"
-    MOVE_RIGHT: str = ">"
+    MOVE_LEFT = "<"
+    MOVE_RIGHT = ">"
 
-    START_LOOP: str = "["
-    END_LOOP: str = "]"
+    START_LOOP = "["
+    END_LOOP = "]"
 
-    STDIN: str = ","
-    STDOUT: str = "."
+    STDIN = ","
+    STDOUT = "."

@@ -1,7 +1,6 @@
 from typing import override
 
 from quix.core.interfaces.writable import Writable
-from quix.core.opcodes import CoreOpcode
 from quix.core.opcodes.dtypes import Code, Program, Ptr, Value
 from quix.core.visitor.base import CoreVisitor
 
@@ -36,7 +35,7 @@ class BFVisitor(CoreVisitor):
         self._dest.write(BFCommands.STDOUT)
 
     @override
-    def loop(self, ptr: Ptr, program: Program[CoreOpcode]) -> None:
+    def loop(self, ptr: Ptr, program: Program) -> None:
         self._move_pointer(ptr)
         self._dest.write(BFCommands.START_LOOP)
         self.visit(program)

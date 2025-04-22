@@ -11,7 +11,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
     __slots__ = ()
 
     @override
-    def visit(self, program: Program[CoreOpcode]) -> None:
+    def visit(self, program: Program) -> None:
         for opcode in program:
             if (method := getattr(self, opcode.__id__, None)) is None:
                 raise NoHandlerFoundException(opcode, self)
@@ -31,7 +31,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
         raise NotImplementedError
 
     @abstractmethod
-    def loop(self, ptr: Ptr, program: Program[CoreOpcode]) -> None:
+    def loop(self, ptr: Ptr, program: Program) -> None:
         raise NotImplementedError
 
     @abstractmethod
