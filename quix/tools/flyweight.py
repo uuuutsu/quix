@@ -32,6 +32,8 @@ class FlyweightMeta(_ProtocolMeta):
         cls.__flyweights__ = {}
         cls.__state_factory__ = state_factory
 
+    # prevent type checkers from analyzing `__call__` and replacing class's `__init__` signature
+    # related: https://github.com/microsoft/pyright/issues/5488
     if not TYPE_CHECKING:
 
         def __call__(cls: FlyweightMeta, *args: Any, **kwargs: Any) -> FlyweightMeta:
