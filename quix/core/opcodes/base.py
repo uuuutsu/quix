@@ -22,6 +22,11 @@ class CoreOpcode(Opcode):
     def __init__(self, args: dict[str, Any]) -> None:
         self._args = args
 
+    def __eq__(self, value: object) -> bool:
+        if isinstance(value, CoreOpcode):
+            return (self.__id__ == value.__id__) and (self._args == value._args)
+        return super().__eq__(value)
+
     @override
     def args(self) -> dict[str, Any]:
         return self._args
