@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from collections.abc import Hashable
-from typing import TYPE_CHECKING, Any, Protocol, final
+from typing import TYPE_CHECKING, Any, Protocol, _ProtocolMeta, final
 
 
 class FlyweightStateType(Protocol):
@@ -16,7 +16,7 @@ def _dummy_factory(*args: Any, **kwargs: Any) -> str:
 
 
 @final
-class FlyweightMeta(ABCMeta):
+class FlyweightMeta(_ProtocolMeta):
     __flyweights__: dict[Hashable, FlyweightMeta]
     __state_factory__: FlyweightStateType
 
