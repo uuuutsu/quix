@@ -58,3 +58,6 @@ lint.select = [
 ]
 unfixable = ["F841"]
 unsafe-fixes = true
+
+[tool.pytest.ini_options]
+python_files = "tests/*.py"

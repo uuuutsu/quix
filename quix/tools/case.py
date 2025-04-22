@@ -4,11 +4,9 @@ import typing
 pattern: typing.Final[re.Pattern[str]] = re.compile(r"(?<!^)(?=[A-Z])")
 
 
-def camel_case_to_snake_case(string: str, /) -> str:
-    return pattern.sub("_", string).lower()
+def pascal_case_to_snake_case(string: str, /) -> str:
+    return pattern.sub("_", string).lower().strip("_")
 
 
-def snake_case_to_camel_case(string: str, /) -> str:
-    first, *others = string.split("_")
-    return ''.join([first.lower(), *map(str.title, others)])
-
+def snake_case_to_pascal_case(string: str, /) -> str:
+    return string.replace("_", " ").title().replace(" ", "")

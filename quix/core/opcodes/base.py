@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any, ClassVar, cast, override
 
 from quix.core.interfaces import Opcode, OpcodeFactory
-from quix.tools import camel_case_to_snake_case, snake_case_to_camel_case
+from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
 
 
 class CoreOpcode(Opcode):
@@ -14,7 +14,7 @@ class CoreOpcode(Opcode):
 
     def __init_subclass__(cls) -> None:
         if not hasattr(cls, "__id__"):
-            cls.__id__ = camel_case_to_snake_case(cls.__name__)
+            cls.__id__ = pascal_case_to_snake_case(cls.__name__)
 
     def __init__(self, args: dict[str, Any]) -> None:
         self._args = args
@@ -29,7 +29,7 @@ class CoreOpcode(Opcode):
 
 def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
     new_opcode_cls = type(
-        snake_case_to_camel_case(func.__name__),
+        snake_case_to_pascal_case(func.__name__),
         (CoreOpcode,),
         {"__id__": func.__name__},
     )

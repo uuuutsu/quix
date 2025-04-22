@@ -1,6 +1,6 @@
 __all__ = (
-    "camel_case_to_snake_case",
-    "snake_case_to_camel_case",
+    "pascal_case_to_snake_case",
+    "snake_case_to_pascal_case",
 )
 
-from .case import camel_case_to_snake_case, snake_case_to_camel_case
+from .case import pascal_case_to_snake_case, snake_case_to_pascal_case
