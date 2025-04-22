@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from typing import override
 
-from core.exceptions import NoHandlerFoundException
-from core.interfaces.visitor import Visitor
-from core.opcodes import CoreOpcode
-from core.opcodes.dtypes import Code, Program, Ptr, Value
+from quix.core.exceptions import NoHandlerFoundException
+from quix.core.interfaces.visitor import Visitor
+from quix.core.opcodes import CoreOpcode
+from quix.core.opcodes.dtypes import Code, Program, Ptr, Value
 
 
 class CoreVisitor(Visitor[CoreOpcode]):

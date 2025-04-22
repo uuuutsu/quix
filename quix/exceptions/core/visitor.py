@@ -1,5 +1,5 @@
-from core.interfaces.opcode import Opcode
-from core.interfaces.visitor import Visitor
+from quix.core.interfaces.opcode import Opcode
+from quix.core.interfaces.visitor import Visitor
 
 from .base import CoreException
 

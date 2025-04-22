@@ -3,7 +3,7 @@ __all__ = (
     "Value",
     "Program",
 )
-from core.interfaces import Program
+from quix.core.interfaces import Program
 
 type Ptr = int
 type Value = int
