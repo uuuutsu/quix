@@ -27,6 +27,10 @@ class BFPointer:
     def move_by_ref(self, ref: Ref, /) -> Code:
         return self.move_by_ptr(self._layout[ref])
 
+    @property
+    def position(self) -> int:
+        return self._curr_pos
+
     @classmethod
     def default(cls) -> Self:
         return cls(BFMemoryLayout.default(), _DEFAULT_START)

@@ -22,7 +22,7 @@ class Var:
     def __init__(self, ref: Ref, name: str | None = None, program: Program | None = None) -> None:
         self._ref = ref
         self._name = name
-        self._program: list[CoreOpcode] | Program = program or []
+        self._program: Program = program or []
 
     def __add__(self, value: Value) -> Var:
         return self._concat_program(add(self._ref, value))
