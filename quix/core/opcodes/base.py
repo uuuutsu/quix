@@ -6,11 +6,11 @@ from typing import Any, ClassVar, cast, override
 from rich.repr import Result, rich_repr
 
 from quix.core.interfaces import Opcode, OpcodeFactory
-from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
+from quix.tools import FlyweightMeta, pascal_case_to_snake_case, snake_case_to_pascal_case
 
 
 @rich_repr
-class CoreOpcode(Opcode):
+class CoreOpcode(Opcode, metaclass=FlyweightMeta):
     __slots__ = ("_args",)
 
     __id__: ClassVar[str]
@@ -46,6 +46,8 @@ def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
     @wraps(func)
     def create(*args: P.args, **kwargs: P.kwargs) -> Opcode:
         func(*args, **kwargs)
-        return cast(Opcode, new_opcode_cls(signature.bind(*args, **kwargs).arguments))
+        binded_signature = signature.bind(*args, **kwargs)
+        binded_signature.apply_defaults()
+        return cast(Opcode, new_opcode_cls(binded_signature.arguments))
 
     return cast(OpcodeFactory[P, CoreOpcode], create)
