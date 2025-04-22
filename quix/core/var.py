@@ -1,8 +1,10 @@
 from __future__ import annotations
+from typing import overload
 
 from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.dtypes import Program, Ref, Value
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
+from quix.tools import generate_unique_id
 
 
 def _to_program(value: CoreOpcode | Program | Var | tuple[Var], /) -> Program:
@@ -51,3 +53,12 @@ class Var:
 
     def _concat_program(self, other: Program | CoreOpcode | Var) -> Var:
         return Var(self._ref, self._name, [*self._program, *_to_program(other)])
+
+@overload
+def var(name: str | None) -> Var:...
+@overload
+def var(name: str | None, ref: Ref) -> Var:...
+def var(name: str | None = None, ref: Ref | None = None) -> Var:
+    if ref is None:
+        ref = generate_unique_id()
+    return Var(ref=ref, name=name)
