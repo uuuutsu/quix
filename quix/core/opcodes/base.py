@@ -3,9 +3,8 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, ClassVar, cast, override
 
-from quix.core.interfaces import Opcode
-from quix.core.interfaces.opcode import OpcodeFactory
-from quix.core.utils import camel_case_to_snake_case, snake_case_to_camel_case
+from quix.core.interfaces import Opcode, OpcodeFactory
+from quix.tools import camel_case_to_snake_case, snake_case_to_camel_case
 
 
 class CoreOpcode(Opcode):
