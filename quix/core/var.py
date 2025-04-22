@@ -5,29 +5,33 @@ from quix.core.opcodes.dtypes import Program, Ref, Value
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
 
 
-def _opcode_to_uniform_program(value: CoreOpcode | Program | Var, /) -> Program:
+def _to_program(value: CoreOpcode | Program | Var | tuple[Var], /) -> Program:
     match value:
         case CoreOpcode():
             return [value]
         case Var():
-            return value.program
-        case Program():
-            return value
+            return value._program
+        case tuple():
+            return sum((var._program for var in value), start=[])
+    return value
 
 
 class Var:
-    __slots__ = "_ref", "program", "_name"
+    __slots__ = "_ref", "_program", "_name"
 
     def __init__(self, ref: Ref, name: str | None = None, program: Program | None = None) -> None:
         self._ref = ref
         self._name = name
-        self.program = program or []
+        self._program = program or []
 
     def __add__(self, value: Value) -> Var:
         return self._concat_program(add(self._ref, value))
 
-    def __getitem__(self, key: CoreOpcode | Var | Program) -> Var:
-        return self._concat_program(loop(self._ref, _opcode_to_uniform_program(key)))
+    def __sub__(self, value: Value) -> Var:
+        return self.__add__(-value)
+
+    def __getitem__(self, key: CoreOpcode | Var | Program | tuple[Var]) -> Var:
+        return self._concat_program(loop(self._ref, _to_program(key)))
 
     def output(self) -> Var:
         return self._concat_program(output(self._ref))
@@ -35,14 +39,15 @@ class Var:
     def input(self) -> Var:
         return self._concat_program(input(self._ref))
 
-    def __call__(self, code: str, exit: Ref) -> Var:
+    def __call__(self, code: str, exit: Ref | None = None) -> Var:
+        exit = self._ref if exit is None else exit
         return self._concat_program(inject(self._ref, code, exit))
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return f"{type(self).__name__}( {self._name or self._ref} )"
 
     def build(self) -> Program:
-        return self.program
+        return self._program
 
     def _concat_program(self, other: Program | CoreOpcode | Var) -> Var:
-        return Var(self._ref, self._name, [self._ref, *_opcode_to_uniform_program(other)])
+        return Var(self._ref, self._name, [*self._program, *_to_program(other)])
