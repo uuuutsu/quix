@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable
 from typing import Any, ClassVar, Protocol
 
 type OpcodeFactory[**P, O: Opcode] = Callable[P, O]
@@ -14,4 +14,4 @@ class Opcode(Protocol):
         raise NotImplementedError
 
 
-class Program[O: Opcode](Protocol, Iterator[O]): ...
+class Program[O: Opcode](Protocol, Iterable[O]): ...
