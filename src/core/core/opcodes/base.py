@@ -1,0 +1,43 @@
+import inspect
+from functools import wraps
+from typing import Any, Callable, ClassVar, override
+
+from core.interfaces import Opcode
+from core.interfaces.opcode import OpcodeFactory
+from core.utils import camel_case_to_snake_case, snake_case_to_camel_case
+
+
+class CoreOpcode(Opcode):
+    __slots__ = ("_args",)
+
+    __id__: ClassVar[str]
+
+    def __init_subclass__(cls) -> None:
+        if not hasattr(cls, "__id__"):
+            cls.__id__ = camel_case_to_snake_case(cls.__name__)
+
+    def __init__(self, args: dict[str, Any]) -> None:
+        self._args = args
+
+    @override
+    def args(self) -> dict[str, Any]:
+        return self._args
+
+    def __str__(self) -> str:
+        return f"Opcode:{self.__id__}{self._args}"
+
+
+def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
+    new_opcode_cls = type(
+        snake_case_to_camel_case(func.__name__),
+        (CoreOpcode,),
+        {"__id__": func.__name__},
+    )
+    signature = inspect.signature(func)
+
+    @wraps(func)
+    def create(*args: P.args, **kwargs: P.kwargs) -> Opcode:
+        func(*args, **kwargs)
+        return new_opcode_cls(signature.bind(*args, **kwargs))
+
+    return create

@@ -1,4 +1,10 @@
-__all__ = ("Opcode",)
+__all__ = (
+    "Opcode",
+    "OpcodeFactory",
+    "Program",
+    "Visitor",
+)
 
 
-from .opcode import Opcode
+from .opcode import Opcode, OpcodeFactory, Program
+from .visitor import Visitor
