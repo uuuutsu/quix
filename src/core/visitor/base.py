@@ -17,21 +17,21 @@ class CoreVisitor(Visitor[CoreOpcode]):
             return method(**opcode.args())
 
     @abstractmethod
-    def add(ptr: Ptr, value: Value) -> None:
+    def add(self, ptr: Ptr, value: Value) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def input(ptr: Ptr) -> None:
+    def input(self, ptr: Ptr) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def output(ptr: Ptr) -> None:
+    def output(self, ptr: Ptr) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def loop(ptr: Ptr, program: Program) -> None:
+    def loop(self, ptr: Ptr, program: Program) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def inject(ptr: Ptr, code: Code, exit: Ptr) -> None:
+    def inject(self, ptr: Ptr, code: Code, exit: Ptr) -> None:
         raise NotImplementedError

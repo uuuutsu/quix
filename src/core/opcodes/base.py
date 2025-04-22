@@ -1,6 +1,7 @@
 import inspect
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, ClassVar, override
+from typing import Any, ClassVar, override
 
 from core.interfaces import Opcode
 from core.interfaces.opcode import OpcodeFactory
