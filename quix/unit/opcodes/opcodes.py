@@ -1,0 +1,83 @@
+from quix.core.opcodes.dtypes import Ref, Value
+
+from .base import opcode
+from .dtypes import Program
+
+# base
+
+
+@opcode
+def move(from_: list[Ref], to: list[tuple[Ref, int]]) -> None: ...
+@opcode
+def copy(from_: list[Ref], to: list[Ref]) -> None: ...
+@opcode
+def assign(from_: list[Ref], to: list[Ref | Value]) -> None: ...
+@opcode
+def clear(value: list[Ref]) -> None: ...
+@opcode
+def free(value: Ref) -> None: ...
+
+
+# array
+
+
+@opcode
+def arr_store(anchor: Ref, offset: list[Ref | Value], value: list[Ref | Value]) -> None: ...
+@opcode
+def arr_load(anchor: Ref, offset: list[Ref | Value], target: list[Ref]) -> None: ...
+@opcode
+def arr_move(anchor: Ref, from_offset: list[Ref | Value], to_offset: list[Ref | Value]) -> None: ...
+
+
+# arithmetic
+
+
+@opcode
+def add(left: list[Ref | Value], right: list[Ref | Value], target: list[Ref]) -> None: ...
+@opcode
+def sub(left: list[Ref | Value], right: list[Ref | Value], target: list[Ref]) -> None: ...
+@opcode
+def mul(left: list[Ref | Value], right: list[Ref | Value], target: list[Ref]) -> None: ...
+@opcode
+def divmod(left: list[Ref | Value], right: list[Ref | Value], remainder: list[Ref], quotient: list[Ref]) -> None: ...
+@opcode
+def pow(left: list[Ref | Value], right: list[Ref | Value], target: list[Ref]) -> None: ...
+
+
+# binary
+
+
+@opcode
+def and_(left: Ref | Value, right: Ref | Value, target: Ref) -> None: ...
+@opcode
+def or_(left: Ref | Value, right: Ref | Value, target: Ref) -> None: ...
+@opcode
+def xor(left: Ref | Value, right: Ref | Value, target: Ref) -> None: ...
+@opcode
+def not_(left: Ref | Value, target: Ref) -> None: ...
+
+
+# conditions
+
+
+@opcode
+def call_z(left: Ref, if_: Program, else_: Program) -> None: ...
+@opcode
+def call_eq(left: Ref, if_: Program, else_: Program) -> None: ...
+@opcode
+def call_ge(left: Ref, if_: Program, else_: Program) -> None: ...
+@opcode
+def call_gt(left: Ref, if_: Program, else_: Program) -> None: ...
+@opcode
+def call_le(left: Ref, if_: Program, else_: Program) -> None: ...
+@opcode
+def call_lt(left: Ref, if_: Program, else_: Program) -> None: ...
+
+
+# I/O
+
+
+@opcode
+def input(left: list[Ref] | str) -> None: ...
+@opcode
+def output(left: list[Ref] | str) -> None: ...

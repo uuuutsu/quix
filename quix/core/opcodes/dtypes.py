@@ -4,7 +4,8 @@ __all__ = (
     "Program",
 )
 from quix.core.interfaces import Program as _Program
-from quix.core.opcodes.base import CoreOpcode
+
+from .base import CoreOpcode
 
 type Ref = int
 type Value = int
