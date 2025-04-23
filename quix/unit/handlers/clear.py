@@ -14,4 +14,4 @@ def clear_unit(value: Unit) -> ToConvert:
     return value.to_var()("[-]")
 
 
-clear = dp_factory("clear") | clear_wide | clear_unit
+clear = dp_factory("clear", clear_wide) | clear_unit

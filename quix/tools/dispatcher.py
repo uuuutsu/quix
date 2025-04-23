@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, NoReturn
+from typing import Any
 
 from multimethod import multidispatch, multimethod
-
-
-def _dummy() -> NoReturn:
-    raise NotImplementedError("https://media.tenor.com/GNAQm8mZEPgAAAAM/oppenheimer-cillian-murphy.gif")
 
 
 class DynamicOverload[**P, R]:
@@ -15,33 +11,30 @@ class DynamicOverload[**P, R]:
 
     def __init__(
         self,
-        func: Callable[P, R] | None = None,
+        func: Callable[P, R],
         *,
         dp: multimethod | None = None,
     ) -> None:
-        if dp is None:
-            self._dispatcher = multidispatch(func or _dummy)
-            return
-
-        self._dispatcher = dp
-        dp.register(func or _dummy)
+        self._dispatcher = dp or multidispatch(func)
+        self._dispatcher.register(func)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        return self._dispatcher(*args, **kwargs)
+        return self._dispatcher(*args, **kwargs)  # type: ignore
 
     def __or__[**P_new, R_new](
         self,
         other: Callable[P_new, R_new] | DynamicOverload[P_new, R_new],
-    ) -> DynamicOverload[P, R] | DynamicOverload[P_new, R_new]:
+    ) -> DynamicOverload[P_new, R_new] | DynamicOverload[P, R]:
         return type(self)(other, dp=self._dispatcher)  # type: ignore
 
 
 def dp_factory[**P, R](
     name: str,
+    func: Callable[P, R],
     *,
     decs: list[Callable[[Callable[..., Any]], Callable[P, R]]] | None = None,
-) -> DynamicOverload[[], NoReturn]:
-    dp = multidispatch(_dummy)
+) -> DynamicOverload[P, R]:
+    dp = multidispatch(func)
 
     dp.__name__ = name
     old_register = dp.register
@@ -52,4 +45,4 @@ def dp_factory[**P, R](
         return old_register(func)
 
     dp.register = _new_register  # type: ignore
-    return DynamicOverload(_dummy, dp=dp)
+    return DynamicOverload(func, dp=dp)
