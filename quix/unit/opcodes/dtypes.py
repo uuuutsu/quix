@@ -1,6 +1,6 @@
-__all__ = ("Program",)
-from quix.core.interfaces import Program as _Program
+__all__ = ("UnitProgram",)
+from quix.core.interfaces import Program
 
 from .base import UnitOpcode
 
-type Program = _Program[UnitOpcode]
+type UnitProgram = Program[UnitOpcode]

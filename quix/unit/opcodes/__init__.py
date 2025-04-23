@@ -1,5 +1,5 @@
 __all__ = (
-    "Program",
+    "UnitProgram",
     "move",
     "copy",
     "assign",
@@ -26,7 +26,7 @@ __all__ = (
     "output",
 )
 
-from .dtypes import Program
+from .dtypes import UnitProgram
 from .opcodes import (
     add,
     and_,

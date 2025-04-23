@@ -3,7 +3,7 @@ from typing import override
 
 from quix.core.interfaces.visitor import Visitor
 from quix.core.opcodes import CoreOpcode
-from quix.core.opcodes.dtypes import Code, Program, Ref, Value
+from quix.core.opcodes.dtypes import Code, CoreProgram, Ref, Value
 from quix.exceptions.core import NoHandlerFoundException
 
 
@@ -11,7 +11,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
     __slots__ = ()
 
     @override
-    def visit(self, program: Program) -> None:
+    def visit(self, program: CoreProgram) -> None:
         for opcode in program:
             if (method := getattr(self, opcode.__id__, None)) is None:
                 raise NoHandlerFoundException(opcode, self)
@@ -31,7 +31,7 @@ class CoreVisitor(Visitor[CoreOpcode]):
         raise NotImplementedError
 
     @abstractmethod
-    def loop(self, ref: Ref, program: Program) -> None:
+    def loop(self, ref: Ref, program: CoreProgram) -> None:
         raise NotImplementedError
 
     @abstractmethod

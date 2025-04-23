@@ -3,14 +3,14 @@ from __future__ import annotations
 from typing import overload
 
 from quix.core.opcodes.base import CoreOpcode
-from quix.core.opcodes.dtypes import Program, Ref, Value
+from quix.core.opcodes.dtypes import CoreProgram, Ref, Value
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
 from quix.tools import generate_unique_id
 
-type ReducibleToProgram = CoreOpcode | Program | Var | tuple[Var]
+type ReducibleToProgram = CoreOpcode | CoreProgram | Var | tuple[Var]
 
 
-def _to_program(value: ReducibleToProgram, /) -> Program:
+def _to_program(value: ReducibleToProgram, /) -> CoreProgram:
     match value:
         case CoreOpcode():
             return [value]
@@ -24,10 +24,15 @@ def _to_program(value: ReducibleToProgram, /) -> Program:
 class Var:
     __slots__ = "_ref", "_program", "_name"
 
-    def __init__(self, ref: Ref, name: str | None = None, program: Program | None = None) -> None:
+    def __init__(
+        self,
+        ref: Ref,
+        name: str | None = None,
+        program: CoreProgram | None = None,
+    ) -> None:
         self._ref = ref
         self._name = name
-        self._program: Program = program or []
+        self._program: CoreProgram = program or []
 
     def __add__(self, value: Value) -> Var:
         return self._concat_program(add(self._ref, value))
@@ -51,7 +56,7 @@ class Var:
     def __repr__(self) -> str:
         return f"{type(self).__name__}( {self._name or self._ref} )"
 
-    def build(self) -> Program:
+    def build(self) -> CoreProgram:
         return self._program
 
     def _concat_program(self, other: ReducibleToProgram) -> Var:

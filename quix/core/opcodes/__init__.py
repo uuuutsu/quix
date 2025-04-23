@@ -6,11 +6,11 @@ __all__ = (
     "loop",
     "inject",
     "Ref",
-    "Program",
+    "CoreProgram",
     "Value",
     "Code",
 )
 
 from .base import CoreOpcode
-from .dtypes import Code, Program, Ref, Value
+from .dtypes import Code, CoreProgram, Ref, Value
 from .opcodes import add, inject, input, loop, output
