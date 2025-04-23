@@ -7,7 +7,7 @@ from rich.repr import Result, rich_repr
 from quix.core.interfaces.opcode import Opcode, Program
 from quix.core.var import Var
 
-type ToConvert = Program[Opcode] | None | Opcode | Iterable[ToConvert] | SmartProgram | Var
+type ToConvert = Program[Opcode] | None | Opcode | SmartProgram | Var | Iterable[ToConvert]
 
 
 @rich_repr

@@ -6,7 +6,7 @@ from .utils import ToConvert, handler
 
 @handler
 def clear_wide(value: Wide) -> ToConvert:
-    return [clear_unit(unit) for unit in value]
+    return [clear_unit(unit) for unit in set(value)]
 
 
 @handler
