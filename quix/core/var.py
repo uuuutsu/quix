@@ -7,8 +7,10 @@ from quix.core.opcodes.dtypes import Program, Ref, Value
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
 from quix.tools import generate_unique_id
 
+type ReducibleToProgram = CoreOpcode | Program | Var | tuple[Var]
 
-def _to_program(value: CoreOpcode | Program | Var | tuple[Var], /) -> Program:
+
+def _to_program(value: ReducibleToProgram, /) -> Program:
     match value:
         case CoreOpcode():
             return [value]
@@ -33,7 +35,7 @@ class Var:
     def __sub__(self, value: Value) -> Var:
         return self.__add__(-value)
 
-    def __getitem__(self, key: CoreOpcode | Var | Program | tuple[Var]) -> Var:
+    def __getitem__(self, key: ReducibleToProgram) -> Var:
         return self._concat_program(loop(self._ref, _to_program(key)))
 
     def output(self) -> Var:
@@ -52,7 +54,7 @@ class Var:
     def build(self) -> Program:
         return self._program
 
-    def _concat_program(self, other: Program | CoreOpcode | Var) -> Var:
+    def _concat_program(self, other: ReducibleToProgram) -> Var:
         return Var(self._ref, self._name, [*self._program, *_to_program(other)])
 
 
