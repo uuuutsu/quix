@@ -32,6 +32,7 @@ __all__ = (
     "call_lt",
     "input",
     "output",
+    "unit",
 )
 
 from .dtypes import Anchor, IOValue, Literal, UnitProgram, Value, Wide, WideLiteral
@@ -61,4 +62,4 @@ from .opcodes import (
     sub,
     xor,
 )
-from .unit import Unit
+from .unit import Unit, unit

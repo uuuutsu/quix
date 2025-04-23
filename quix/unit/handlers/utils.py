@@ -34,14 +34,12 @@ def _to_program(data: ToConvert) -> SmartProgram:
             return data
         case None:
             return SmartProgram()
-        case Program():
-            return SmartProgram(list(*data))
         case Opcode():
             return SmartProgram([data])
         case Iterable():
-            program = []
+            program: list[Opcode] = []
             for value in data:
-                program.extend(*_to_program(value)._program)
+                program.extend(_to_program(value)._program)
             return SmartProgram(program)
         case _:
             raise ValueError(f"Trying to cast an unsupported data to OpCodeReturn. {type(data).__name__}: {data}")

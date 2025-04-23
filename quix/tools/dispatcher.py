@@ -15,18 +15,19 @@ class DynamicOverload[**P, R]:
 
     def __init__(
         self,
-        func: Callable[P, R],
+        func: Callable[P, R] | None = None,
         *,
         dp: multimethod | None = None,
     ) -> None:
-        if dp is not None:
-            self._dispatcher = dp
+        if dp is None:
+            self._dispatcher = multidispatch(func or _dummy)
             return
 
-        self._dispatcher = multidispatch(func)
+        self._dispatcher = dp
+        dp.register(func or _dummy)
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        return self._dispatcher(*args, **kwargs)  # type: ignore
+        return self._dispatcher(*args, **kwargs)
 
     def __or__[**P_new, R_new](
         self,

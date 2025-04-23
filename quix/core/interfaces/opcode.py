@@ -15,5 +15,4 @@ class Opcode(Protocol):
         raise NotImplementedError
 
 
-@runtime_checkable
 class Program[O: Opcode](Protocol, Iterable[O]): ...
