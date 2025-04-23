@@ -1,6 +1,6 @@
 from io import StringIO
 
-from quix.core.opcodes.dtypes import Program
+from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
 from quix.core.visitor.bf import BFVisitor
 from quix.core.visitor.bf.layout import BFMemoryLayout
@@ -33,7 +33,7 @@ def test_inject() -> None:
     assert compile([inject(3, "(-_-)", 0), inject(3, "#", 0)], L({3: 4, 0: 2})) == ">>>>(-_-)>>#"
 
 
-def compile(program: Program, layout: BFMemoryLayout) -> str:
+def compile(program: CoreProgram, layout: BFMemoryLayout) -> str:
     buff = StringIO()
     BFVisitor(buff, BFPointer(layout)).visit(program)
     return buff.getvalue()

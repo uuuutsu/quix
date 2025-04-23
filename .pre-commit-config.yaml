@@ -1,0 +1,45 @@
+fail_fast: true
+
+repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.16
+    hooks:
+      - id: uv-lock
+      - id: uv-export
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        entry: uv run mypy
+        args: 
+          - "--config-file"
+          - "pyproject.toml"
+        types: [python]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.6
+    hooks:
+      - id: ruff-format
+        entry: uv run ruff format
+        args: 
+          - "--config"
+          - "pyproject.toml"
+        types: [python]
+        language: system
+      - id: ruff
+        entry: uv run ruff check
+        args:
+          - "--config"
+          - "pyproject.toml"
+        types: [python]
+
+  - repo: https://github.com/christophmeissner/pytest-pre-commit
+    rev: 1.0.0
+    hooks:
+    - id: pytest
+      entry: uv run -m pytest
+      pass_filenames: false
+      always_run: true
+      args:
+        - "-vs"

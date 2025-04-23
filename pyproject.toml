@@ -1,6 +1,6 @@
 [project]
 dependencies = [
-    "rich>=14.0.0",
+  "rich>=14.0.0",
 ]
 description = "Add your description here"
 name = "quix"
@@ -11,6 +11,7 @@ version = "0.1.0"
 [dependency-groups]
 dev = [
   "mypy>=1.15.0",
+  "pre-commit>=4.2.0",
   "pytest>=8.3.5",
   "ruff>=0.11.6",
 ]
@@ -24,6 +25,7 @@ disallow_subclassing_any = false
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
+exclude = ".venv"
 follow_imports_for_stubs = true
 ignore_missing_imports = false
 namespace_packages = true

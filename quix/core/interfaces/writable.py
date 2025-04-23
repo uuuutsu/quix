@@ -6,5 +6,5 @@ class Writable(Protocol):
     __slots__ = ()
 
     @abstractmethod
-    def write(self, __value: str, /) -> None:
+    def write(self, __value: str, /) -> int:
         raise NotImplementedError
