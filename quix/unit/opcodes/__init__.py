@@ -1,5 +1,13 @@
 __all__ = (
     "UnitProgram",
+    "UnitProgram",
+    "Wide",
+    "Literal",
+    "WideLiteral",
+    "Anchor",
+    "IOValue",
+    "Unit",
+    "Value",
     "move",
     "copy",
     "assign",
@@ -26,7 +34,7 @@ __all__ = (
     "output",
 )
 
-from .dtypes import UnitProgram
+from .dtypes import Anchor, IOValue, Literal, Unit, UnitProgram, Value, Wide, WideLiteral
 from .opcodes import (
     add,
     and_,
