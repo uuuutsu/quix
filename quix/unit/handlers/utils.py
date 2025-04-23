@@ -5,8 +5,9 @@ from typing import Self
 from rich.repr import Result, rich_repr
 
 from quix.core.interfaces.opcode import Opcode, Program
+from quix.core.var import Var
 
-type ToConvert = Program[Opcode] | None | Opcode | Iterable[ToConvert] | SmartProgram
+type ToConvert = Program[Opcode] | None | Opcode | Iterable[ToConvert] | SmartProgram | Var
 
 
 @rich_repr
@@ -34,6 +35,8 @@ def _to_program(data: ToConvert) -> SmartProgram:
             return data
         case None:
             return SmartProgram()
+        case Var():
+            return SmartProgram(list(data.build()))
         case Opcode():
             return SmartProgram([data])
         case Iterable():

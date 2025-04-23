@@ -11,7 +11,7 @@ def clear_wide(value: Wide) -> ToConvert:
 
 @handler
 def clear_unit(value: Unit) -> ToConvert:
-    return value.to_var()("[-]").build()
+    return value.to_var()("[-]")
 
 
 clear = dp_factory("clear") | clear_wide | clear_unit
