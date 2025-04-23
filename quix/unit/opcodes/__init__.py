@@ -34,7 +34,7 @@ __all__ = (
     "output",
 )
 
-from .dtypes import Anchor, IOValue, Literal, Unit, UnitProgram, Value, Wide, WideLiteral
+from .dtypes import Anchor, IOValue, Literal, UnitProgram, Value, Wide, WideLiteral
 from .opcodes import (
     add,
     and_,
@@ -61,3 +61,4 @@ from .opcodes import (
     sub,
     xor,
 )
+from .unit import Unit

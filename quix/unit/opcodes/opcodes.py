@@ -1,5 +1,6 @@
 from .base import opcode
-from .dtypes import Anchor, IOValue, Literal, Unit, UnitProgram, Value, Wide, WideLiteral
+from .dtypes import Anchor, IOValue, Literal, UnitProgram, Value, Wide, WideLiteral
+from .unit import Unit
 
 # base
 
@@ -11,7 +12,7 @@ def copy(from_: Wide, to: Wide) -> None: ...
 @opcode
 def assign(from_: Wide, to: WideLiteral) -> None: ...
 @opcode
-def clear(value: Wide) -> None: ...
+def clear(value: Wide | Unit) -> None: ...
 
 
 # array

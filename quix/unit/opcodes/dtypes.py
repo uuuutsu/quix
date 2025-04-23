@@ -1,12 +1,11 @@
 __all__ = ("UnitProgram",)
 
-from collections.abc import Hashable
 
 from quix.core.interfaces import Program
 
 from .base import UnitOpcode
+from .unit import Unit
 
-type Unit = Hashable
 type Value = int
 type UnitProgram = Program[UnitOpcode]
 type Wide = list[Unit]

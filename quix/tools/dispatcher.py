@@ -38,7 +38,7 @@ class DynamicOverload[**P, R]:
 def dp_factory[**P, R](
     name: str,
     *,
-    decs: list[Callable[[Callable[..., Any]], Callable[P, R]]],
+    decs: list[Callable[[Callable[..., Any]], Callable[P, R]]] | None = None,
 ) -> DynamicOverload[[], NoReturn]:
     dp = multidispatch(_dummy)
 
@@ -46,7 +46,7 @@ def dp_factory[**P, R](
     old_register = dp.register
 
     def _new_register(func: Callable[P, R]) -> Callable[P, R]:
-        for dec in decs:
+        for dec in decs or []:
             func = dec(func)
         return old_register(func)
 
