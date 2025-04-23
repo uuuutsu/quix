@@ -16,6 +16,7 @@ repos:
           - "--config-file"
           - "pyproject.toml"
         types: [python]
+        language: system
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.6
@@ -33,13 +34,15 @@ repos:
           - "--config"
           - "pyproject.toml"
         types: [python]
+        language: system
 
   - repo: https://github.com/christophmeissner/pytest-pre-commit
     rev: 1.0.0
     hooks:
-    - id: pytest
-      entry: uv run -m pytest
-      pass_filenames: false
-      always_run: true
-      args:
-        - "-vs"
+      - id: pytest
+        entry: uv run -m pytest
+        pass_filenames: false
+        always_run: true
+        args:
+          - "-vs"
+        language: system
