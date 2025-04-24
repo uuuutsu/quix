@@ -26,3 +26,6 @@ class Blueprint:
         for constr in self.constraints:
             owners.update(constr.get_owners())
         return owners
+
+    def get_constraint_types(self) -> set[type[BaseConstraint]]:
+        return {type(constr) for constr in self.constraints}
