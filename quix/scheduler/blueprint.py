@@ -15,7 +15,7 @@ class Blueprint:
 
     def __init__(self, root: Owner) -> None:
         self.root = root
-        self.hierarchy: dict[Owner, set[Owner]] = {}
+        self.hierarchy: dict[Owner, set[Owner]] = {root: set()}
         self.constraints: dict[Owner, set[BaseConstraint]] = {}
         self.signature: set[type[BaseConstraint]] = set()
 
@@ -35,8 +35,11 @@ class Blueprint:
 
         return self
 
-    def get_related_owners(self) -> set[Owner]:
+    def get_owners(self) -> set[Owner]:
         return set(self.hierarchy.keys())
 
     def get_domain(self) -> set[type[BaseConstraint]]:
         return self.signature
+
+    def get_constraints(self, owner: Owner) -> set[BaseConstraint]:
+        return self.constraints[owner]

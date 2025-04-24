@@ -1,12 +1,15 @@
 from abc import abstractmethod
-from typing import Protocol
+from typing import ClassVar, Protocol
 
 from quix.scheduler.blueprint import Blueprint
+from quix.scheduler.constraints import BaseConstraint
 from quix.scheduler.layout import Layout
 
 
 class Resolver(Protocol):
     __slots__ = ()
+
+    __signature__: ClassVar[set[type[BaseConstraint]]]
 
     @abstractmethod
     def __call__(self, blueprint: Blueprint) -> Layout:
