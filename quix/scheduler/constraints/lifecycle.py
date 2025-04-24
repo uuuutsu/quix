@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import override
 
 from quix.scheduler.owner import Owner
 
@@ -10,5 +11,6 @@ class LifeCycle(BaseConstraint):
     start: int
     end: int
 
+    @override
     def get_owners(self) -> set[Owner]:
         return set()

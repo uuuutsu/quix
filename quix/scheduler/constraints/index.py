@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import override
 
 from quix.scheduler.owner import Owner
 
@@ -9,5 +10,6 @@ from .base import BaseConstraint
 class Index(BaseConstraint):
     index: int
 
+    @override
     def get_owners(self) -> set[Owner]:
         return set()
