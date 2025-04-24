@@ -1,2 +1,6 @@
-__all__ = ("Resolver",)
+__all__ = (
+    "Resolver",
+    "PrimitiveResolver",
+)
 from .base import Resolver
+from .primitive import PrimitiveResolver
