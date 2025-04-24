@@ -17,3 +17,6 @@ class Owner:
         if not isinstance(value, Owner):
             return False
         return self._ref == value._ref
+
+    def __repr__(self) -> str:
+        return f"Owner( {self._name or self._ref} )"
