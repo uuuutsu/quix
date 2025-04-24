@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from typing import Self
 
 from quix.scheduler.owner import Owner
@@ -17,7 +16,7 @@ class Blueprint:
     def __init__(self, root: Owner) -> None:
         self.root = root
         self.hierarchy: dict[Owner, set[Owner]] = {root: set()}
-        self._constraints: dict[Owner, set[BaseConstraint]] = {}
+        self._constraints: dict[Owner, set[BaseConstraint]] = {root: set()}
         self.signature: set[type[BaseConstraint]] = set()
 
     def add_constraint(self, owner: Owner, constr: BaseConstraint) -> Self:
@@ -44,6 +43,3 @@ class Blueprint:
 
     def get_constraints(self, owner: Owner) -> set[BaseConstraint]:
         return self._constraints[owner]
-
-    def owner_to_constraints(self) -> Iterable[tuple[Owner, set[BaseConstraint]]]:
-        return self._constraints.items()

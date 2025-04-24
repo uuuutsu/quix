@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from rich.pretty import pretty_repr
 
 from .owner import Owner
 
@@ -15,18 +15,15 @@ class Layout:
         self._reverse_mapping: dict[int, list[Owner]] = {}
         self.absolute = absolute
 
-    def __setitem__(self, key: Owner, value: int) -> None:
+    def set(self, key: Owner, value: int) -> None:
         self._mapping[key] = value
         self._reverse_mapping.setdefault(value, []).append(key)
 
-    def __getitem__(self, key: Owner) -> int:
+    def get_by_owner(self, key: Owner) -> int:
         return self._mapping[key]
 
     def get_by_idx(self, value: int) -> list[Owner]:
         return self._reverse_mapping[value]
 
-    def __contains__(self, item: Owner) -> bool:
-        return item in self._mapping
-
-    def items(self) -> Iterable[tuple[Owner, int]]:
-        return self._mapping.items()
+    def __repr__(self) -> str:
+        return pretty_repr(self._mapping)

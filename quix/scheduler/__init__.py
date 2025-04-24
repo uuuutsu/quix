@@ -6,6 +6,7 @@ __all__ = (
     "Index",
     "LifeCycle",
     "Resolver",
+    "PrimitiveResolver",
 )
 
 
@@ -13,4 +14,4 @@ from .blueprint import Blueprint
 from .constraints import BaseConstraint, Index, LifeCycle
 from .layout import Layout
 from .owner import Owner
-from .resolvers import Resolver
+from .resolvers import PrimitiveResolver, Resolver
