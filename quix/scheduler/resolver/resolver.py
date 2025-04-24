@@ -24,8 +24,15 @@ class Resolver:
             for key, handler in self._tile_handlers.items():
                 if set(key) == signature:
                     groups.append(handler(list(bps)))
-
+                    break
+            else:
+                raise RuntimeError(f"No handler found for contraint set: {signature}")
         return groups
 
     def add_handler(self, constraints: tuple[type[BaseConstraint], ...], handler: Handler) -> None:
         self._tile_handlers[constraints] = handler
+
+
+def create_resolver() -> Resolver:
+    resolver = Resolver()
+    return resolver

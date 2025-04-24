@@ -9,3 +9,6 @@ class BaseConstraint(ABC):
     @abstractmethod
     def get_owners(self) -> set[Owner]:
         raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return type(self).__name__
