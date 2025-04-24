@@ -9,23 +9,34 @@ class Blueprint:
     __slots__ = (
         "root",
         "constraints",
+        "hierarchy",
+        "signature",
     )
 
     def __init__(self, root: Owner) -> None:
         self.root = root
-        self.constraints: list[BaseConstraint] = []
+        self.hierarchy: dict[Owner, set[Owner]] = {}
+        self.constraints: dict[Owner, set[BaseConstraint]] = {}
+        self.signature: set[type[BaseConstraint]] = set()
 
-    def add_constraint(self, constr: BaseConstraint) -> Self:
-        self.constraints.append(constr)
+    def add_constraint(self, owner: Owner, constr: BaseConstraint) -> Self:
+        if owner not in self.hierarchy:
+            raise RuntimeError(
+                f"Owner {owner} has not been seen in the blueprint yet.Build the blueprint from the root."
+            )
+
+        self.constraints.setdefault(owner, set()).add(constr)
+        self.signature.add(type(constr))
+
+        owners = constr.get_owners()
+        self.hierarchy[owner].update(owners)
+        for new_owner in owners:
+            self.hierarchy[new_owner] = set()
+
         return self
 
-    def get_owners(self) -> set[Owner]:
-        owners = {
-            self.root,
-        }
-        for constr in self.constraints:
-            owners.update(constr.get_owners())
-        return owners
+    def get_related_owners(self) -> set[Owner]:
+        return set(self.hierarchy.keys())
 
-    def get_constraint_types(self) -> set[type[BaseConstraint]]:
-        return {type(constr) for constr in self.constraints}
+    def get_domain(self) -> set[type[BaseConstraint]]:
+        return self.signature
