@@ -7,7 +7,7 @@ from quix.core.opcodes.dtypes import CoreProgram, Ref, Value
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
 from quix.tools import generate_unique_id
 
-type ReducibleToProgram = CoreOpcode | CoreProgram | Var | tuple[Var]
+type ReducibleToProgram = CoreOpcode | CoreProgram | Var | tuple[Var, ...]
 
 
 def _to_program(value: ReducibleToProgram, /) -> CoreProgram:
@@ -17,7 +17,10 @@ def _to_program(value: ReducibleToProgram, /) -> CoreProgram:
         case Var():
             return value._program
         case tuple():
-            return sum((var._program for var in value), start=[])
+            program: list[CoreOpcode] = []
+            for var in value:
+                program.extend(var._program)
+            return program
     return value
 
 
