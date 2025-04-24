@@ -1,9 +1,11 @@
-from collections.abc import Hashable
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
 
-type Owner = Hashable
+from quix.scheduler.owner import Owner
 
 
-@dataclass(slots=True, frozen=True)
-class BaseConstraint:
-    owner: Owner
+class BaseConstraint(ABC):
+    __slots__ = ()
+
+    @abstractmethod
+    def get_owners(self) -> set[Owner]:
+        raise NotImplementedError
