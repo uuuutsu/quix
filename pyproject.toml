@@ -1,5 +1,6 @@
 [project]
 dependencies = [
+  "mip>=1.15.0",
   "multimethod>=2.0",
   "rich>=14.0.0",
 ]
@@ -65,4 +66,5 @@ unfixable = ["F841"]
 unsafe-fixes = true
 
 [tool.pytest.ini_options]
+norecursedirs = "dev/*"
 python_files = "tests/*.py"
