@@ -18,7 +18,6 @@ class MIPResolver(Resolver):
     @override
     def __call__(self, blueprint: Blueprint) -> Layout:
         model = Model()
-        layout = Layout(Index in blueprint.domain)
 
         for owner in blueprint.get_owners():
             model.add_var(owner)
@@ -29,7 +28,4 @@ class MIPResolver(Resolver):
         expr_links(mappers.get(HardLink, {}), mappers.get(SoftLink, {}), model)  # type: ignore
 
         model.optimize()
-        for owner, index in model.get_mapping().items():
-            layout.set(owner, index)
-
-        return layout
+        return Layout(blueprint, model.get_mapping(), Index in mappers)
