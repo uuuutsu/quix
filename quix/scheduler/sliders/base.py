@@ -5,7 +5,7 @@ from quix.scheduler.constraints import BaseConstraint
 from quix.scheduler.layout import Layout
 
 
-class Combinator(Protocol):
+class Slider(Protocol):
     __slots__ = ()
 
     __domain__: ClassVar[set[type[BaseConstraint]]]

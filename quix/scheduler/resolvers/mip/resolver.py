@@ -4,10 +4,10 @@ from quix.scheduler.blueprint import Blueprint
 from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.scheduler.layout import Layout
 from quix.scheduler.resolvers.base import Resolver
+from quix.scheduler.utils import get_constraint_mappers
 
 from .exprs import expr_index, expr_lifecycle, expr_links
 from .model import Model
-from .utils import get_constraint_mappers
 
 
 class MIPResolver(Resolver):
@@ -28,4 +28,4 @@ class MIPResolver(Resolver):
         expr_links(mappers.get(HardLink, {}), mappers.get(SoftLink, {}), model)  # type: ignore
 
         model.optimize()
-        return Layout(blueprint, model.get_mapping(), Index in mappers)
+        return Layout(blueprint, model.get_mapping())

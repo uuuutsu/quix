@@ -92,4 +92,4 @@ class PrimitiveResolver(Resolver):
                     break
                 index += 1
 
-        return Layout(blueprint, mapping, len(arrays) > 0)
+        return Layout(blueprint, mapping)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from typing import Self
 
@@ -12,8 +14,8 @@ class Blueprint:
         "domain",
     )
 
-    def __init__(self, root: Owner) -> None:
-        self.constraints: dict[Owner, list[BaseConstraint]] = {root: []}
+    def __init__(self) -> None:
+        self.constraints: dict[Owner, list[BaseConstraint]] = {}
         self.domain: set[type[BaseConstraint]] = set()
 
     def add_constraint(self, owner: Owner, constr: BaseConstraint) -> Self:
@@ -27,6 +29,12 @@ class Blueprint:
 
     def get_owners(self) -> set[Owner]:
         return set(self.constraints.keys())
+
+    def combine(self, other: Blueprint) -> Blueprint:
+        new_bp = Blueprint()
+        new_bp.constraints = self.constraints | other.constraints
+        new_bp.domain = self.domain | other.domain
+        return new_bp
 
     def get_constraints(self, owner: Owner) -> list[BaseConstraint]:
         return self.constraints[owner]

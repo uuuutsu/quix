@@ -1,10 +1,10 @@
 from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.scheduler.layout import Layout
 
-from .base import Combinator
+from .base import Slider
 
 
-class SimpleCombinator(Combinator):
+class SimpleSlider(Slider):
     __slots__ = ()
 
     __domain__ = {Index, SoftLink, HardLink, Array, LifeCycle}
