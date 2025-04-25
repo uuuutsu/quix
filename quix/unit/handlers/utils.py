@@ -6,21 +6,33 @@ from rich.repr import Result, rich_repr
 
 from quix.core.interfaces.opcode import Opcode, Program
 from quix.core.var import Var
+from quix.scheduler.blueprint import Blueprint
 
-type ToConvert = Program[Opcode] | None | Opcode | SmartProgram | Var | Iterable[ToConvert]
+type ToConvert = Program[Opcode] | None | Opcode | SmartProgram | Var | Blueprint | Iterable[ToConvert]
 
 
 @rich_repr
 class SmartProgram:
-    __slots__ = ("program",)
-    program: list[Opcode]
+    __slots__ = (
+        "program",
+        "bps",
+    )
 
-    def __init__(self, program: list[Opcode] | None = None) -> None:
+    program: list[Opcode]
+    bps: list[Blueprint]
+
+    def __init__(
+        self,
+        program: list[Opcode] | None = None,
+        bps: list[Blueprint] | None = None,
+    ) -> None:
         self.program = program or []
+        self.bps = bps or []
 
     def __or__(self, other: ToConvert) -> Self:
         if isinstance(other, SmartProgram):
             self.program.extend(other.program)
+            self.bps.extend(other.bps)
             return self
 
         return self | _to_program(other)
@@ -39,6 +51,8 @@ def _to_program(data: ToConvert) -> SmartProgram:
             return SmartProgram(list(data.build()))
         case Opcode():
             return SmartProgram([data])
+        case Blueprint():
+            return SmartProgram([], [data])
         case Iterable():
             program: list[Opcode] = []
             for value in data:
