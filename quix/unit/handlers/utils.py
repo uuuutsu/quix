@@ -55,9 +55,12 @@ def _to_program(data: ToConvert) -> SmartProgram:
             return SmartProgram([], [data])
         case Iterable():
             program: list[Opcode] = []
+            bps: list[Blueprint] = []
             for value in data:
-                program.extend(_to_program(value).program)
-            return SmartProgram(program)
+                new = _to_program(value)
+                program.extend(new.program)
+                bps.extend(new.bps)
+            return SmartProgram(program, bps)
         case _:
             raise ValueError(f"Trying to cast an unsupported data to OpCodeReturn. {type(data).__name__}: {data}")
 
