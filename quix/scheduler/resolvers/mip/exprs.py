@@ -7,13 +7,23 @@ from .model import Model
 from .utils import intervals_intersects
 
 
-def expr_index(owner2constr: dict[Owner, Index], model: Model) -> None:
-    for owner, constr in owner2constr.items():
+def expr_index(owner2constr: dict[Owner, list[Index]], model: Model) -> None:
+    for owner, (constr, *_) in owner2constr.items():
+        if len(_) > 0:
+            raise ValueError(f"At most one `{Index}` constraint is allowed for each owner.")
         model.add_constr(model.get_var_by_owner(owner) == constr.index)
 
 
-def expr_lifecycle(owner2constr: dict[Owner, LifeCycle], arrays: dict[Owner, Array], model: Model) -> None:
-    cycles = [(owner, (constr.start, constr.end)) for owner, constr in owner2constr.items()]
+def expr_lifecycle(
+    lifecycles: dict[Owner, list[LifeCycle]],
+    arrays: dict[Owner, list[Array]],
+    model: Model,
+) -> None:
+    cycles: list[tuple[Owner, tuple[int, int]]] = []
+    for owner, (constr, *_) in lifecycles.items():
+        if len(_) > 0:
+            raise ValueError(f"At most one `{LifeCycle}` constraint is allowed for each owner.")
+        cycles.append((owner, (constr.start, constr.end)))
 
     for idx, (owner_left, cycle_left) in enumerate(cycles):
         for owner_right, cycle_right in cycles[idx + 1 :]:
@@ -28,19 +38,23 @@ def expr_lifecycle(owner2constr: dict[Owner, LifeCycle], arrays: dict[Owner, Arr
                 )
                 continue
 
+            if len(arr) > 0:
+                raise ValueError(f"At most one `{Array}` constraint is allowed for each owner.")
+
             _do_not_intersect_array_expression(
                 model.get_var_by_owner(owner_left),
-                arr.length,
+                arr[0].length,
                 model.get_var_by_owner(owner_right),
                 model,
             )
 
 
-def expr_hard_link(owner2constr: dict[Owner, HardLink], model: Model) -> None:
-    for owner, constr in owner2constr.items():
-        model.add_constr(
-            (model.get_var_by_owner(owner) - model.get_var_by_owner(constr.to_)) == constr.distance,
-        )
+def expr_hard_link(owner2constr: dict[Owner, list[HardLink]], model: Model) -> None:
+    for owner, constrs in owner2constr.items():
+        for constr in constrs:
+            model.add_constr(
+                (model.get_var_by_owner(owner) - model.get_var_by_owner(constr.to_)) == constr.distance,
+            )
 
 
 def _do_not_intersect_array_expression(
