@@ -1,7 +1,7 @@
 from typing import override
 
 from quix.scheduler.blueprint import Blueprint
-from quix.scheduler.constraints import Index, LifeCycle, Reserve
+from quix.scheduler.constraints import Array, Index, LifeCycle
 from quix.scheduler.layout import Layout
 
 from .base import Resolver
@@ -10,7 +10,7 @@ from .base import Resolver
 class PrimitiveResolver(Resolver):
     __slots__ = ()
 
-    __domain__ = {Index, LifeCycle, Reserve}
+    __domain__ = {Index, LifeCycle, Array}
 
     @override
     def __call__(self, blueprint: Blueprint) -> Layout:

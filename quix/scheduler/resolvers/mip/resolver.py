@@ -1,7 +1,7 @@
 from typing import override
 
 from quix.scheduler.blueprint import Blueprint
-from quix.scheduler.constraints import HardLink, Index, LifeCycle, Reserve, SoftLink
+from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.scheduler.layout import Layout
 from quix.scheduler.resolvers.base import Resolver
 
@@ -13,7 +13,7 @@ from .utils import get_constraint_mappers
 class MIPResolver(Resolver):
     __slots__ = ()
 
-    __domain__ = {Reserve, Index, LifeCycle, HardLink, SoftLink}
+    __domain__ = {Array, Index, LifeCycle, HardLink, SoftLink}
 
     @override
     def __call__(self, blueprint: Blueprint) -> Layout:

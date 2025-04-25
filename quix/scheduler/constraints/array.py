@@ -6,9 +6,8 @@ from .base import BaseConstraint
 
 
 @dataclass(slots=True, frozen=True)
-class Reserve(BaseConstraint):
-    left: int
-    right: int
+class Array(BaseConstraint):
+    length: int
 
     def get_owners(self) -> set[Owner]:
         return set()
