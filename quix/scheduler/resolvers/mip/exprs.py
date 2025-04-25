@@ -2,9 +2,9 @@ import mip  # type: ignore
 
 from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.scheduler.owner import Owner
+from quix.tools import intervals_intersects
 
 from .model import Model
-from .utils import intervals_intersects
 
 
 def expr_index(owner2constr: dict[Owner, list[Index]], model: Model) -> None:
