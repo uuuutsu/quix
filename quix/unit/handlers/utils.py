@@ -12,21 +12,21 @@ type ToConvert = Program[Opcode] | None | Opcode | SmartProgram | Var | Iterable
 
 @rich_repr
 class SmartProgram:
-    __slots__ = ("_program",)
-    _program: list[Opcode]
+    __slots__ = ("program",)
+    program: list[Opcode]
 
     def __init__(self, program: list[Opcode] | None = None) -> None:
-        self._program = program or []
+        self.program = program or []
 
     def __or__(self, other: ToConvert) -> Self:
         if isinstance(other, SmartProgram):
-            self._program.extend(other._program)
+            self.program.extend(other.program)
             return self
 
         return self | _to_program(other)
 
     def __rich_repr__(self) -> Result:
-        yield from self._program
+        yield from self.program
 
 
 def _to_program(data: ToConvert) -> SmartProgram:
@@ -42,7 +42,7 @@ def _to_program(data: ToConvert) -> SmartProgram:
         case Iterable():
             program: list[Opcode] = []
             for value in data:
-                program.extend(_to_program(value)._program)
+                program.extend(_to_program(value).program)
             return SmartProgram(program)
         case _:
             raise ValueError(f"Trying to cast an unsupported data to OpCodeReturn. {type(data).__name__}: {data}")

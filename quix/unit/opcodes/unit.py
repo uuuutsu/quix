@@ -7,19 +7,19 @@ from quix.tools import generate_unique_id
 
 class Unit:
     __slots__ = (
-        "_ref",
-        "_name",
+        "ref",
+        "name",
     )
 
     def __init__(self, ref: Ref, name: str | None) -> None:
-        self._ref = ref
-        self._name = name
+        self.ref = ref
+        self.name = name
 
     def to_var(self) -> Var:
-        return Var(self._ref, self._name)
+        return Var(self.ref, self.name)
 
     def __str__(self) -> str:
-        return f"Unit( {self._name or self._ref} )"
+        return f"Unit( {self.name or self.ref} )"
 
 
 @overload
