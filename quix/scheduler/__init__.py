@@ -8,11 +8,14 @@ __all__ = (
     "Resolver",
     "PrimitiveResolver",
     "MIPResolver",
+    "Array",
+    "HardLink",
+    "SoftLink",
 )
 
 
 from .blueprint import Blueprint
-from .constraints import BaseConstraint, Index, LifeCycle
+from .constraints import Array, BaseConstraint, HardLink, Index, LifeCycle, SoftLink
 from .layout import Layout
 from .owner import Owner
 from .resolvers import MIPResolver, PrimitiveResolver, Resolver

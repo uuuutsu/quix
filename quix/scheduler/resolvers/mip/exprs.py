@@ -1,6 +1,6 @@
 import mip  # type: ignore
 
-from quix.scheduler.constraints import Array, Index, LifeCycle
+from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle
 from quix.scheduler.owner import Owner
 
 from .model import Model
@@ -34,6 +34,13 @@ def expr_lifecycle(owner2constr: dict[Owner, LifeCycle], arrays: dict[Owner, Arr
                 model.get_var_by_owner(owner_right),
                 model,
             )
+
+
+def expr_hard_link(owner2constr: dict[Owner, HardLink], model: Model) -> None:
+    for owner, constr in owner2constr.items():
+        model.add_constr(
+            (model.get_var_by_owner(owner) - model.get_var_by_owner(constr.to_)) == constr.distance,
+        )
 
 
 def _do_not_intersect_array_expression(
