@@ -3,9 +3,13 @@ __all__ = (
     "Index",
     "LifeCycle",
     "Reserve",
+    "SoftLink",
+    "HardLink",
 )
 
 from .array import Reserve
 from .base import BaseConstraint
+from .hard_link import HardLink
 from .index import Index
 from .lifecycle import LifeCycle
+from .soft_link import SoftLink
