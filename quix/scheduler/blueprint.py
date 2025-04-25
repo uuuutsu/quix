@@ -17,7 +17,7 @@ class Blueprint:
     def __init__(self, root: Owner) -> None:
         self.root = root
         self.hierarchy: dict[Owner, set[Owner]] = {root: set()}
-        self._constraints: dict[Owner, set[BaseConstraint]] = {root: set()}
+        self._constraints: dict[Owner, list[BaseConstraint]] = {root: []}
         self.domain: set[type[BaseConstraint]] = set()
 
     def add_constraint(self, owner: Owner, constr: BaseConstraint) -> Self:
@@ -26,9 +26,9 @@ class Blueprint:
                 f"Owner {owner} has not been seen in the blueprint yet.Build the blueprint from the root."
             )
 
-        if constr in self._constraints.setdefault(owner, set()):
+        if constr in self._constraints.setdefault(owner, []):
             raise ValueError(f"Constraint {constr} already exist for owner {owner}")
-        self._constraints[owner].add(constr)
+        self._constraints[owner].append(constr)
         self.domain.add(type(constr))
 
         owners = constr.get_owners()
@@ -41,7 +41,7 @@ class Blueprint:
     def get_owners(self) -> set[Owner]:
         return set(self.hierarchy.keys())
 
-    def get_constraints(self, owner: Owner) -> set[BaseConstraint]:
+    def get_constraints(self, owner: Owner) -> list[BaseConstraint]:
         return self._constraints[owner]
 
     def iter_constr(self) -> Iterable[tuple[Owner, BaseConstraint]]:

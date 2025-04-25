@@ -1,6 +1,6 @@
 import mip  # type: ignore
 
-from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle
+from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.scheduler.owner import Owner
 
 from .model import Model
@@ -49,12 +49,38 @@ def expr_lifecycle(
             )
 
 
-def expr_hard_link(owner2constr: dict[Owner, list[HardLink]], model: Model) -> None:
-    for owner, constrs in owner2constr.items():
+def expr_links(
+    hard_links: dict[Owner, list[HardLink]],
+    soft_links: dict[Owner, list[SoftLink]],
+    model: Model,
+) -> None:
+    if set(hard_links).intersection(soft_links):
+        raise ValueError("Each owner can have either `SoftLink` constraint or `HardLink` one.")
+
+    _hard_links(hard_links, model)
+    _soft_links(soft_links, model)
+
+
+def _hard_links(hard_links: dict[Owner, list[HardLink]], model: Model) -> None:
+    for owner, constrs in hard_links.items():
         for constr in constrs:
             model.add_constr(
                 (model.get_var_by_owner(owner) - model.get_var_by_owner(constr.to_)) == constr.distance,
             )
+
+
+def _soft_links(soft_links: dict[Owner, list[SoftLink]], model: Model) -> None:
+    for owner, constrs in soft_links.items():
+        for constr in constrs:
+            factor_var = model.add_var(
+                None,
+                lb=1,
+            )
+
+            for to_, scale in constr.to_.items():
+                model.add_constr(
+                    (model.get_var_by_owner(owner) - model.get_var_by_owner(to_)) == (factor_var * scale),
+                )
 
 
 def _do_not_intersect_array_expression(
