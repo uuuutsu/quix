@@ -38,7 +38,7 @@ def expr_lifecycle(
                 )
                 continue
 
-            if len(arr) > 0:
+            if len(arr) > 1:
                 raise ValueError(f"At most one `{Array}` constraint is allowed for each owner.")
 
             _do_not_intersect_array_expression(
