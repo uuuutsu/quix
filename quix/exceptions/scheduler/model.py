@@ -1,0 +1,8 @@
+from quix.scheduler.owner import Owner
+
+from .base import SchedulerException
+
+
+class IndexIsNotYetResolvedError(SchedulerException):
+    def __init__(self, owner: Owner) -> None:
+        super().__init__(f"Index of {owner} has not yet been resolved by the model.")
