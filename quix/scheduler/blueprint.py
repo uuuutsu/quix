@@ -26,7 +26,9 @@ class Blueprint:
                 f"Owner {owner} has not been seen in the blueprint yet.Build the blueprint from the root."
             )
 
-        self._constraints.setdefault(owner, set()).add(constr)
+        if constr in self._constraints.setdefault(owner, set()):
+            raise ValueError(f"Constraint {constr} already exist for owner {owner}")
+        self._constraints[owner].add(constr)
         self.domain.add(type(constr))
 
         owners = constr.get_owners()

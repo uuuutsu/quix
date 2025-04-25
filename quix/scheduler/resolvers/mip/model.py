@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import mip  # type: ignore
 
-from quix.exceptions.scheduler import IndexIsNotYetResolvedError
+from quix.exceptions.scheduler import IndexIsNotYetResolvedError, UnknownOwnerException
 from quix.scheduler.owner import Owner
 
 
@@ -72,10 +72,16 @@ class Model:
             relax=relax,
         )
 
+    def get_var_by_owner(self, owner: Owner) -> mip.Var:
+        var = self._mip_model.var_by_name(owner_to_str_key(owner))
+        if var is None:
+            raise UnknownOwnerException(owner)
+        return var
+
     def get_mapping(self) -> dict[Owner, int]:
         indexes = {}
         for owner in self._owners:
-            index = self._mip_model.var_by_name(owner_to_str_key(owner))
+            index = self.get_var_by_owner(owner)
             if index is None:
                 raise IndexIsNotYetResolvedError(owner)
             indexes[owner] = int(index.x)
