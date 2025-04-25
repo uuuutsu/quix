@@ -18,12 +18,13 @@ class Blueprint:
         self.constraints: dict[Owner, list[BaseConstraint]] = {}
         self.domain: set[type[BaseConstraint]] = set()
 
-    def add_constraint(self, owner: Owner, constr: BaseConstraint) -> Self:
-        if constr in self.constraints.setdefault(owner, []):
-            raise ValueError(f"Constraint {constr} already exist for owner {owner}")
+    def add_constraints(self, owner: Owner, *constrs: BaseConstraint) -> Self:
+        for constr in constrs:
+            if constr in self.constraints.setdefault(owner, []):
+                raise ValueError(f"Constraint {constr} already exist for owner {owner}")
 
-        self.constraints[owner].append(constr)
-        self.domain.add(type(constr))
+            self.constraints[owner].append(constr)
+            self.domain.add(type(constr))
 
         return self
 

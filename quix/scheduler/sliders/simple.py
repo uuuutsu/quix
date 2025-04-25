@@ -49,18 +49,18 @@ def _mappings_intersect(
     inter_pairs: list[tuple[Owner, Owner]],
     left_arrays: dict[Owner, int],
     right_arrays: dict[Owner, int],
-) -> bool:
+) -> int:
     for left_owner, right_owner in inter_pairs:
         left_index = left[left_owner]
         right_index = right[right_owner]
 
         if intervals_intersects(
             (left_index, left_index + left_arrays.get(left_owner, 0)),
-            (left_index, right_index + right_arrays.get(right_owner, 0)),
+            (right_index, right_index + right_arrays.get(right_owner, 0)),
         ):
-            return True
+            return left_index + left_arrays.get(left_owner, 1) - right_index
 
-    return False
+    return 0
 
 
 def _slide_mapping(mapping: dict[Owner, int], offset: int) -> dict[Owner, int]:
@@ -73,11 +73,15 @@ class SimpleSlider(Slider):
     __domain__ = {Index, SoftLink, HardLink, Array, LifeCycle}
 
     def __call__(self, left: Layout, right: Layout) -> Layout:
-        if left.blueprint.get_owners().union(right.blueprint.get_owners()):
+        if left.blueprint.get_owners().intersection(right.blueprint.get_owners()):
             raise RuntimeError("Blueprints can't reference same owner.")
 
         left_constrs = get_constraint_mappers(left.blueprint)
         right_constrs = get_constraint_mappers(right.blueprint)
+        if not left_constrs.get(Index, {}):
+            left_constrs, right_constrs = right_constrs, left_constrs
+            left, right = right, left
+
         left_arrays = _simplify_array_constrs(left_constrs.get(Array, {}))  # type: ignore
         right_arrays = _simplify_array_constrs(right_constrs.get(Array, {}))  # type: ignore
         pos_inters = _get_intersected_owners_between_sets(
@@ -88,18 +92,19 @@ class SimpleSlider(Slider):
         root_mapping = left.mapping()
         sliding_mapping = right.mapping()
 
-        if right_constrs.get(Index, {}):
-            if _mappings_intersect(root_mapping, sliding_mapping, pos_inters, left_arrays, right_arrays):
+        if right_constrs.get(Index, {}) and left_constrs.get(Index, {}):
+            if _mappings_intersect(root_mapping, sliding_mapping, pos_inters, left_arrays, right_arrays) != 0:
                 raise RuntimeError(
                     f"Layouts {left} and {right} cannot be combined due to coliding lifecycles on enforced indexes."
                 )
             return Layout(left.blueprint.combine(right.blueprint), root_mapping | sliding_mapping)
 
-        for offset in range(left.footprint + 1):
+        offset: int = 0
+        while True:
             sliding_mapping = _slide_mapping(sliding_mapping, offset)
-            if _mappings_intersect(root_mapping, sliding_mapping, pos_inters, left_arrays, right_arrays):
+            new_offset = _mappings_intersect(root_mapping, sliding_mapping, pos_inters, left_arrays, right_arrays)
+            if new_offset != 0:
+                offset += new_offset
                 continue
 
             return Layout(left.blueprint.combine(right.blueprint), root_mapping | sliding_mapping)
-
-        raise RuntimeError(f"Layouts {left} and {right} cannot be combined.")
