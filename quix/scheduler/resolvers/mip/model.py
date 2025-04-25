@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import typing
-
 import mip  # type: ignore
 
 from quix.exceptions.scheduler import IndexIsNotYetResolvedError
@@ -26,7 +24,7 @@ class Model:
         ub: mip.numbers.Real = mip.INF,
         obj: mip.numbers.Real = 0.0,
         var_type: str = mip.CONTINUOUS,
-        column: typing.Optional[mip.Column] = None,
+        column: mip.Column | None = None,
     ) -> mip.Var:
         if owner:
             self._owners.append(owner)
@@ -43,7 +41,7 @@ class Model:
         self,
         lin_expr: mip.LinExpr,
         name: str = "",
-        priority: typing.Optional[mip.ConstraintPriority] = None,
+        priority: mip.ConstraintPriority | None = None,
     ) -> mip.Constr:
         return self.model.add_constr(
             lin_expr=lin_expr,
@@ -54,7 +52,7 @@ class Model:
     def add_sos(self, sos: list[tuple[mip.Var, mip.numbers.Real]], sos_type: int) -> None:
         self.model.add_sos(sos=sos, sos_type=sos_type)
 
-    def get_var(self, owner: Owner) -> typing.Optional[mip.Var]:
+    def get_var(self, owner: Owner) -> mip.Var | None:
         return self.model.var_by_name(owner_to_str_key(owner))
 
     def optimize(

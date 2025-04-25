@@ -1,3 +1,5 @@
+from typing import override
+
 from quix.scheduler.blueprint import Blueprint
 from quix.scheduler.constraints import Index, LifeCycle, Reserve
 from quix.scheduler.layout import Layout
@@ -10,6 +12,7 @@ class PrimitiveResolver(Resolver):
 
     __signature__ = {Index, LifeCycle, Reserve}
 
+    @override
     def __call__(self, blueprint: Blueprint) -> Layout:
         layout = Layout()
         if Index not in blueprint.signature:
