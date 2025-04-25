@@ -92,4 +92,7 @@ class PrimitiveResolver(Resolver):
                     break
                 index += 1
 
+        for owner in blueprint.get_owners().difference(mapping):
+            mapping[owner] = 0
+
         return Layout(blueprint, mapping)
