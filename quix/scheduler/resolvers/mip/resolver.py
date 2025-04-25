@@ -5,7 +5,7 @@ from quix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLi
 from quix.scheduler.layout import Layout
 from quix.scheduler.resolvers.base import Resolver
 
-from .exprs import EXPR_REGISTRY
+from .exprs import expr_index, expr_lifecycle
 from .model import Model
 from .utils import get_constraint_mappers
 
@@ -24,8 +24,8 @@ class MIPResolver(Resolver):
             model.add_var(owner)
 
         mappers = get_constraint_mappers(blueprint)
-        for type, mapper in mappers.items():
-            EXPR_REGISTRY[type](mapper, model)
+        expr_index(mappers.get(Index, {}), model)  # type: ignore
+        expr_lifecycle(mappers.get(LifeCycle, {}), mappers.get(Array, {}), model)  # type: ignore
 
         model.optimize()
         for owner, index in model.get_mapping().items():
