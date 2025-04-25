@@ -28,7 +28,7 @@ class MIPResolver(Resolver):
         for owner, constr in blueprint.iter_constr():
             match constr:
                 case Index():
-                    handle_index(owner, model, constr)
+                    handle_index(owner2var[owner], model, constr)
 
         layout = Layout(Index in blueprint.domain)
         model.optimize()
