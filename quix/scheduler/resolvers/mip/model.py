@@ -11,10 +11,10 @@ def owner_to_str_key(owner: Owner) -> str:
 
 
 class Model:
-    __slots__ = ("model", "_owners")
+    __slots__ = ("_mip_model", "_owners")
 
     def __init__(self) -> None:
-        self.model = mip.Model()
+        self._mip_model = mip.Model()
         self._owners: list[Owner] = []
 
     def add_var(
@@ -23,12 +23,12 @@ class Model:
         lb: mip.numbers.Real = 0.0,
         ub: mip.numbers.Real = mip.INF,
         obj: mip.numbers.Real = 0.0,
-        var_type: str = mip.CONTINUOUS,
+        var_type: str = mip.INTEGER,
         column: mip.Column | None = None,
     ) -> mip.Var:
         if owner:
             self._owners.append(owner)
-        return self.model.add_var(
+        return self._mip_model.add_var(
             "" if owner is None else owner_to_str_key(owner),
             lb=lb,
             ub=ub,
@@ -43,17 +43,14 @@ class Model:
         name: str = "",
         priority: mip.ConstraintPriority | None = None,
     ) -> mip.Constr:
-        return self.model.add_constr(
+        return self._mip_model.add_constr(
             lin_expr=lin_expr,
             name=name,
             priority=priority,
         )
 
     def add_sos(self, sos: list[tuple[mip.Var, mip.numbers.Real]], sos_type: int) -> None:
-        self.model.add_sos(sos=sos, sos_type=sos_type)
-
-    def get_var(self, owner: Owner) -> mip.Var | None:
-        return self.model.var_by_name(owner_to_str_key(owner))
+        self._mip_model.add_sos(sos=sos, sos_type=sos_type)
 
     def optimize(
         self,
@@ -65,8 +62,8 @@ class Model:
         relax: bool = False,
         verbose: int = 0,
     ) -> mip.OptimizationStatus:
-        self.model.verbose = verbose
-        return self.model.optimize(
+        self._mip_model.verbose = verbose
+        return self._mip_model.optimize(
             max_seconds=max_seconds,
             max_nodes=max_nodes,
             max_solutions=max_solutions,
@@ -78,7 +75,7 @@ class Model:
     def get_mapping(self) -> dict[Owner, int]:
         indexes = {}
         for owner in self._owners:
-            index = self.get_var(owner)
+            index = self._mip_model.var_by_name(owner_to_str_key(owner))
             if index is None:
                 raise IndexIsNotYetResolvedError(owner)
             indexes[owner] = int(index.x)

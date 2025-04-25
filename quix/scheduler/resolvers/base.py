@@ -9,7 +9,7 @@ from quix.scheduler.layout import Layout
 class Resolver(Protocol):
     __slots__ = ()
 
-    __signature__: ClassVar[set[type[BaseConstraint]]]
+    __domain__: ClassVar[set[type[BaseConstraint]]]
 
     @abstractmethod
     def __call__(self, blueprint: Blueprint) -> Layout:
