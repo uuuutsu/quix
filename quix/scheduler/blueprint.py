@@ -28,7 +28,12 @@ class Blueprint:
         return self
 
     def get_owners(self) -> set[Owner]:
-        return set(self.constraints.keys())
+        owners = set()
+        for owner, constrs in self.constraints.items():
+            owners.add(owner)
+            for constr in constrs:
+                owners.update(constr.get_owners())
+        return owners
 
     def combine(self, other: Blueprint) -> Blueprint:
         new_bp = Blueprint()

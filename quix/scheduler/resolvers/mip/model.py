@@ -82,7 +82,7 @@ class Model:
         indexes = {}
         for owner in self._owners:
             index = self.get_var_by_owner(owner)
-            if index is None:
+            if index.x is None:
                 raise IndexIsNotYetResolvedError(owner)
             indexes[owner] = int(index.x)
 

@@ -53,8 +53,8 @@ def _get_all_affected_owners(
         anchor + arrays.get(owner, 0) + 1,
     ):
         for existing_owner, existing_idx in mapping.items():
-            left, right = existing_idx, existing_idx + arrays.get(existing_owner, 0)
-            if left <= idx <= right:
+            left, right = existing_idx, existing_idx + arrays.get(existing_owner, 1)
+            if left <= idx < right:
                 owners.add(existing_owner)
 
     return owners

@@ -30,7 +30,10 @@ def expr_lifecycle(
             if not intervals_intersects(cycle_left, cycle_right):
                 continue
 
-            if (arr := arrays.get(owner_left)) is None:
+            left_arr = arrays.get(owner_left)
+            right_arr = arrays.get(owner_right)
+
+            if left_arr is right_arr is None:
                 _do_not_intersect_unit_expression(
                     model.get_var_by_owner(owner_left),
                     model.get_var_by_owner(owner_right),
@@ -38,13 +41,21 @@ def expr_lifecycle(
                 )
                 continue
 
-            if len(arr) > 1:
+            if (len(left_arr or []) > 1) or (len(right_arr or []) > 1):
                 raise ValueError(f"At most one `{Array}` constraint is allowed for each owner.")
 
+            if left_arr:
+                _do_not_intersect_array_expression(
+                    model.get_var_by_owner(owner_left),
+                    left_arr[0].length,
+                    model.get_var_by_owner(owner_right),
+                    model,
+                )
+                continue
             _do_not_intersect_array_expression(
-                model.get_var_by_owner(owner_left),
-                arr[0].length,
                 model.get_var_by_owner(owner_right),
+                right_arr[0].length,  # type: ignore
+                model.get_var_by_owner(owner_left),
                 model,
             )
 
