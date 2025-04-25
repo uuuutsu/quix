@@ -3,8 +3,9 @@ __all__ = (
     "PrimitiveResolver",
     "MIPResolver",
     "ResolverRegistry",
+    "create_resolver_registry",
 )
 from .base import Resolver
 from .mip import MIPResolver
 from .primitive import PrimitiveResolver
-from .registry import ResolverRegistry
+from .registry import ResolverRegistry, create_resolver_registry

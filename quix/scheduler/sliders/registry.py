@@ -1,13 +1,11 @@
 import math
 from collections.abc import Callable
 
-from quix.scheduler.blueprint import Blueprint
 from quix.scheduler.constraints import BaseConstraint
 from quix.scheduler.layout import Layout
 
-from .base import Resolver
-from .mip import MIPResolver
-from .primitive import PrimitiveResolver
+from .base import Slider
+from .simple import SimpleSlider
 
 type Domain = set[type[BaseConstraint]]
 type Matcher = Callable[[Domain, list[Domain]], int | None]
@@ -30,31 +28,30 @@ def _inclusion_matcher(to_match: Domain, registry: list[Domain]) -> int | None:
     return None
 
 
-class ResolverRegistry:
+class SliderRegistry:
     __slots__ = (
         "_matcher",
-        "_resolvers",
+        "_sliders",
     )
 
     def __init__(self, matcher: Matcher = _inclusion_matcher) -> None:
         self._matcher = matcher
-        self._resolvers: list[Resolver] = []
+        self._sliders: list[Slider] = []
 
-    def __call__(self, blueprint: Blueprint) -> Layout:
-        domains = [resolver.__domain__ for resolver in self._resolvers]
-        match = self._matcher(blueprint.domain, domains)
+    def __call__(self, left: Layout, right: Layout) -> Layout:
+        domains = [slider.__domain__ for slider in self._sliders]
+        match = self._matcher(left.blueprint.domain | right.blueprint.domain, domains)
 
         if match is None:
-            raise RuntimeError(f"No resolver was found to handle: {blueprint.domain}")
+            raise RuntimeError(f"No slider found to handle: {left} + {right}")
 
-        return self._resolvers[match](blueprint)
+        return self._sliders[match](left, right)
 
-    def register(self, resolver: Resolver) -> None:
-        self._resolvers.append(resolver)
+    def register(self, slider: Slider) -> None:
+        self._sliders.append(slider)
 
 
-def create_resolver_registry() -> ResolverRegistry:
-    registry = ResolverRegistry()
-    registry.register(PrimitiveResolver())
-    registry.register(MIPResolver())
+def create_slider_registry() -> SliderRegistry:
+    registry = SliderRegistry()
+    registry.register(SimpleSlider())
     return registry
