@@ -52,9 +52,9 @@ class Var:
     def input(self) -> Var:
         return self._concat_program(input(self._ref))
 
-    def __call__(self, code: str, exit: Ref | None = None) -> Var:
+    def __call__(self, code: str, exit: Ref | None = None, sortable: bool = False) -> Var:
         exit = self._ref if exit is None else exit
-        return self._concat_program(inject(self._ref, code, exit))
+        return self._concat_program(inject(self._ref, code, exit, sortable))
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}( {self._name or self._ref} )"

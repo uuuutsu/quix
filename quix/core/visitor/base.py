@@ -35,5 +35,5 @@ class CoreVisitor(Visitor[CoreOpcode]):
         raise NotImplementedError
 
     @abstractmethod
-    def inject(self, ref: Ref, code: Code, exit: Ref) -> None:
+    def inject(self, ref: Ref, code: Code, exit: Ref, sortable: bool = False) -> None:
         raise NotImplementedError

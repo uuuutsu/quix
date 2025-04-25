@@ -18,13 +18,14 @@ __all__ = (
     "create_slider_registry",
     "create_resolver_registry",
     "Scheduler",
+    "owner",
 )
 
 
 from .blueprint import Blueprint
 from .constraints import Array, BaseConstraint, HardLink, Index, LifeCycle, SoftLink
 from .layout import Layout
-from .owner import Owner
+from .owner import Owner, owner
 from .resolvers import MIPResolver, PrimitiveResolver, Resolver, ResolverRegistry, create_resolver_registry
 from .scheduler import Scheduler
 from .sliders import SimpleSlider, Slider, SliderRegistry, create_slider_registry

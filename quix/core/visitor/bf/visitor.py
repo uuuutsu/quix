@@ -47,7 +47,7 @@ class BFVisitor(CoreVisitor):
         self._dest.write(BFCommands.END_LOOP)
 
     @override
-    def inject(self, ref: Ref, code: Code, exit: Ref) -> None:
+    def inject(self, ref: Ref, code: Code, exit: Ref, sortable: bool = False) -> None:
         self._move_pointer(ref)
         self._dest.write(code)
         self._move_pointer(exit, gen_code=False)

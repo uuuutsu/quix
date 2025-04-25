@@ -61,9 +61,9 @@ def test_loop(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ref": 5, "code": "", "exit": 30},
-        {"ref": 0, "code": "sigma", "exit": -55},
-        {"ref": -1, "code": "that's crazy", "exit": 100},
+        {"ref": 5, "code": "", "exit": 30, "sortable": True},
+        {"ref": 0, "code": "sigma", "exit": -55, "sortable": False},
+        {"ref": -1, "code": "that's crazy", "exit": 100, "sortable": True},
     ],
 )
 def test_inject(args: dict[str, Any]) -> None:

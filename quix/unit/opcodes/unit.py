@@ -2,6 +2,7 @@ from typing import overload
 
 from quix.core.opcodes.dtypes import Ref
 from quix.core.var import Var
+from quix.scheduler import Owner
 from quix.tools import generate_unique_id
 
 
@@ -17,6 +18,9 @@ class Unit:
 
     def to_var(self) -> Var:
         return Var(self.ref, self.name)
+
+    def to_owner(self) -> Owner:
+        return Owner(ref=self.ref, name=self.name)
 
     def __str__(self) -> str:
         return f"Unit( {self.name or self.ref} )"

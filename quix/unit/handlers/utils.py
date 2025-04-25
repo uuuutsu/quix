@@ -39,6 +39,7 @@ class SmartProgram:
 
     def __rich_repr__(self) -> Result:
         yield from self.program
+        yield from self.bps
 
 
 def _to_program(data: ToConvert) -> SmartProgram:
