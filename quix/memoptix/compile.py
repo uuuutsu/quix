@@ -50,14 +50,16 @@ def get_ref_scopes(
             loop_program = opcode.args()["program"]
             internal_rough_usages = get_ref_scopes(loop_program, close=False)
 
+            adjusted_idx = curr_opcode_idx + 1
             for ref, (start, end) in internal_rough_usages.items():
                 if ref not in rough_usages:
-                    adjusted_end = None if end is None else curr_opcode_idx + end
-                    rough_usages[ref] = curr_opcode_idx + start, adjusted_end
+                    adjusted_end = None if end is None else adjusted_idx + end
+                    rough_usages[ref] = adjusted_idx + start, adjusted_end
                 else:
                     if rough_usages[ref][-1] is not None:
                         warning(f"Using freed reference. Freeing discarded: {ref}")
-                    adjusted_end = None if end is None else curr_opcode_idx + end
+
+                    adjusted_end = None if end is None else adjusted_idx + end
                     rough_usages[ref] = rough_usages[ref][0], adjusted_end
 
             loop_ref = opcode.args()["ref"]
@@ -69,6 +71,7 @@ def get_ref_scopes(
 
             loops.append((curr_opcode_idx, curr_opcode_idx + len(loop_program)))
             curr_opcode_idx += len(loop_program)
+            continue
 
         elif opcode.__id__ == MemoptixOpcodes.FREE:
             if ref not in rough_usages:
@@ -92,7 +95,7 @@ def get_ref_scopes(
 
     adjusted_usages: dict[Ref, tuple[int, int]] = {}
     for ref, (start_, end_) in rough_usages.items():
-        end_ = end_ if end_ is not None else curr_opcode_idx - 1
+        end_ = end_ if end_ is not None else curr_opcode_idx
         adjusted_usages[ref] = find_optimal_usage_scope((start_, end_), loops)
 
     return adjusted_usages
