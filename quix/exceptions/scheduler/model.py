@@ -1,4 +1,4 @@
-from quix.scheduler.owner import Owner
+from quix.memoptix.scheduler.owner import Owner
 
 from .base import SchedulerException
 

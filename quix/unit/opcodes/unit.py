@@ -1,7 +1,7 @@
 from typing import overload
 
 from quix.core.opcodes.dtypes import Ref
-from quix.scheduler import Owner
+from quix.memoptix.scheduler import Owner
 from quix.tools import generate_unique_id
 
 

@@ -6,7 +6,7 @@ from rich.repr import Result, rich_repr
 
 from quix.core.interfaces.opcode import Opcode, Program
 from quix.core.var import Var
-from quix.scheduler.blueprint import Blueprint
+from quix.memoptix.scheduler.blueprint import Blueprint
 
 type ToConvert = Program[Opcode] | None | Opcode | SmartProgram | Var | Blueprint | Iterable[ToConvert]
 
