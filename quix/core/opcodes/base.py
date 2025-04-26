@@ -27,6 +27,9 @@ class CoreOpcode(Opcode, metaclass=FlyweightMeta):
             return (self.__id__ == value.__id__) and (self._args == value._args)
         return super().__eq__(value)
 
+    def __hash__(self) -> int:
+        return id(self)
+
     @override
     def args(self) -> dict[str, Any]:
         return self._args

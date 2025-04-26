@@ -1,7 +1,3 @@
-__all__ = (
-    "clear",
-    "move",
-)
+__all__ = ("clear",)
 
 from .clear import clear
-from .move import move

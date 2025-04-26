@@ -1,3 +1,4 @@
+from quix.core.opcodes.opcodes import inject
 from quix.unit.opcodes import Unit, Wide
 
 from .utils import ToConvert, handler
@@ -9,4 +10,4 @@ def clear(value: Wide) -> ToConvert:
 
 
 def clear_unit(value: Unit) -> ToConvert:
-    return value.to_var()("[-]", sortable=True)
+    return inject(value, "[-]", value, sortable=True)

@@ -63,7 +63,7 @@ lint.select = [
   "B",
   "UP",
 ]
-unfixable = ["F841"]
+lint.unfixable = ["F841"]
 unsafe-fixes = true
 
 [tool.pytest.ini_options]
