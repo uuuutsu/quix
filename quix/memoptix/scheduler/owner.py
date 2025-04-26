@@ -7,22 +7,22 @@ from quix.tools.unique import generate_unique_id
 
 
 class Owner:
-    __slots__ = ("_name", "_ref")
+    __slots__ = ("name", "ref")
 
     def __init__(self, name: str | None = None, *, ref: Ref | None = None) -> None:
-        self._name = name
-        self._ref = ref or generate_unique_id()
+        self.name = name
+        self.ref = ref or generate_unique_id()
 
     def __hash__(self) -> int:
-        return hash(self._ref)
+        return hash(self.ref)
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, Owner):
             return False
-        return self._ref == value._ref
+        return self.ref == value.ref
 
     def __repr__(self) -> str:
-        return f"Owner( {self._name or self._ref} )"
+        return f"Owner( {self.name or self.ref} )"
 
 
 @overload

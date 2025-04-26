@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from .base import opcode
 from .dtypes import Code, CoreProgram, Ref, Value
 
@@ -12,3 +14,11 @@ def output(ref: Ref) -> None: ...
 def loop(ref: Ref, program: CoreProgram) -> None: ...
 @opcode
 def inject(ref: Ref, code: Code, exit: Ref, sortable: bool = False) -> None: ...
+
+
+class CoreOpcodes(StrEnum):
+    ADD = "add"
+    INPUT = "input"
+    OUTPUT = "output"
+    LOOP = "loop"
+    INJECT = "inject"
