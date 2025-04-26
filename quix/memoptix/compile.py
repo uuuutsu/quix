@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from logging import warning
+from typing import Literal, overload
 
 from quix.core.opcodes import CoreOpcode, CoreOpcodes, CoreProgram, Ref
 from quix.memoptix.scheduler import (
@@ -32,7 +33,13 @@ def compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
     return strip_program(program), memory
 
 
-def get_ref_scopes(program: CoreProgram) -> dict[Ref, tuple[int, int]]:
+@overload
+def get_ref_scopes(program: CoreProgram, *, close: Literal[True] = True) -> dict[Ref, tuple[int, int]]: ...
+@overload
+def get_ref_scopes(program: CoreProgram, *, close: Literal[False] = False) -> dict[Ref, tuple[int, int | None]]: ...
+def get_ref_scopes(
+    program: CoreProgram, *, close: bool = True
+) -> dict[Ref, tuple[int, int | None]] | dict[Ref, tuple[int, int]]:
     rough_usages: dict[Ref, tuple[int, int | None]] = {}
     loops: list[tuple[int, int]] = []
     curr_opcode_idx: int = 0
@@ -40,22 +47,24 @@ def get_ref_scopes(program: CoreProgram) -> dict[Ref, tuple[int, int]]:
         if (ref := opcode.args().get("ref")) is None:
             ...
         elif opcode.__id__ == CoreOpcodes.LOOP:
-            curr_opcode_idx += 1
             loop_program = opcode.args()["program"]
-            internal_rough_usages = get_ref_scopes(loop_program)
+            internal_rough_usages = get_ref_scopes(loop_program, close=False)
 
             for ref, (start, end) in internal_rough_usages.items():
                 if ref not in rough_usages:
-                    rough_usages[ref] = curr_opcode_idx + start, curr_opcode_idx + end
+                    adjusted_end = None if end is None else curr_opcode_idx + end
+                    rough_usages[ref] = curr_opcode_idx + start, adjusted_end
                 else:
-                    rough_usages[ref] = rough_usages[ref][0], curr_opcode_idx + end
+                    if rough_usages[ref][-1] is not None:
+                        warning(f"Using freed reference. Freeing discarded: {ref}")
+                    adjusted_end = None if end is None else curr_opcode_idx + end
+                    rough_usages[ref] = rough_usages[ref][0], adjusted_end
 
             loop_ref = opcode.args()["ref"]
-            if loop_ref in rough_usages:
-                if rough_usages[loop_ref][-1] is not None:
-                    warning(f"Loop's owning ref is freed inside the loop. Freeing discared: {loop_ref}")
-                rough_usages[loop_ref] = rough_usages[loop_ref][0], curr_opcode_idx + len(loop_program)
-            else:
+            if (loop_ref in rough_usages) and (rough_usages[loop_ref][-1] is not None):
+                warning(f"Loop's owning ref is freed inside the loop. Freeing discared: {loop_ref}")
+                rough_usages[loop_ref] = rough_usages[loop_ref][0], None
+            elif loop_ref not in rough_usages:
                 rough_usages[loop_ref] = curr_opcode_idx, None
 
             loops.append((curr_opcode_idx, curr_opcode_idx + len(loop_program)))
@@ -70,16 +79,20 @@ def get_ref_scopes(program: CoreProgram) -> dict[Ref, tuple[int, int]]:
 
             rough_usages[ref] = rough_usages[ref][0], curr_opcode_idx
 
-        elif ref in rough_usages:
+        elif (ref in rough_usages) and (rough_usages[ref][-1] is not None):
+            warning(f"Using freed reference. Freeing discarded: {ref}")
             rough_usages[ref] = rough_usages[ref][0], None
-        else:
+        elif ref not in rough_usages:
             rough_usages[ref] = curr_opcode_idx, None
 
         curr_opcode_idx += 1
 
+    if not close:
+        return rough_usages
+
     adjusted_usages: dict[Ref, tuple[int, int]] = {}
     for ref, (start_, end_) in rough_usages.items():
-        end_ = end_ if end_ is not None else curr_opcode_idx
+        end_ = end_ if end_ is not None else curr_opcode_idx - 1
         adjusted_usages[ref] = find_optimal_usage_scope((start_, end_), loops)
 
     return adjusted_usages
