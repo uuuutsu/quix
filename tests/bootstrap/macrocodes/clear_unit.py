@@ -1,10 +1,12 @@
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.macrocodes import clear_unit
-from quix.core.opcodes.opcodes import inject
+
+from .utils import compile_to_bf
 
 
-def test_macrocodes() -> None:
+def test_clear_unit_simple() -> None:
     u1 = Unit("u1")
     program = clear_unit(u1).builder()
 
-    assert program == [inject(u1, "[-]", u1, sortable=True)]
+    code = compile_to_bf(program, {u1: 0})
+    assert code == "[-]"

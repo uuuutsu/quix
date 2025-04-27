@@ -56,7 +56,7 @@ def to_program(data: ToConvert) -> SmartProgram:
             raise ValueError(f"Trying to cast an unsupported data to OpCodeReturn. {type(data).__name__}: {data}")
 
 
-def macrocode[**P, R: ToConvert](func: Callable[P, R]) -> Callable[P, SmartProgram]:
+def convert[**P, R: ToConvert](func: Callable[P, R]) -> Callable[P, SmartProgram]:
     @wraps(func)
     def _wrapper(*args: P.args, **kwargs: P.kwargs) -> SmartProgram:
         return to_program(func(*args, **kwargs))

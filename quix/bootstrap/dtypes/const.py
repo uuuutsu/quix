@@ -9,9 +9,18 @@ class Const[C](DType, metaclass=FlyweightMeta):
 
 
 @dtype
-class Int8(Const[int]):
+class UInt8(Const[int]):
     value: int
 
     def __post_init__(self) -> None:
         if self.value not in range(0, 256):
-            raise ValueError(f"Int8 can only be in range [0, 255]. Got: {self.value}")
+            raise ValueError(f"UInt8 can only be in range [0, 255]. Got: {self.value}")
+
+
+@dtype
+class Int8(Const[int]):
+    value: int
+
+    def __post_init__(self) -> None:
+        if self.value not in range(-128, 128):
+            raise ValueError(f"Int8 can only be in range [-128, 128]. Got: {self.value}")
