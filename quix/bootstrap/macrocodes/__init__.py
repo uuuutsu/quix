@@ -1,3 +1,7 @@
-__all__ = ("SmartProgram",)
+__all__ = (
+    "clear_unit",
+    "clear_wide",
+)
 
-from .program import SmartProgram
+from .clear_unit import clear_unit
+from .clear_wide import clear_wide

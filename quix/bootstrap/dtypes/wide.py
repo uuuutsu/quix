@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterator
 
 from .base import DType, dtype
 from .unit import Unit
@@ -8,7 +8,7 @@ from .unit import Unit
 class Wide(DType):
     units: tuple[Unit, ...]
 
-    def __iter__(self) -> Iterable[Unit]:
+    def __iter__(self) -> Iterator[Unit]:
         return self.units.__iter__()
 
     def __len__(self) -> int:
