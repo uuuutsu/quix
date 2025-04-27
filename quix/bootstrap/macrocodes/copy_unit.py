@@ -1,5 +1,6 @@
 from quix.bootstrap.dtypes import Int8, Unit
 from quix.bootstrap.program import ToConvert, convert
+from quix.memoptix.opcodes import free
 
 from .move_unit import move_unit
 
@@ -14,4 +15,5 @@ def copy_unit[Scale: Int8](value: Unit, to: dict[Unit, Scale]) -> ToConvert:
     return [
         move_unit(value, {buff: Int8.from_value(1)}),
         move_unit(buff, {value: Int8.from_value(1), **to}),
+        free(buff),
     ]
