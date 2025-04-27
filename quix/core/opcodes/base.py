@@ -32,7 +32,7 @@ class CoreOpcode(Opcode, metaclass=FlyweightMeta):
 
     @override
     def args(self) -> dict[str, Any]:
-        return self._args
+        return self._args.copy()
 
     def __rich_repr__(self) -> Result:
         yield from self._args.items()

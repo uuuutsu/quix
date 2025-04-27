@@ -3,6 +3,7 @@ from logging import warning
 from typing import Literal, overload
 
 from quix.core.opcodes import CoreOpcode, CoreOpcodes, CoreProgram, Ref
+from quix.core.opcodes.opcodes import loop
 from quix.memoptix.scheduler import (
     Array,
     BaseConstraint,
@@ -126,6 +127,7 @@ def create_constraints(
 
     for opcode in program:
         args = opcode.args()
+
         own_constrs = constrs.setdefault(mapping[args.pop("ref")], [])
         match opcode.__id__:
             case MemoptixOpcodes.INDEX:
@@ -169,5 +171,8 @@ def strip_program(program: CoreProgram) -> CoreProgram:
     for opcode in program:
         if opcode.__id__ in MemoptixOpcodes:
             continue
+        if opcode.__id__ == CoreOpcodes.LOOP:
+            args = opcode.args()
+            opcode = loop(args["ref"], program=strip_program(args["program"]))
         new_program.append(opcode)
     return new_program
