@@ -1,15 +1,28 @@
-from collections.abc import Hashable
 from io import StringIO
 
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.program import SmartProgram
+from quix.core.opcodes.dtypes import CoreProgram, Ref
 from quix.core.visitor.bf.layout import BFMemoryLayout
 from quix.core.visitor.bf.pointer import BFPointer
 from quix.core.visitor.bf.visitor import BFVisitor
+from quix.exec.simple import Executor
+from quix.memoptix import mem_compile
 
 
-def compile_to_bf(program: CoreProgram, mapping: dict[Hashable, int]) -> str:
-    layout = BFMemoryLayout(mapping)
-    pointer = BFPointer(layout)
+def run(program: SmartProgram) -> dict[Ref, int]:
+    core_program, mapping = mem_compile(program.build())
+    code = _compile_to_bf(core_program, mapping)
+    executor = Executor(code).run()
+
+    memory = executor.memory.cells
+    values = {ref: memory[idx] for ref, idx in mapping.items()}
+
+    return values
+
+
+def _compile_to_bf(program: CoreProgram, mapping: dict[Ref, int]) -> str:
     buff = StringIO()
+    pointer = BFPointer(BFMemoryLayout(mapping))
     BFVisitor(buff, pointer).visit(program)
+
     return buff.getvalue()

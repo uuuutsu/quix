@@ -1,5 +1,6 @@
 import io
 from dataclasses import dataclass, field
+from typing import Self
 
 from bidict import bidict
 
@@ -16,7 +17,7 @@ class Executor:
     pc: int = field(init=False, default=0)
     jump_map: bidict[int, int] = field(init=False, default_factory=bidict)
 
-    def __call__(self) -> None:
+    def run(self) -> Self:
         if isinstance(self.code, io.StringIO):
             self.code = self.code.getvalue()
 
@@ -24,6 +25,8 @@ class Executor:
         while self.pc < len(self.code):
             self._execute_command(self.code[self.pc])
             self.pc += 1
+
+        return self
 
     def _execute_command(self, command: str) -> None:
         match command:

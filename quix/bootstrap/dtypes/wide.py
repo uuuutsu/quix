@@ -10,6 +10,10 @@ from .unit import Unit
 class Wide(DType):
     units: tuple[Unit, ...]
 
+    def __post_init__(self) -> None:
+        if len(set(self.units)) < len(self.units):
+            raise ValueError(f"All units of {type(self).__name__!r} must be unique.")
+
     def __iter__(self) -> Iterator[Unit]:
         return self.units.__iter__()
 
