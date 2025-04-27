@@ -1,10 +1,10 @@
 from typing import override
 
+from quix.core.compiler.base import CoreVisitor
 from quix.core.interfaces.writable import Writable
 from quix.core.opcodes.dtypes import Code, CoreProgram, Ref, Value
-from quix.core.visitor.base import CoreVisitor
+from quix.core.values import BFCommands
 
-from .commands import BFCommands
 from .pointer import BFPointer
 
 

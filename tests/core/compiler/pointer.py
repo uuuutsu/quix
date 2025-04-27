@@ -1,7 +1,7 @@
 from typing import Final
 
-from quix.core.visitor.bf import BFMemoryLayout, BFPointer
-from quix.core.visitor.bf.commands import BFCommands
+from quix.core.compiler import BFMemoryLayout, BFPointer
+from quix.core.values import BFCommands
 
 
 def test_pointer_default() -> None:

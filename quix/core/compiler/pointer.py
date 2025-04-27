@@ -1,8 +1,8 @@
 from typing import Final, Self
 
 from quix.core.opcodes.dtypes import Code, Ref
+from quix.core.values import BFCommands
 
-from .commands import BFCommands
 from .layout import BFMemoryLayout
 from .types import Ptr
 

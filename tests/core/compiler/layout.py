@@ -2,7 +2,7 @@ from typing import Final
 
 import pytest
 
-from quix.core.visitor.bf import BFMemoryLayout
+from quix.core.compiler import BFMemoryLayout
 from quix.exceptions.core import RefNotFound
 
 

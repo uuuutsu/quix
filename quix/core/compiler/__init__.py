@@ -3,8 +3,10 @@ __all__ = (
     "BFVisitor",
     "Ptr",
     "BFMemoryLayout",
+    "CoreVisitor",
 )
 
+from .base import CoreVisitor
 from .layout import BFMemoryLayout
 from .pointer import BFPointer
 from .types import Ptr

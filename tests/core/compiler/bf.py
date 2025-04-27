@@ -1,10 +1,10 @@
 from io import StringIO
 
+from quix.core.compiler import BFVisitor
+from quix.core.compiler.layout import BFMemoryLayout
+from quix.core.compiler.pointer import BFPointer
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add, inject, input, loop, output
-from quix.core.visitor.bf import BFVisitor
-from quix.core.visitor.bf.layout import BFMemoryLayout
-from quix.core.visitor.bf.pointer import BFPointer
 
 L = BFMemoryLayout
 

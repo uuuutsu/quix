@@ -1,10 +1,10 @@
 from io import StringIO
 
 from quix.bootstrap.program import SmartProgram
+from quix.core.compiler.layout import BFMemoryLayout
+from quix.core.compiler.pointer import BFPointer
+from quix.core.compiler.visitor import BFVisitor
 from quix.core.opcodes.dtypes import CoreProgram, Ref
-from quix.core.visitor.bf.layout import BFMemoryLayout
-from quix.core.visitor.bf.pointer import BFPointer
-from quix.core.visitor.bf.visitor import BFVisitor
 from quix.exec.simple import Executor
 from quix.memoptix import mem_compile
 
