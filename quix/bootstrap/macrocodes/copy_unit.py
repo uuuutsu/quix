@@ -9,11 +9,10 @@ from .move_unit import move_unit
 def copy_unit[Scale: Int8](value: Unit, to: dict[Unit, Scale]) -> ToConvert:
     buff = Unit(f"{value.name}_buffer")
 
-    if value in to:
-        raise ValueError(f"Copy target cannot contain copy origin: {value}")
+    return_scale = to.pop(value, Int8.from_value(0)).value + 1
 
     return [
         move_unit(value, {buff: Int8.from_value(1)}),
-        move_unit(buff, {value: Int8.from_value(1), **to}),
+        move_unit(buff, {value: Int8.from_value(return_scale), **to}),
         free(buff),
     ]
