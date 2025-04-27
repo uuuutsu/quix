@@ -1,6 +1,10 @@
 from dataclasses import dataclass
+from typing import dataclass_transform
 
-dtype = dataclass(slots=True, frozen=True)
+
+@dataclass_transform()
+def dtype[C](cls: type[C]) -> type[C]:
+    return dataclass(slots=True, frozen=True)(cls)
 
 
 @dtype
