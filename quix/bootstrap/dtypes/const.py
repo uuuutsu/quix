@@ -1,3 +1,5 @@
+from typing import Self
+
 from quix.tools import FlyweightMeta
 
 from .base import DType, dtype
@@ -6,6 +8,10 @@ from .base import DType, dtype
 @dtype
 class Const[C](DType, metaclass=FlyweightMeta):
     value: C
+
+    @classmethod
+    def from_value(cls: type[Self], value: C) -> Self:
+        return cls("const", value=value)
 
 
 @dtype

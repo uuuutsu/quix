@@ -7,6 +7,9 @@ from quix.core.opcodes import add, loop
 def move_unit[Scale: Int8](value: Unit, to: dict[Unit, Scale]) -> ToConvert:
     instrs = [add(value, -1)]
 
+    if value in to:
+        raise ValueError("Target set cannot contain origin `Unit`: {value}.")
+
     for unit, scale in to.items():
         instrs.append(add(unit, scale.value))
 
