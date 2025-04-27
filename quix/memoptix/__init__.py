@@ -6,9 +6,9 @@ __all__ = (
     "hard_link",
     "MemoptixOpcodes",
     #
-    "compile",
+    "mem_compile",
     "get_ref_scopes",
 )
 
-from .compile import compile, get_ref_scopes
+from .compile import get_ref_scopes, mem_compile
 from .opcodes import MemoptixOpcodes, array, free, hard_link, index, soft_link

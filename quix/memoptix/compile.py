@@ -22,7 +22,7 @@ from .opcodes import MemoptixOpcodes
 from .utils import find_optimal_usage_scope
 
 
-def compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
+def mem_compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
     scopes = get_ref_scopes(program)
     owners = create_owners(list(scopes.keys()))
 
