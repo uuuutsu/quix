@@ -8,10 +8,12 @@ __all__ = (
     "sub_unit",
     "call_z_unit",
     "call_neq_unit",
+    "call_eq_unit",
 )
 
 from .add_unit import add_unit
 from .assign_unit import assign_unit
+from .call_eq_unit import call_eq_unit
 from .call_neq_unit import call_neq_unit
 from .call_z_unit import call_z_unit
 from .clear_unit import clear_unit
