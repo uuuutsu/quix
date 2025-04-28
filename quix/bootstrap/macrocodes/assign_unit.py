@@ -7,7 +7,7 @@ from .copy_unit import copy_unit
 
 
 @convert
-def assign_unit[Literal: UInt8 | Int8](to: Unit, value: Unit | Literal) -> ToConvert:
+def assign_unit(to: Unit, value: Unit | UInt8 | Int8) -> ToConvert:
     if isinstance(value, Unit):
         return clear_unit(to), copy_unit(value, {to: Int8.from_value(1)})
 

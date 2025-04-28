@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Self
 
 from quix.tools import FlyweightMeta
@@ -21,6 +23,12 @@ class UInt8(Const[int]):
     def __post_init__(self) -> None:
         if self.value not in range(0, 256):
             raise ValueError(f"UInt8 can only be in range [0, 255]. Got: {self.value}")
+
+    def __mul__(self, other: UInt8) -> UInt8:
+        return UInt8.from_value(self.value * other.value % 256)
+
+    def __add__(self, other: UInt8) -> UInt8:
+        return UInt8.from_value(self.value + other.value % 256)
 
 
 @dtype
