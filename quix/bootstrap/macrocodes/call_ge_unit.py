@@ -11,7 +11,7 @@ from quix.memoptix.opcodes import free
 
 @convert
 def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
-    else_flag = Unit("else_ge_flag")
+    else_flag = Unit(f"{left.name}_ge_{right.name}_else_flag")
     left_buffer, right_buffer = Unit(f"{left.name}_buffer"), Unit(f"{right.name}_buffer")
 
     return [

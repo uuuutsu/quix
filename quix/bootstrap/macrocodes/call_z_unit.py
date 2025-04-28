@@ -7,7 +7,7 @@ from quix.memoptix.opcodes import free, soft_link
 
 @convert
 def call_z_unit(value: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
-    else_flag, zero = Unit("else_z_flag"), Unit("zero_flag")
+    else_flag, zero = Unit(f"{value.name}_else_z_flag"), Unit(f"{value.name}_zero")
 
     return [
         soft_link(value, {else_flag: 1, zero: 2}),

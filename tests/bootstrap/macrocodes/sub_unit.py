@@ -53,7 +53,7 @@ def test_sub_same_unit() -> None:
     assert sum(mem.values()) == 10
 
 
-def test_sub_same_unit_target() -> None:
+def test_sub_unit_same_unit_target() -> None:
     u1, u2 = Unit("u1"), Unit("u2")
     program = to_program(
         add(u1, 15),
@@ -68,7 +68,7 @@ def test_sub_same_unit_target() -> None:
     assert sum(mem.values()) == 15
 
 
-def test_sub_same_unit_everywhere() -> None:
+def test_sub_unit_same_unit_each_arg() -> None:
     u1 = Unit("u1")
     program = to_program(
         add(u1, 10),

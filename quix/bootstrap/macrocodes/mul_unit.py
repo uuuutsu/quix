@@ -38,26 +38,29 @@ def _mul_two_units(
     right: Unit,
     target: Unit,
 ) -> ToConvert:
-    cand_buf, plier_buf = Unit("cand_buf"), Unit("plier_buf")
+    left_buff, right_buff = Unit(f"{left.name}_buff"), Unit(f"{right.name}_buff")
 
     if left == right:
-        yield move_unit(left, {cand_buf: Int8.from_value(1), plier_buf: Int8.from_value(1)})
+        yield move_unit(left, {left_buff: Int8.from_value(1), right_buff: Int8.from_value(1)})
     else:
-        yield move_unit(left, {cand_buf: Int8.from_value(1)})
-        yield move_unit(right, {plier_buf: Int8.from_value(1)})
+        yield move_unit(left, {left_buff: Int8.from_value(1)})
+        yield move_unit(right, {right_buff: Int8.from_value(1)})
 
-    yield clear_unit(target)
+    if target not in (left, right):
+        yield clear_unit(target)
 
-    loop_instrs = add_unit(cand_buf, target, target)
+    loop_instrs = add_unit(left_buff, target, target)
     if left != right != target:
         loop_instrs |= add(right, 1)
-    loop_instrs |= add(plier_buf, -1)
-    yield loop(plier_buf, loop_instrs)
+    loop_instrs |= add(right_buff, -1)
+    yield loop(right_buff, loop_instrs)
 
     if left != target:
-        yield move_unit(cand_buf, {left: Int8.from_value(1)})
+        yield move_unit(left_buff, {left: Int8.from_value(1)})
+    else:
+        yield clear_unit(left_buff)
 
     return [
-        free(cand_buf),
-        free(plier_buf),
+        free(left_buff),
+        free(right_buff),
     ]
