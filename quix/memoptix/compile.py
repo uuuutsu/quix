@@ -22,8 +22,8 @@ from .opcodes import MemoptixOpcodes
 from .utils import find_optimal_usage_scope
 
 
-def mem_compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
-    scopes = get_ref_scopes(program)
+def mem_compile(program: CoreProgram, garbage_collector: bool = True) -> tuple[CoreProgram, dict[Ref, int]]:
+    scopes = get_ref_scopes(program, garbage_collector)
     owners = create_owners(list(scopes.keys()))
 
     blueprints = create_blueprints(create_constraints(program, owners, scopes))
@@ -35,18 +35,47 @@ def mem_compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
 
 
 @overload
-def get_ref_scopes(program: CoreProgram, *, close: Literal[True] = True) -> dict[Ref, tuple[int, int]]: ...
+def get_ref_scopes(
+    program: CoreProgram,
+    garbage_collector: bool = True,
+    *,
+    close: Literal[True] = True,
+) -> dict[
+    Ref,
+    tuple[int, int],
+]: ...
 @overload
 def get_ref_scopes(
-    program: CoreProgram, *, close: Literal[False] = False
-) -> tuple[dict[Ref, tuple[int, int | None]], list[tuple[int, int]], int]: ...
+    program: CoreProgram,
+    garbage_collector: bool = True,
+    *,
+    close: Literal[False] = False,
+) -> tuple[
+    dict[Ref, tuple[int, int | None]],
+    list[tuple[int, int]],
+    int,
+]: ...
 def get_ref_scopes(
-    program: CoreProgram, *, close: bool = True
-) -> tuple[dict[Ref, tuple[int, int | None]], list[tuple[int, int]], int] | dict[Ref, tuple[int, int]]:
+    program: CoreProgram,
+    garbage_collector: bool = True,
+    *,
+    close: bool = True,
+) -> (
+    tuple[
+        dict[Ref, tuple[int, int | None]],
+        list[tuple[int, int]],
+        int,
+    ]
+    | dict[
+        Ref,
+        tuple[int, int],
+    ]
+):
     rough_usages: dict[Ref, tuple[int, int | None]] = {}
     loops: list[tuple[int, int]] = []
     curr_opcode_idx: int = 0
     length: int = 0
+
     for opcode in program:
         if (ref := opcode.args().get("ref")) is None:
             ...
@@ -103,6 +132,9 @@ def get_ref_scopes(
 
     adjusted_usages: dict[Ref, tuple[int, int]] = {}
     for ref, (start_, end_) in rough_usages.items():
+        if garbage_collector is False:
+            adjusted_usages[ref] = (0, curr_opcode_idx - 1)
+            continue
         end_ = end_ if end_ is not None else curr_opcode_idx - 1
         adjusted_usages[ref] = find_optimal_usage_scope((start_, end_), loops)
 

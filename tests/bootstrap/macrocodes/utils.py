@@ -10,10 +10,10 @@ from quix.memoptix import mem_compile
 
 
 def run(program: SmartProgram) -> dict[Ref, int]:
-    core_program, mapping = mem_compile(program.build())
+    core_program, mapping = mem_compile(program.build(), garbage_collector=False)
     code = _compile_to_bf(core_program, mapping)
     executor = Executor(code).run()
-    print(code)
+
     memory = executor.memory.cells
     values = {ref: memory[idx] for ref, idx in mapping.items()}
 
