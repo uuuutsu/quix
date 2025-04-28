@@ -26,7 +26,11 @@ def mem_compile(program: CoreProgram, garbage_collector: bool = True) -> tuple[C
     scopes = get_ref_scopes(program, garbage_collector)
     owners = create_owners(list(scopes.keys()))
 
-    blueprints = create_blueprints(create_constraints(program, owners, scopes))
+    constrs = create_constraints(program, owners)
+    cycle_constrs = create_lifecycle_constraints(owners, scopes)
+    constraints = merge_constraints(constrs, cycle_constrs)
+
+    blueprints = create_blueprints(constraints)
     layout = Scheduler(create_resolver_registry(), create_slider_registry()).schedule(*blueprints)
 
     memory = {owner.ref: index for owner, index in layout.mapping().items()}
@@ -150,10 +154,32 @@ def create_owners(refs: Iterable[Ref]) -> dict[Ref, Owner]:
     return mapping
 
 
+def merge_constraints(
+    left: dict[Owner, list[BaseConstraint]], right: dict[Owner, list[BaseConstraint]]
+) -> dict[Owner, list[BaseConstraint]]:
+    constrs: dict[Owner, list[BaseConstraint]] = left
+    for owner, right_constrs in right.items():
+        if owner in constrs:
+            constrs[owner].extend(right_constrs)
+        else:
+            constrs[owner] = right_constrs
+    return constrs
+
+
+def create_lifecycle_constraints(
+    mapping: dict[Ref, Owner],
+    lifecycles: dict[Ref, tuple[int, int]],
+) -> dict[Owner, list[BaseConstraint]]:
+    constrs: dict[Owner, list[BaseConstraint]] = {}
+    for ref, cycle in lifecycles.items():
+        own_constrs = constrs.setdefault(mapping[ref], [])
+        own_constrs.append(LifeCycle(*cycle))
+    return constrs
+
+
 def create_constraints(
     program: CoreProgram,
     mapping: dict[Ref, Owner],
-    lifecycles: dict[Ref, tuple[int, int]],
 ) -> dict[Owner, list[BaseConstraint]]:
     constrs: dict[Owner, list[BaseConstraint]] = {}
 
@@ -161,6 +187,7 @@ def create_constraints(
         args = opcode.args()
 
         own_constrs = constrs.setdefault(mapping[args.pop("ref")], [])
+
         match opcode.__id__:
             case MemoptixOpcodes.INDEX:
                 own_constrs.append(Index(**args))
@@ -172,10 +199,10 @@ def create_constraints(
             case MemoptixOpcodes.SOFT_LINK:
                 soft_to_: dict[Owner, int] = {mapping[ref]: scale for ref, scale in args["to_"].items()}
                 own_constrs.append(SoftLink(soft_to_))
-
-    for ref, cycle in lifecycles.items():
-        own_constrs = constrs.setdefault(mapping[ref], [])
-        own_constrs.append(LifeCycle(*cycle))
+            case CoreOpcodes.LOOP:
+                sub_program: CoreProgram = opcode.args()["program"]
+                sub_owner_constrs = create_constraints(sub_program, mapping)
+                constrs = merge_constraints(constrs, sub_owner_constrs)
 
     return constrs
 
