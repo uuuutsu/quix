@@ -6,7 +6,7 @@ from .move_unit import move_unit
 
 
 @convert
-def copy_unit[Scale: Int8](value: Unit, to: dict[Unit, Scale]) -> ToConvert:
+def copy_unit(value: Unit, to: dict[Unit, Int8]) -> ToConvert:
     buff = Unit(f"{value.name}_buffer")
 
     return_scale = to.pop(value, Int8.from_value(0)).value + 1

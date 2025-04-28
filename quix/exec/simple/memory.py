@@ -30,6 +30,8 @@ class Memory:
             data = ord(data)
 
         self._array[self._pointer] = data
+        if self._array[self._pointer] > 255:
+            self._array[self._pointer] = 0
 
     def load(self) -> int:
         return self._array[self._pointer]

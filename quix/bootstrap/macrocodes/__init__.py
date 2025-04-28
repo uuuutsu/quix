@@ -6,6 +6,7 @@ __all__ = (
     "add_unit",
     "assign_unit",
     "call_z_unit",
+    "sub_unit",
 )
 
 from .add_unit import add_unit
@@ -15,3 +16,4 @@ from .clear_unit import clear_unit
 from .clear_wide import clear_wide
 from .copy_unit import copy_unit
 from .move_unit import move_unit
+from .sub_unit import sub_unit

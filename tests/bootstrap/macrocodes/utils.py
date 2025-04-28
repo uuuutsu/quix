@@ -13,7 +13,7 @@ def run(program: SmartProgram) -> dict[Ref, int]:
     core_program, mapping = mem_compile(program.build())
     code = _compile_to_bf(core_program, mapping)
     executor = Executor(code).run()
-
+    print(code)
     memory = executor.memory.cells
     values = {ref: memory[idx] for ref, idx in mapping.items()}
 
