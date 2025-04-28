@@ -28,9 +28,9 @@ def _mul_by_int(
     target: Unit,
 ) -> ToConvert:
     if left == target:
-        return copy_unit(left, {target: Int8.from_value(right.value - 1)})
+        return copy_unit(left, {target: (right - 1).to(Int8)})
 
-    return clear_unit(target) | copy_unit(left, {target: Int8.from_value(right.value)})
+    return clear_unit(target) | copy_unit(left, {target: right.to(Int8)})
 
 
 def _mul_two_units(

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Self
+from collections.abc import Callable
+from logging import warning
+from typing import ClassVar, Self
 
 from quix.tools import FlyweightMeta
 
@@ -13,28 +15,62 @@ class Const[C](DType, metaclass=FlyweightMeta):
 
     @classmethod
     def from_value(cls: type[Self], value: C) -> Self:
-        return cls("const", value=value)
+        return cls(f"Const( {value} )", value=value)
+
+
+def _wrap(value: int, min: int, max: int) -> int:
+    range = max - min + 1
+    value -= min
+    value %= range
+    value += min
+    return value
 
 
 @dtype
-class UInt8(Const[int]):
+class _Int(Const[int]):
+    _MIN: ClassVar[int]
+    _MAX: ClassVar[int]
+
     value: int
 
     def __post_init__(self) -> None:
-        if self.value not in range(0, 256):
-            raise ValueError(f"UInt8 can only be in range [0, 255]. Got: {self.value}")
+        if not (self._MIN <= self.value <= self._MAX):
+            new_value = _wrap(self.value, self._MIN, self._MAX)
+            warning(
+                f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MIN}]."
+                "\n\tPassed: {self.value}\n\tWrapped to: {new_value}"
+            )
+            object.__setattr__(self, "value", new_value)
 
-    def __mul__(self, other: UInt8) -> UInt8:
-        return UInt8.from_value(self.value * other.value % 256)
+    def __mul__[C: _Int](self: C, other: C | int) -> C:
+        return self._op(other, lambda x, y: x * y)
 
-    def __add__(self, other: UInt8) -> UInt8:
-        return UInt8.from_value(self.value + other.value % 256)
+    def __add__[C: _Int](self: C, other: C | int) -> C:
+        return self._op(other, lambda x, y: x + y)
+
+    def __sub__[C: _Int](self: C, other: C | int) -> C:
+        return self._op(other, lambda x, y: x - y)
+
+    def _op[C: _Int](self: C, other: C | int, func: Callable[[int, int], int]) -> C:
+        if isinstance(other, int):
+            return self.from_value(self.wrap(func(self.value, other)))
+        return self.from_value(self.wrap(func(self.value, other.value)))
+
+    def to[C: _Int](self, other: type[C]) -> C:
+        return other.from_value(other.wrap(self.value))
+
+    @classmethod
+    def wrap(cls, value: int) -> int:
+        return _wrap(value, cls._MIN, cls._MAX)
 
 
 @dtype
-class Int8(Const[int]):
-    value: int
+class UInt8(_Int):
+    _MIN: ClassVar[int] = 0
+    _MAX: ClassVar[int] = 255
 
-    def __post_init__(self) -> None:
-        if self.value not in range(-128, 128):
-            raise ValueError(f"Int8 can only be in range [-128, 128]. Got: {self.value}")
+
+@dtype
+class Int8(_Int):
+    _MIN: ClassVar[int] = -128
+    _MAX: ClassVar[int] = 127
