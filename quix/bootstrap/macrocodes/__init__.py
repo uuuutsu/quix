@@ -19,9 +19,12 @@ __all__ = (
     "or_unit",
     "xor_unit",
     "not_unit",
+    "add_unit_carry",
+    "move_unit_carry",
 )
 
 from .add_unit import add_unit
+from .add_unit_carry import add_unit_carry
 from .and_unit import and_unit
 from .assign_unit import assign_unit
 from .call_eq_unit import call_eq_unit
@@ -36,6 +39,7 @@ from .clear_wide import clear_wide
 from .copy_unit import copy_unit
 from .div_unit import div_unit
 from .move_unit import move_unit
+from .move_unit_carry import move_unit_carry
 from .mul_unit import mul_unit
 from .not_unit import not_unit
 from .or_unit import or_unit

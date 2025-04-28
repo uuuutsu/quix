@@ -4,7 +4,7 @@ from quix.core.opcodes import add, loop
 
 
 @convert
-def move_unit[Scale: Int8](value: Unit, to: dict[Unit, Scale]) -> ToConvert:
+def move_unit(value: Unit, to: dict[Unit, Int8]) -> ToConvert:
     instrs = [add(value, -1)]
 
     if value in to:
