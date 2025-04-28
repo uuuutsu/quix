@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator
+from collections.abc import Callable, Generator, Iterable, Iterator
 from functools import wraps
 from typing import Self
 
@@ -8,7 +8,9 @@ from rich.repr import Result, rich_repr
 
 from quix.core.opcodes import CoreOpcode, CoreProgram
 
-type ToConvert = CoreProgram | CoreOpcode | SmartProgram | Iterable[ToConvert] | None
+type ToConvert = (
+    CoreProgram | CoreOpcode | SmartProgram | Iterable[ToConvert] | Generator[ToConvert, None, ToConvert] | None
+)
 
 
 @rich_repr
@@ -43,6 +45,10 @@ class SmartProgram:
         yield from self._program
 
 
+def _unwrap_generator(func: Generator[ToConvert, None, ToConvert]) -> Iterable[ToConvert]:
+    yield (yield from func)
+
+
 def to_program(data: ToConvert, *include: ToConvert) -> SmartProgram:
     if include:
         data = (data, include)
@@ -54,6 +60,8 @@ def to_program(data: ToConvert, *include: ToConvert) -> SmartProgram:
             return SmartProgram()
         case CoreOpcode():
             return SmartProgram([data])
+        case Generator():
+            return to_program(*_unwrap_generator(data))
         case Iterable():
             program: list[CoreOpcode] = []
             for value in data:
