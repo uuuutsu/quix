@@ -18,6 +18,7 @@ __all__ = (
     "and_unit",
     "or_unit",
     "xor_unit",
+    "not_unit",
 )
 
 from .add_unit import add_unit
@@ -36,6 +37,7 @@ from .copy_unit import copy_unit
 from .div_unit import div_unit
 from .move_unit import move_unit
 from .mul_unit import mul_unit
+from .not_unit import not_unit
 from .or_unit import or_unit
 from .sub_unit import sub_unit
 from .xor_unit import xor_unit
