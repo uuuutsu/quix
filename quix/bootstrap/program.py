@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from functools import wraps
 from typing import Self
 
@@ -35,6 +35,9 @@ class SmartProgram:
 
     def build(self) -> CoreProgram:
         return self._program
+
+    def __iter__(self) -> Iterator[CoreOpcode]:
+        return self._program.__iter__()
 
     def __rich_repr__(self) -> Result:
         yield from self._program

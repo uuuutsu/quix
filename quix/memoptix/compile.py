@@ -26,7 +26,7 @@ def mem_compile(program: CoreProgram) -> tuple[CoreProgram, dict[Ref, int]]:
     scopes = get_ref_scopes(program)
     owners = create_owners(list(scopes.keys()))
 
-    blueprints = create_blueprints_by_domain(create_constraints(program, owners, scopes))
+    blueprints = create_blueprints(create_constraints(program, owners, scopes))
     layout = Scheduler(create_resolver_registry(), create_slider_registry()).schedule(*blueprints)
 
     memory = {owner.ref: index for owner, index in layout.mapping().items()}
@@ -138,7 +138,7 @@ def create_constraints(
                 hard_to_ = mapping[args.pop("to_")]
                 own_constrs.append(HardLink(hard_to_, **args))
             case MemoptixOpcodes.SOFT_LINK:
-                soft_to_: dict[Owner, int] = {mapping[ref]: scale for ref, scale in args["to_"]}
+                soft_to_: dict[Owner, int] = {mapping[ref]: scale for ref, scale in args["to_"].items()}
                 own_constrs.append(SoftLink(soft_to_))
 
     for ref, cycle in lifecycles.items():
@@ -148,22 +148,55 @@ def create_constraints(
     return constrs
 
 
-def create_blueprints_by_domain(constraints: dict[Owner, list[BaseConstraint]]) -> list[Blueprint]:
-    domain2constr: dict[tuple[type[BaseConstraint], ...], dict[Owner, list[BaseConstraint]]] = {}
+def create_blueprints(constraints: dict[Owner, list[BaseConstraint]]) -> list[Blueprint]:
+    domain2constr: list[
+        dict[
+            tuple[type[BaseConstraint], ...],
+            dict[Owner, list[BaseConstraint]],
+        ]
+    ] = []
 
-    for owner, constrs in constraints.items():
-        domain = tuple(type(constr) for constr in constrs)
-        domain2constr.setdefault(domain, {})[owner] = constrs
+    for constr_set in group_constraints_by_owners(constraints):
+        constr_mapping: dict[
+            tuple[type[BaseConstraint], ...],
+            dict[Owner, list[BaseConstraint]],
+        ] = {}
+        for owner, constrs in constr_set.items():
+            domain = tuple(type(constr) for constr in constrs)
+            constr_mapping.setdefault(domain, {})[owner] = constrs
+        domain2constr.append(constr_mapping)
 
     blueprints: list[Blueprint] = []
-    for constr_set in domain2constr.values():
+    for constr_mapping in domain2constr:
         new_blueprint = Blueprint()
-        for owner, constrs in constr_set.items():
-            new_blueprint.add_constraints(owner, *constrs)
-
+        for constr_set in constr_mapping.values():
+            for owner, constrs in constr_set.items():
+                new_blueprint.add_constraints(owner, *constrs)
         blueprints.append(new_blueprint)
 
     return blueprints
+
+
+def group_constraints_by_owners(
+    constraints: dict[Owner, list[BaseConstraint]],
+) -> list[dict[Owner, list[BaseConstraint]]]:
+    owner2mapping: dict[Owner, dict[Owner, list[BaseConstraint]]] = {}
+    roots: list[Owner] = []
+
+    for owner, constrs in constraints.items():
+        if owner not in owner2mapping:
+            owner2mapping[owner] = {}
+            roots.append(owner)
+
+        mapping = owner2mapping[owner]
+        mapping[owner] = constrs
+
+        for constr in constrs:
+            for related_owner in constr.get_owners():
+                owner2mapping[related_owner] = mapping
+
+    unique_list = [owner2mapping[owner] for owner in roots]
+    return unique_list
 
 
 def strip_program(program: CoreProgram) -> CoreProgram:
