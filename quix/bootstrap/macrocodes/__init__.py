@@ -15,9 +15,11 @@ __all__ = (
     "call_lt_unit",
     "mul_unit",
     "div_unit",
+    "and_unit",
 )
 
 from .add_unit import add_unit
+from .and_unit import and_unit
 from .assign_unit import assign_unit
 from .call_eq_unit import call_eq_unit
 from .call_ge_unit import call_ge_unit
