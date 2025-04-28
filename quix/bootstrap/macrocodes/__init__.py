@@ -10,12 +10,18 @@ __all__ = (
     "call_neq_unit",
     "call_eq_unit",
     "call_ge_unit",
+    "call_gt_unit",
+    "call_le_unit",
+    "call_lt_unit",
 )
 
 from .add_unit import add_unit
 from .assign_unit import assign_unit
 from .call_eq_unit import call_eq_unit
 from .call_ge_unit import call_ge_unit
+from .call_gt_unit import call_gt_unit
+from .call_le_unit import call_le_unit
+from .call_lt_unit import call_lt_unit
 from .call_neq_unit import call_neq_unit
 from .call_z_unit import call_z_unit
 from .clear_unit import clear_unit
