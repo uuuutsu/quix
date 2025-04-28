@@ -51,6 +51,9 @@ class _Int(Const[int]):
     def __sub__[C: _Int](self: C, other: C | int) -> C:
         return self._op(other, lambda x, y: x - y)
 
+    def __divmod__[C: _Int](self: C, other: C | int) -> tuple[C, C]:
+        return self._op(other, lambda x, y: x // y), self._op(other, lambda x, y: x % y)
+
     def _op[C: _Int](self: C, other: C | int, func: Callable[[int, int], int]) -> C:
         if isinstance(other, int):
             return self.from_value(self.wrap(func(self.value, other)))

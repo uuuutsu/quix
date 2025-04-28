@@ -14,6 +14,7 @@ __all__ = (
     "call_le_unit",
     "call_lt_unit",
     "mul_unit",
+    "div_unit",
 )
 
 from .add_unit import add_unit
@@ -28,6 +29,7 @@ from .call_z_unit import call_z_unit
 from .clear_unit import clear_unit
 from .clear_wide import clear_wide
 from .copy_unit import copy_unit
+from .div_unit import div_unit
 from .move_unit import move_unit
 from .mul_unit import mul_unit
 from .sub_unit import sub_unit
