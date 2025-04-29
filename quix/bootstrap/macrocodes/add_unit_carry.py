@@ -1,8 +1,6 @@
-from typing import overload
-
 from quix.bootstrap.dtypes import UInt8, Unit
 from quix.bootstrap.dtypes.const import Int8
-from quix.bootstrap.program import SmartProgram, ToConvert, convert
+from quix.bootstrap.program import ToConvert, convert
 from quix.memoptix.opcodes import free
 
 from .assign_unit import assign_unit
@@ -11,20 +9,6 @@ from .move_unit import move_unit
 from .move_unit_carry import move_unit_carry
 
 
-@overload
-def add_unit_carry(
-    left: Unit,
-    right: Unit | UInt8,
-    target: Unit,
-    carry: tuple[Unit, ...],
-) -> SmartProgram: ...
-@overload
-def add_unit_carry(
-    left: Unit | UInt8,
-    right: Unit,
-    target: Unit,
-    carry: tuple[Unit, ...],
-) -> SmartProgram: ...
 @convert
 def add_unit_carry(
     left: Unit | UInt8,

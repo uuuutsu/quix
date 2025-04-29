@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import overload
 
 from .base import DType, dtype
 from .unit import Unit
@@ -19,6 +20,13 @@ class Wide(DType):
 
     def __len__(self) -> int:
         return len(self.units)
+
+    @overload
+    def __getitem__(self, item: int) -> Unit: ...
+    @overload
+    def __getitem__(self, item: slice) -> tuple[Unit, ...]: ...
+    def __getitem__(self, item: int | slice) -> Unit | tuple[Unit, ...]:
+        return self.units[item]
 
     @classmethod
     def from_length(cls, name: str, length: int) -> Wide:

@@ -54,3 +54,16 @@ def test_mul_unit_carry_same_unit() -> None:
     assert mem[u1] == 144
     assert mem[u2] == 101
     assert sum(mem.values()) == 245
+
+
+def test_mul_unit_carry_two_ints() -> None:
+    u1 = Unit("u1")
+    program = to_program(
+        add(u1, 100),
+        mul_unit_carry(UInt8.from_value(20), UInt8.from_value(20), u1, (u1,)),
+    )
+
+    mem = run(program)
+
+    assert mem[u1] == 145
+    assert sum(mem.values()) == 145
