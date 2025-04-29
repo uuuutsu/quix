@@ -13,9 +13,11 @@ def add_wide(
     right: Wide | DynamicUInt,
     target: Wide,
 ) -> ToConvert:
-    left_unit: UInt8 | Unit
-    right_unit: UInt8 | Unit
-    for idx, (left_unit, right_unit, target_unit) in enumerate(zip(left, right, target, strict=True)):  # type: ignore
-        yield add_unit_carry(left_unit, right_unit, target_unit, target[idx + 1 :])
+    args: tuple[tuple[UInt8 | Unit, UInt8 | Unit, Unit]] = tuple(zip(left, right, target, strict=True))  # type: ignore
+    # We must start adding from the end, to avoid zeroing carries
+    inv_args = args[::-1]
+
+    for idx, (left_unit, right_unit, target_unit) in enumerate(inv_args):
+        yield add_unit_carry(left_unit, right_unit, target_unit, target[-idx:])
 
     return None

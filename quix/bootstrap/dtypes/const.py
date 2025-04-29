@@ -95,14 +95,10 @@ class Int8(_Int):
 
 
 @dtype
-class DynamicUInt(Const[int]):
-    size: int
+class DynamicUInt(Const[tuple[UInt8, ...]]):
+    @property
+    def size(self) -> int:
+        return len(self.value)
 
     def __iter__(self) -> Iterator[UInt8]:
-        curr_size: int = 0
-        for int_ in _int_to_cell_size(self.value):
-            yield UInt8.from_value(int_)
-            curr_size += 1
-
-        for _ in range(curr_size, self.size):
-            yield UInt8.from_value(0)
+        return self.value.__iter__()

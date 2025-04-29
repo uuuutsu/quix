@@ -28,6 +28,10 @@ class Wide(DType):
     def __getitem__(self, item: int | slice) -> Unit | tuple[Unit, ...]:
         return self.units[item]
 
+    @property
+    def size(self) -> int:
+        return len(self)
+
     @classmethod
     def from_length(cls, name: str, length: int) -> Wide:
         units = []
