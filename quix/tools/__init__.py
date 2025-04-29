@@ -13,9 +13,13 @@ __all__ = (
     "dp_factory",
     #
     "intervals_intersects",
+    #
+    "Arg",
+    "check",
 )
 
 from .case import pascal_case_to_snake_case, snake_case_to_pascal_case
+from .check import Arg, check
 from .dispatcher import DynamicOverload, dp_factory
 from .flyweight import FlyweightMeta, FlyweightStateType
 from .math import intervals_intersects
