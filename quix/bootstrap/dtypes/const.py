@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from logging import warning
 from typing import ClassVar, Self
 
@@ -24,6 +24,18 @@ def _wrap(value: int, min: int, max: int) -> int:
     value %= range
     value += min
     return value
+
+
+def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
+    byte_list = []
+    while number > 0:
+        byte_list.append(number & 0xFF)
+        number >>= 8
+
+    if not byte_list:
+        return [0]
+
+    return byte_list[::-1] if little_endian else byte_list
 
 
 @dtype
@@ -80,3 +92,14 @@ class UInt8(_Int):
 class Int8(_Int):
     _MIN: ClassVar[int] = -128
     _MAX: ClassVar[int] = 127
+
+
+@dtype
+class DynamicUInt(Const[int]):
+    @property
+    def size(self) -> int:
+        return len(_int_to_cell_size(self.value))
+
+    def __iter__(self) -> Iterator[UInt8]:
+        for int_ in _int_to_cell_size(self.value):
+            yield UInt8.from_value(int_)
