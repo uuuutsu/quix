@@ -41,7 +41,6 @@ def decompile(
                 old_program, old_curr_ptr, old_memory = loop_stack.pop()
                 if curr_ptr != old_curr_ptr:
                     raise RuntimeError("Unbalanced loops are not supported")
-                    ...
 
                 memory.update(old_memory)
                 old_program.append(loop(get_current_ref(), program))

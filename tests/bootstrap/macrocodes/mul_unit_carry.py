@@ -50,7 +50,7 @@ def test_mul_unit_carry_same_unit() -> None:
     )
 
     mem = run(program)
-    print(mem)
+
     assert mem[u1] == 144
     assert mem[u2] == 101
     assert sum(mem.values()) == 245
