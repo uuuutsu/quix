@@ -21,6 +21,7 @@ __all__ = (
     "not_unit",
     "add_unit_carry",
     "move_unit_carry",
+    "sub_unit_carry",
 )
 
 from .add_unit import add_unit
@@ -44,4 +45,5 @@ from .mul_unit import mul_unit
 from .not_unit import not_unit
 from .or_unit import or_unit
 from .sub_unit import sub_unit
+from .sub_unit_carry import sub_unit_carry
 from .xor_unit import xor_unit

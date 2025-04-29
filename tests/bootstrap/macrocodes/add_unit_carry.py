@@ -39,3 +39,18 @@ def test_add_unit_carry_unit() -> None:
     assert mem[u3] == 94
     assert mem[u4] == 0
     assert sum(mem.values()) == 444
+
+
+def test_add_unit_carry_same_unit() -> None:
+    u1, u2 = Unit("u1"), Unit("u2")
+    program = to_program(
+        add(u1, 100),
+        add(u2, 100),
+        add_unit_carry(u1, u1, u1, (u2,)),
+    )
+
+    mem = run(program)
+
+    assert mem[u1] == 200
+    assert mem[u2] == 100
+    assert sum(mem.values()) == 300

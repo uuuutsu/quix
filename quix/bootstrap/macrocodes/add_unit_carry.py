@@ -32,15 +32,19 @@ def _addc_to_target(argument: Unit | UInt8, target: Unit, carry: tuple[Unit, ...
         yield move_unit_carry(buffer, {target: Int8.from_value(1)}, {target: carry})
         return free(buffer)
 
-    return _move_without_clear_with_carry(argument, target, carry)
+    return _move_without_clear_with_carry_increment(argument, target, carry)
 
 
-def _move_without_clear_with_carry(
+def _move_without_clear_with_carry_increment(
     from_: Unit,
     to_: Unit,
     carry: tuple[Unit, ...],
 ) -> ToConvert:
     buffer = Unit("buffer")
     yield move_unit(from_, {buffer: Int8.from_value(1)})
-    yield move_unit_carry(buffer, {from_: Int8.from_value(1), to_: Int8.from_value(1)}, {to_: carry})
+
+    if from_ == to_:
+        yield move_unit_carry(buffer, {from_: Int8.from_value(2)}, {to_: carry})
+    else:
+        yield move_unit_carry(buffer, {from_: Int8.from_value(1), to_: Int8.from_value(1)}, {to_: carry})
     return free(buffer)
