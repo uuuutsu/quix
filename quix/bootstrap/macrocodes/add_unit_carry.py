@@ -1,6 +1,8 @@
+from typing import overload
+
 from quix.bootstrap.dtypes import UInt8, Unit
 from quix.bootstrap.dtypes.const import Int8
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.memoptix.opcodes import free
 
 from .assign_unit import assign_unit
@@ -9,19 +11,33 @@ from .move_unit import move_unit
 from .move_unit_carry import move_unit_carry
 
 
+@overload
+def add_unit_carry(
+    left: Unit,
+    right: Unit | UInt8,
+    target: Unit,
+    carry: tuple[Unit, ...],
+) -> SmartProgram: ...
+@overload
+def add_unit_carry(
+    left: Unit | UInt8,
+    right: Unit,
+    target: Unit,
+    carry: tuple[Unit, ...],
+) -> SmartProgram: ...
 @convert
 def add_unit_carry(
-    augend: Unit | UInt8,
-    addend: Unit | UInt8,
+    left: Unit | UInt8,
+    right: Unit | UInt8,
     target: Unit,
     carry: tuple[Unit, ...],
 ) -> ToConvert:
-    if target == augend:
-        return _addc_to_target(addend, target, carry)
-    elif target == addend:
-        return _addc_to_target(augend, target, carry)
+    if target == left:
+        return _addc_to_target(right, target, carry)
+    elif target == right:
+        return _addc_to_target(left, target, carry)
 
-    return clear_unit(target), _addc_to_target(augend, target, carry), _addc_to_target(addend, target, carry)
+    return clear_unit(target), _addc_to_target(left, target, carry), _addc_to_target(right, target, carry)
 
 
 def _addc_to_target(argument: Unit | UInt8, target: Unit, carry: tuple[Unit, ...]) -> ToConvert:
