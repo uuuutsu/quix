@@ -9,6 +9,16 @@ from quix.exec.simple import Executor
 from quix.memoptix import mem_compile
 
 
+def run_with_tape(program: SmartProgram) -> tuple[dict[Ref, int], list[int]]:
+    core_program, mapping = mem_compile(program.build(), garbage_collector=False)
+    code = _compile_to_bf(core_program, mapping)
+
+    executor = Executor(code).run()
+    memory = executor.memory.cells
+
+    return mapping, memory
+
+
 def run(program: SmartProgram) -> dict[Ref, int]:
     core_program, mapping = mem_compile(program.build(), garbage_collector=False)
     code = _compile_to_bf(core_program, mapping)
