@@ -17,4 +17,5 @@ def test_move_unit_simple() -> None:
     mem = run(program)
 
     assert mem[u1] == 10
-    assert mem[u2] == 10  # 30 + (-2 * 10)
+    assert mem[u2] == 10
+    assert sum(mem.values()) == 20

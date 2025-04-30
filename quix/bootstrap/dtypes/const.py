@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator
 from logging import warning
-from typing import ClassVar, Self
+from typing import ClassVar, Self, overload
 
 from quix.tools import FlyweightMeta
 
@@ -95,20 +95,25 @@ class Int8(_Int):
 
 
 @dtype
-class DynamicUInt(Const[tuple[UInt8, ...]]):
+class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
     @property
     def size(self) -> int:
         return len(self.value)
 
-    def __iter__(self) -> Iterator[UInt8]:
+    def __iter__(self) -> Iterator[I]:
         return self.value.__iter__()
+
+    @overload
+    def __getitem__(self, item: int) -> I: ...
+    @overload
+    def __getitem__(self, item: slice) -> tuple[I, ...]: ...
+    def __getitem__(self, item: int | slice) -> I | tuple[I, ...]:
+        return self.value[item]
 
 
 @dtype
-class DynamicInt(Const[tuple[Int8, ...]]):
-    @property
-    def size(self) -> int:
-        return len(self.value)
+class DynamicUInt(_DynamicInt[UInt8]): ...
 
-    def __iter__(self) -> Iterator[Int8]:
-        return self.value.__iter__()
+
+@dtype
+class DynamicInt(_DynamicInt[Int8]): ...
