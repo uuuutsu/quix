@@ -40,6 +40,7 @@ __all__ = (
     "call_le_wide",
     "call_lt_wide",
     "mul_wide",
+    "mul_wide_carry",
 )
 
 from .add_unit import add_unit
@@ -73,6 +74,7 @@ from .move_unit_carry import move_unit_carry
 from .mul_unit import mul_unit
 from .mul_unit_carry import mul_unit_carry
 from .mul_wide import mul_wide
+from .mul_wide_carry import mul_wide_carry
 from .not_unit import not_unit
 from .not_wide import not_wide
 from .or_unit import or_unit
