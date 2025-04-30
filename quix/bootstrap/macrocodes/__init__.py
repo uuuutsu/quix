@@ -33,6 +33,7 @@ __all__ = (
     "copy_wide",
     "not_wide",
     "add_wide_carry",
+    "sub_wide_carry",
 )
 
 from .add_unit import add_unit
@@ -67,5 +68,6 @@ from .or_wide import or_wide
 from .sub_unit import sub_unit
 from .sub_unit_carry import sub_unit_carry
 from .sub_wide import sub_wide
+from .sub_wide_carry import sub_wide_carry
 from .xor_unit import xor_unit
 from .xor_wide import xor_wide
