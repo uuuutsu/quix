@@ -27,6 +27,7 @@ __all__ = (
     "or_wide",
     "xor_wide",
     "assign_wide",
+    "clear_wide",
 )
 
 from .add_unit import add_unit
@@ -44,6 +45,7 @@ from .call_lt_unit import call_lt_unit
 from .call_neq_unit import call_neq_unit
 from .call_z_unit import call_z_unit
 from .clear_unit import clear_unit
+from .clear_wide import clear_wide
 from .copy_unit import copy_unit
 from .div_unit import div_unit
 from .move_unit import move_unit
