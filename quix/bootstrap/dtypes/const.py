@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator
 from logging import warning
-from typing import ClassVar, Self, overload
+from typing import ClassVar, Self, get_args, overload
 
 from quix.tools import FlyweightMeta
 
@@ -26,7 +26,7 @@ def _wrap(value: int, min: int, max: int) -> int:
     return value
 
 
-def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
+def _int_to_cell_size(number: int, *, little_endian: bool = False) -> list[int]:
     byte_list = []
     while number > 0:
         byte_list.append(number & 0xFF)
@@ -74,6 +74,9 @@ class _Int(Const[int]):
             return self.from_value(self.wrap(func(self.value, other)))
         return self.from_value(self.wrap(func(self.value, other.value)))
 
+    def __int__(self) -> int:
+        return self.value + self._MIN
+
     def to[C: _Int](self, other: type[C]) -> C:
         return other.from_value(other.wrap(self.value))
 
@@ -103,12 +106,45 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
     def __iter__(self) -> Iterator[I]:
         return self.value.__iter__()
 
+    def __divmod__[C: _DynamicInt[I]](self: C, other: C | int) -> tuple[C, C]:
+        return self._op(other, lambda x, y: x // y), self._op(other, lambda x, y: x % y)
+
+    def _op[C: _DynamicInt[I]](self: C, other: C | int, func: Callable[[int, int], int]) -> C:
+        if isinstance(other, int):
+            new_value = func(int(self), other)
+            return self.from_value(self.wrap(new_value))
+        return self.from_value(self.wrap(func(int(self), int(other))))
+
     @overload
     def __getitem__(self, item: int) -> I: ...
     @overload
     def __getitem__(self, item: slice) -> tuple[I, ...]: ...
     def __getitem__(self, item: int | slice) -> I | tuple[I, ...]:
         return self.value[item]
+
+    @classmethod
+    def wrap(cls, value: int) -> tuple[I, ...]:
+        int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
+        return tuple(int_cls.from_value(int_) for int_ in _int_to_cell_size(value))
+
+    def __int__(self) -> int:
+        final_value: int = 0
+        for int_ in self.value:
+            final_value <<= 8
+            final_value += int(int_)
+        return final_value
+
+    @classmethod
+    def from_int(cls, value: int, size: int | None = None) -> Self:
+        ints_ = cls.wrap(value)
+        if size is None:
+            return cls.from_value(ints_)
+        if len(ints_) > size:
+            return cls.from_value(ints_[:size])
+
+        int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
+        ints_ = tuple(int_cls.from_value(0) for _ in range(size - len(ints_))) + ints_
+        return cls.from_value(ints_)
 
 
 @dtype

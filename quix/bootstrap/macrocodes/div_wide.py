@@ -1,0 +1,134 @@
+from quix.bootstrap.dtypes import Wide
+from quix.bootstrap.dtypes.const import DynamicUInt, Int8
+from quix.bootstrap.dtypes.unit import Unit
+from quix.bootstrap.program import ToConvert, convert
+from quix.tools import Arg, check
+
+from .assign_wide import assign_wide
+from .call_z_wide import call_z_wide
+from .clear_wide import clear_wide
+from .dec_wide import dec_wide
+from .free_wide import free_wide
+from .inc_wide import inc_wide
+from .loop_wide import loop_wide
+from .move_unit_carry import move_unit_carry
+
+
+@convert
+@check(Arg("left").size == Arg("right").size)
+def div_wide(
+    left: Wide | DynamicUInt,
+    right: Wide | DynamicUInt,
+    quotient: Wide | None,
+    remainder: Wide | None,
+) -> ToConvert:
+    if remainder is quotient is None:
+        return None
+    elif remainder == quotient:
+        raise ValueError("Remainder cannot be Quotient")
+    elif isinstance(left, DynamicUInt) and isinstance(right, DynamicUInt):
+        return _div_wide_ints(left, right, quotient, remainder)
+    elif left == right:
+        return _div_wide_by_itself(quotient, remainder)
+
+    return _div_wides_and_ints(left, right, quotient, remainder)
+
+
+def _div_wide_ints(
+    left: DynamicUInt,
+    right: DynamicUInt,
+    quotient: Wide | None,
+    remainder: Wide | None,
+) -> ToConvert:
+    quot_int, rem_int = divmod(left, right)
+
+    if quotient:
+        yield assign_wide(quotient, quot_int)
+
+    if remainder:
+        yield assign_wide(remainder, rem_int)
+
+    return None
+
+
+def _div_wide_by_itself(
+    quotient: Wide | None,
+    remainder: Wide | None,
+) -> ToConvert:
+    if quotient:
+        yield assign_wide(quotient, DynamicUInt.from_int(0, size=quotient.size))
+
+    if remainder:
+        yield clear_wide(remainder)
+
+    return None
+
+
+def _div_wides_and_ints(
+    left: Wide | DynamicUInt,
+    right: Wide | DynamicUInt,
+    quotient: Wide | None,
+    remainder: Wide | None,
+) -> ToConvert:
+    rem_buff = Wide.from_length("rem_buff", right.size)
+    left_buff = Wide.from_length("left_buff", left.size)
+
+    dynamic_right: bool = False
+    if isinstance(right, DynamicUInt):
+        right_wide = Wide.from_length(f"{right.name}_buff", right.size)
+        yield assign_wide(right_wide, right)
+        dynamic_right = True
+    elif right in [quotient, remainder]:
+        right_wide = Wide.from_length(f"{right.name}_buff", right.size)
+        yield _move_wide(right, {right_wide: Int8.from_value(1)})
+        dynamic_right = True
+    else:
+        right_wide = right
+
+    if isinstance(left, DynamicUInt):
+        yield assign_wide(left_buff, left)
+    else:
+        yield _move_wide(left, {left_buff: Int8.from_value(1)})
+
+    if quotient:
+        yield clear_wide(quotient)
+
+    instrs = dec_wide(left_buff) | dec_wide(right_wide) | inc_wide(rem_buff)
+    if (left not in (remainder, quotient)) and isinstance(left, Wide):
+        instrs |= inc_wide(left)
+
+    if_ = _move_wide(rem_buff, {right_wide: Int8.from_value(1)})
+    if quotient:
+        if_ |= inc_wide(quotient)
+
+    instrs |= call_z_wide(right_wide, if_, [])
+
+    yield loop_wide(left_buff, instrs)
+
+    if dynamic_right:
+        yield clear_wide(right_wide), free_wide(right_wide)
+
+    if remainder:
+        yield clear_wide(remainder)
+    if remainder and not dynamic_right:
+        yield _move_wide(rem_buff, {right_wide: Int8.from_value(1), remainder: Int8.from_value(1)})
+    elif remainder:
+        yield _move_wide(rem_buff, {remainder: Int8.from_value(1)})
+    elif not dynamic_right:
+        yield _move_wide(rem_buff, {right_wide: Int8.from_value(1)})
+    else:
+        yield clear_wide(rem_buff)
+
+    return [free_wide(rem_buff), free_wide(left_buff)]
+
+
+@convert
+def _move_wide(orig: Wide, to: dict[Wide, Int8]) -> ToConvert:
+    for idx, unit in enumerate(orig):
+        unit_target: dict[Unit, Int8] = {}
+        carries: dict[Unit, tuple[Unit, ...]] = {}
+        for target, scale in to.items():
+            unit_target[target[idx]] = scale
+            carries[target[idx]] = target[idx + 1 :]
+        yield move_unit_carry(unit, unit_target, carries=carries)
+    return None
