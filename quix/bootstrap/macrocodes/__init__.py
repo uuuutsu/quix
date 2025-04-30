@@ -32,11 +32,13 @@ __all__ = (
     "call_z_wide",
     "copy_wide",
     "not_wide",
+    "add_wide_carry",
 )
 
 from .add_unit import add_unit
 from .add_unit_carry import add_unit_carry
 from .add_wide import add_wide
+from .add_wide_carry import add_wide_carry
 from .and_unit import and_unit
 from .and_wide import and_wide
 from .assign_unit import assign_unit
