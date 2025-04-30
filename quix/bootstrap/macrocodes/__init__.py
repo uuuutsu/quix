@@ -34,6 +34,7 @@ __all__ = (
     "not_wide",
     "add_wide_carry",
     "sub_wide_carry",
+    "call_neq_wide",
 )
 
 from .add_unit import add_unit
@@ -50,6 +51,7 @@ from .call_gt_unit import call_gt_unit
 from .call_le_unit import call_le_unit
 from .call_lt_unit import call_lt_unit
 from .call_neq_unit import call_neq_unit
+from .call_neq_wide import call_neq_wide
 from .call_z_unit import call_z_unit
 from .call_z_wide import call_z_wide
 from .clear_unit import clear_unit

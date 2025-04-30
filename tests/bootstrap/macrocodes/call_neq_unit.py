@@ -34,7 +34,7 @@ def test_call_neq_unit_if() -> None:
     u1, u2 = Unit("u1"), Unit("u2")
     program = to_program(
         add(u1, 10),
-        add(u2, 35),
+        add(u2, 11),
         call_neq_unit(
             u1,
             u2,
@@ -49,8 +49,8 @@ def test_call_neq_unit_if() -> None:
 
     mem = run(program)
     assert mem[u1] == 10
-    assert mem[u2] == 34
-    assert sum(mem.values()) == 44
+    assert mem[u2] == 10
+    assert sum(mem.values()) == 20
 
 
 def test_call_neq_unit_if_if() -> None:
