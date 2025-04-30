@@ -26,6 +26,7 @@ __all__ = (
     "and_wide",
     "or_wide",
     "xor_wide",
+    "assign_wide",
 )
 
 from .add_unit import add_unit
@@ -34,6 +35,7 @@ from .add_wide import add_wide
 from .and_unit import and_unit
 from .and_wide import and_wide
 from .assign_unit import assign_unit
+from .assign_wide import assign_wide
 from .call_eq_unit import call_eq_unit
 from .call_ge_unit import call_ge_unit
 from .call_gt_unit import call_gt_unit

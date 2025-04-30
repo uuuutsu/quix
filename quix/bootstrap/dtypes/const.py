@@ -102,3 +102,13 @@ class DynamicUInt(Const[tuple[UInt8, ...]]):
 
     def __iter__(self) -> Iterator[UInt8]:
         return self.value.__iter__()
+
+
+@dtype
+class DynamicInt(Const[tuple[Int8, ...]]):
+    @property
+    def size(self) -> int:
+        return len(self.value)
+
+    def __iter__(self) -> Iterator[Int8]:
+        return self.value.__iter__()
