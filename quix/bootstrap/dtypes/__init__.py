@@ -7,8 +7,10 @@ __all__ = (
     "Wide",
     "DynamicUInt",
     "DynamicInt",
+    "Array",
 )
 
+from .array import Array
 from .base import DType
 from .const import Const, DynamicInt, DynamicUInt, Int8, UInt8
 from .unit import Unit
