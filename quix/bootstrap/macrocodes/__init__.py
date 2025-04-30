@@ -28,6 +28,7 @@ __all__ = (
     "xor_wide",
     "assign_wide",
     "clear_wide",
+    "sub_wide",
 )
 
 from .add_unit import add_unit
@@ -57,5 +58,6 @@ from .or_unit import or_unit
 from .or_wide import or_wide
 from .sub_unit import sub_unit
 from .sub_unit_carry import sub_unit_carry
+from .sub_wide import sub_wide
 from .xor_unit import xor_unit
 from .xor_wide import xor_wide
