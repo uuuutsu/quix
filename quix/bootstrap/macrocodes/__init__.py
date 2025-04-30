@@ -39,6 +39,7 @@ __all__ = (
     "call_ge_wide",
     "call_gt_wide",
     "call_le_wide",
+    "call_lt_wide",
 )
 
 from .add_unit import add_unit
@@ -58,6 +59,7 @@ from .call_gt_wide import call_gt_wide
 from .call_le_unit import call_le_unit
 from .call_le_wide import call_le_wide
 from .call_lt_unit import call_lt_unit
+from .call_lt_wide import call_lt_wide
 from .call_neq_unit import call_neq_unit
 from .call_neq_wide import call_neq_wide
 from .call_z_unit import call_z_unit
