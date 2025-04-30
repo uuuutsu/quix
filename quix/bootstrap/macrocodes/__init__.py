@@ -31,6 +31,7 @@ __all__ = (
     "sub_wide",
     "call_z_wide",
     "copy_wide",
+    "not_wide",
 )
 
 from .add_unit import add_unit
@@ -58,6 +59,7 @@ from .move_unit_carry import move_unit_carry
 from .mul_unit import mul_unit
 from .mul_unit_carry import mul_unit_carry
 from .not_unit import not_unit
+from .not_wide import not_wide
 from .or_unit import or_unit
 from .or_wide import or_wide
 from .sub_unit import sub_unit
