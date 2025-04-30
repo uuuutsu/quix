@@ -36,6 +36,7 @@ __all__ = (
     "sub_wide_carry",
     "call_neq_wide",
     "call_eq_wide",
+    "call_ge_wide",
 )
 
 from .add_unit import add_unit
@@ -49,6 +50,7 @@ from .assign_wide import assign_wide
 from .call_eq_unit import call_eq_unit
 from .call_eq_wide import call_eq_wide
 from .call_ge_unit import call_ge_unit
+from .call_ge_wide import call_ge_wide
 from .call_gt_unit import call_gt_unit
 from .call_le_unit import call_le_unit
 from .call_lt_unit import call_lt_unit
