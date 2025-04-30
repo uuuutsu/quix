@@ -23,12 +23,14 @@ __all__ = (
     "sub_unit_carry",
     "mul_unit_carry",
     "add_wide",
+    "and_wide",
 )
 
 from .add_unit import add_unit
 from .add_unit_carry import add_unit_carry
 from .add_wide import add_wide
 from .and_unit import and_unit
+from .and_wide import and_wide
 from .assign_unit import assign_unit
 from .call_eq_unit import call_eq_unit
 from .call_ge_unit import call_ge_unit
