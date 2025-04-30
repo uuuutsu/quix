@@ -1,13 +1,13 @@
 from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.macrocodes import call_neq_wide
+from quix.bootstrap.macrocodes import call_eq_wide
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
 
 from .utils import run
 
 
-def test_call_neq_wide_else() -> None:
+def test_call_eq_wide_if() -> None:
     w1, w2 = Wide.from_length("w1", 2), Wide.from_length("w2", 2)
     u1 = Unit("u1")
     program = to_program(
@@ -15,7 +15,7 @@ def test_call_neq_wide_else() -> None:
         add(w1[1], 150),
         add(w2[0], 250),
         add(w2[1], 150),
-        call_neq_wide(
+        call_eq_wide(
             w1,
             w2,
             [
@@ -35,12 +35,12 @@ def test_call_neq_wide_else() -> None:
     assert mem[w2[0]] == 250
     assert mem[w2[1]] == 150
 
-    assert mem[u1] == 2
+    assert mem[u1] == 1
 
-    assert sum(mem.values()) == 802
+    assert sum(mem.values()) == 801
 
 
-def test_call_neq_wide_if() -> None:
+def test_call_eq_wide_else() -> None:
     w1, w2 = Wide.from_length("w1", 2), Wide.from_length("w2", 2)
     u1 = Unit("u1")
     program = to_program(
@@ -48,7 +48,7 @@ def test_call_neq_wide_if() -> None:
         add(w1[1], 150),
         add(w2[0], 250),
         add(w2[1], 149),
-        call_neq_wide(
+        call_eq_wide(
             w1,
             w2,
             [
@@ -68,6 +68,6 @@ def test_call_neq_wide_if() -> None:
     assert mem[w2[0]] == 250
     assert mem[w2[1]] == 149
 
-    assert mem[u1] == 1
+    assert mem[u1] == 2
 
-    assert sum(mem.values()) == 800
+    assert sum(mem.values()) == 801
