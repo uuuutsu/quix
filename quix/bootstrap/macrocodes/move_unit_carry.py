@@ -1,10 +1,12 @@
 from collections.abc import Callable
 
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import Int8
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.dtypes.const import Int8, UInt8
+from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes import add, loop
+from quix.memoptix.opcodes import free
 
+from .assign_unit import assign_unit
 from .call_z_unit import call_z_unit
 
 
@@ -18,14 +20,24 @@ def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple
         if value in carries.get(unit, ()):
             raise ValueError(f"Carry cannot reference origin: {value}")
 
-        func: Callable[[Unit, tuple[Unit, ...]], ToConvert]
+        func: Callable[[Unit, tuple[Unit, ...]], SmartProgram]
         if to_add.value < 0:
             func = _recursive_carry_decrement
         else:
             func = _recursive_carry_increment
 
-        for _ in range(abs(to_add.value)):
-            instrs.extend(func(unit, carries.get(unit, ())))
+        counter = Unit("counter")
+        instrs.extend(assign_unit(counter, UInt8.from_value(abs(to_add.value))))
+        instrs.append(
+            loop(
+                counter,
+                [
+                    add(counter, -1),
+                    *func(unit, carries.get(unit, ())),
+                ],
+            )
+        )
+        instrs.append(free(counter))
 
     return loop(value, instrs)
 
