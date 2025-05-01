@@ -81,6 +81,10 @@ class SimpleSlider(Slider):
         if not left_constrs.get(Index, {}):
             left_constrs, right_constrs = right_constrs, left_constrs
             left, right = right, left
+        elif (not right_constrs.get(Array, {})) and left_constrs.get(Array, {}):
+            # To make array included one sliding
+            left_constrs, right_constrs = right_constrs, left_constrs
+            left, right = right, left
 
         left_arrays = _simplify_array_constrs(left_constrs.get(Array, {}))  # type: ignore
         right_arrays = _simplify_array_constrs(right_constrs.get(Array, {}))  # type: ignore

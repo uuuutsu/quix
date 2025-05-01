@@ -34,8 +34,24 @@ def _extract_constraint_info(
     return indexes, life_cycles, arrays
 
 
-def _order_ascend(life_cycles: dict[Owner, tuple[int, int]]) -> list[Owner]:
-    return [p[0] for p in sorted(life_cycles.items(), key=lambda p: p[1][0])]
+def _order_ascend_with_array_in_the_back(
+    life_cycles: dict[Owner, tuple[int, int]],
+    arrays: dict[Owner, int],
+) -> list[Owner]:
+    ordered: list[Owner] = []
+    array_owners: dict[Owner, int] = {}
+
+    for pair in sorted(life_cycles.items(), key=lambda p: p[1][0]):
+        owner = pair[0]
+        if owner not in arrays:
+            ordered.append(owner)
+        else:
+            array_owners[owner] = arrays[owner]
+
+    for owner, _ in sorted(array_owners.items(), key=lambda p: p[1]):
+        ordered.append(owner)
+
+    return ordered
 
 
 def _get_all_affected_owners(
@@ -66,7 +82,7 @@ class PrimitiveResolver(Resolver):
     @override
     def __call__(self, blueprint: Blueprint) -> Layout:
         indexes, life_cycles, arrays = _extract_constraint_info(blueprint)
-        ordered_owners = _order_ascend(life_cycles)
+        ordered_owners = _order_ascend_with_array_in_the_back(life_cycles, arrays)
 
         mapping: dict[Owner, int] = {}
         for owner, index in indexes.items():

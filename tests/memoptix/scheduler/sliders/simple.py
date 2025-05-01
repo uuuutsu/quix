@@ -28,4 +28,4 @@ def test_compatible_array_layouts() -> None:
     )
     l2 = Layout(Blueprint().add_constraints(o2, LifeCycle(0, 10)), {o2: 0})
 
-    assert SimpleSlider()(l1, l2).mapping() == {o1: 0, o2: 100}
+    assert SimpleSlider()(l1, l2).mapping() == {o1: 1, o2: 0}

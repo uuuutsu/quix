@@ -226,14 +226,19 @@ def create_blueprints(constraints: dict[Owner, list[BaseConstraint]]) -> list[Bl
         domain2constr.append(constr_mapping)
 
     blueprints: list[Blueprint] = []
+    array_bps: list[Blueprint] = []
     for constr_mapping in domain2constr:
         new_blueprint = Blueprint()
-        for constr_set in constr_mapping.values():
+        is_array: bool = False
+        for domain, constr_set in constr_mapping.items():
             for owner, constrs in constr_set.items():
                 new_blueprint.add_constraints(owner, *constrs)
-        blueprints.append(new_blueprint)
 
-    return blueprints
+            is_array = Array in domain
+
+        (array_bps if is_array else blueprints).append(new_blueprint)
+
+    return blueprints + array_bps
 
 
 def group_constraints_by_owners(
