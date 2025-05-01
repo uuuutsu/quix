@@ -87,3 +87,52 @@ def test_store_array_int_by_wide_zero_index() -> None:
     assert tape[index + 1] == 100
 
     assert sum(tape) == 100
+
+
+def test_store_array_wide_by_wide_cell_sized() -> None:
+    index = Wide.from_length("index", 1)
+    store = Wide.from_length("store", 1)
+    a1 = Array("a1", length=256)
+    program = to_program(
+        add(index[0], 50),
+        add(store[0], 25),
+        init_array(a1),
+        store_array(a1, store, index),
+    )
+
+    indexes, tape = run_with_tape(program)
+
+    assert tape[indexes[index[0]]] == 50
+    assert tape[indexes[store[0]]] == 25
+
+    val_idx = indexes[a1] + (50 + 1) * 2
+    assert tape[val_idx + 1] == 25
+
+    assert sum(tape) == 100
+
+
+def test_store_array_wide_by_wide_double() -> None:
+    index = Wide.from_length("index", 2)
+    store = Wide.from_length("store", 2)
+    a1 = Array("a1", length=4092)
+    program = to_program(
+        add(index[0], 2),
+        add(index[1], 75),
+        add(store[0], 23),
+        add(store[1], 124),
+        init_array(a1),
+        store_array(a1, store, index),
+    )
+
+    indexes, tape = run_with_tape(program)
+
+    assert tape[indexes[index[0]]] == 2
+    assert tape[indexes[index[1]]] == 75
+    assert tape[indexes[store[0]]] == 23
+    assert tape[indexes[store[1]]] == 124
+
+    val_idx = indexes[a1] + (2 * 256 + 75 * 1 + 1) * 2
+    assert tape[val_idx + 1] == 23
+    assert tape[val_idx + 3] == 124
+
+    assert sum(tape) == 371

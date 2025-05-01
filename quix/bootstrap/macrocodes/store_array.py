@@ -19,13 +19,39 @@ def _array_store_by_wide(array: Array, to_store: Wide | DynamicUInt, index: Wide
     if isinstance(to_store, DynamicUInt):
         return _array_store_int_by_wide(array, to_store, index)
 
+    return _array_store_wide_by_wide(array, to_store, index)
+
+
+def _array_store_wide_by_wide(array: Array, to_store: Wide, index: Wide) -> ToConvert:
+    yield _array_set_control_unit(array)
+    yield _array_move_by_wide_index(array, index)
+    yield _store_wide_in_current_position(array, to_store)
+    return _move_to_origin_traceless(array)
+
+
+def _store_wide_in_current_position(array: Array, to_store: Wide) -> ToConvert:
+    offset = 1
+    default_safe_zone = (array.granularity + 1) * 2
+    for unit in to_store:
+        yield _store_value_at_current_position(array, unit, default_safe_zone)
+
+        yield _go_by_value_forward(array, offset)
+        yield inject(array, "[-]", array)
+        yield _move_in_array(array, default_safe_zone - offset, 0)
+        yield _go_by_value_backward(array, offset)
+        yield inject(array, "#", array)
+
+        if offset % array.granularity == 0:
+            offset += 1
+        offset += 1
+
     return None
 
 
 def _array_store_int_by_wide(array: Array, to_store: DynamicUInt, index: Wide) -> ToConvert:
     yield _array_set_control_unit(array)
     yield _array_move_by_wide_index(array, index)
-    yield _store_wide_in_current_position(array, to_store)
+    yield _store_int_in_current_position(array, to_store)
     return _move_to_origin_traceless(array)
 
 
@@ -144,6 +170,25 @@ def _array_store_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offse
     return _array_store_unit_in_array(array, unit, (int(index) + 1) * (array.granularity + 1) + offset)
 
 
+def _move_in_array(array: Array, from_: int, to_: int) -> ToConvert:
+    yield _go_by_value_forward(array, from_)
+    instrs: CoreProgram = to_program(
+        add(array, -1),
+        _go_by_value(array, to_ - from_),
+        add(array, 1),
+        _go_by_value(array, from_ - to_),
+    )
+
+    yield loop(array, instrs)
+    return _go_by_value_backward(array, from_)
+
+
+def _go_by_value(array: Array, value: int) -> ToConvert:
+    if value < 0:
+        return _go_by_value_backward(array, abs(value))
+    return _go_by_value_forward(array, value)
+
+
 def _array_store_unit_in_array(array: Array, unit: Unit, offset: int) -> ToConvert:
     if offset == 1:
         buff, target = array.granularity + 1, offset
@@ -174,11 +219,11 @@ def _array_store_unit_in_array(array: Array, unit: Unit, offset: int) -> ToConve
 
 def _array_store_int_by_int(array: Array, to_store: DynamicUInt, index: DynamicUInt) -> ToConvert:
     yield _go_by_index_forward(array, index)
-    yield _store_wide_in_current_position(array, to_store)
+    yield _store_int_in_current_position(array, to_store)
     return _go_by_index_backward(array, index)
 
 
-def _store_wide_in_current_position(array: Array, to_store: DynamicUInt) -> ToConvert:
+def _store_int_in_current_position(array: Array, to_store: DynamicUInt) -> ToConvert:
     offset: int = 0
     for idx, value in enumerate(to_store):
         if idx and (idx % array.granularity == 0):
