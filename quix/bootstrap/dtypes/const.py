@@ -26,7 +26,7 @@ def _wrap(value: int, min: int, max: int) -> int:
     return value
 
 
-def _int_to_cell_size(number: int, *, little_endian: bool = False) -> list[int]:
+def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
     byte_list = []
     while number > 0:
         byte_list.append(number & 0xFF)

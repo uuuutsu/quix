@@ -45,3 +45,45 @@ def test_store_array_wide_by_int() -> None:
     assert tape[indexes[u1]] == 5
 
     assert sum(tape) == 345
+
+
+def test_store_array_int_by_wide() -> None:
+    w1 = Wide.from_length("w1", 2)
+    a1 = Array("a1", length=1600)
+    program = to_program(
+        add(w1[0], 1),
+        add(w1[1], 70),
+        init_array(a1),
+        store_array(a1, DynamicUInt.from_int(258), w1),
+    )
+
+    indexes, tape = run_with_tape(program)
+
+    assert tape[indexes[w1[0]]] == 1
+    assert tape[indexes[w1[1]]] == 70
+
+    index = indexes[a1] + (256 + 70 + 1) * 2
+
+    assert tape[index + 1] == 1
+    assert tape[index + 3] == 2
+
+    assert sum(tape) == 74
+
+
+def test_store_array_int_by_wide_zero_index() -> None:
+    w1 = Wide.from_length("w1", 1)
+    a1 = Array("a1", length=1600)
+    program = to_program(
+        add(w1[0], 0),
+        init_array(a1),
+        store_array(a1, DynamicUInt.from_int(100), w1),
+    )
+
+    indexes, tape = run_with_tape(program)
+
+    assert tape[indexes[w1[0]]] == 0
+
+    index = indexes[a1] + 2
+    assert tape[index + 1] == 100
+
+    assert sum(tape) == 100
