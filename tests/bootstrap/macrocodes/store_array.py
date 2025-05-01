@@ -111,6 +111,28 @@ def test_store_array_wide_by_wide_cell_sized() -> None:
     assert sum(tape) == 100
 
 
+def test_store_array_wide_by_wide_cell_sized_granularity_2() -> None:
+    index = Wide.from_length("index", 1)
+    store = Wide.from_length("store", 1)
+    a1 = Array("a1", length=256, granularity=2)
+    program = to_program(
+        add(index[0], 50),
+        add(store[0], 25),
+        init_array(a1),
+        store_array(a1, store, index),
+    )
+
+    indexes, tape = run_with_tape(program)
+
+    assert tape[indexes[index[0]]] == 50
+    assert tape[indexes[store[0]]] == 25
+
+    val_idx = indexes[a1] + (50 + 1) * 3
+    assert tape[val_idx + 1] == 25
+
+    assert sum(tape) == 100
+
+
 def test_store_array_wide_by_wide_double() -> None:
     index = Wide.from_length("index", 2)
     store = Wide.from_length("store", 2)
