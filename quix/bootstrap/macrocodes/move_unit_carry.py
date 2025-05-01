@@ -26,18 +26,22 @@ def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple
         else:
             func = _recursive_carry_increment
 
-        counter = Unit("counter")
-        instrs.extend(assign_unit(counter, UInt8.from_value(abs(to_add.value))))
-        instrs.append(
-            loop(
-                counter,
-                [
-                    add(counter, -1),
-                    *func(unit, carries.get(unit, ())),
-                ],
+        if abs(to_add.value) <= 2:
+            for _ in range(abs(to_add.value)):
+                instrs.extend(func(unit, carries.get(unit, ())))
+        else:
+            counter = Unit("counter")
+            instrs.extend(assign_unit(counter, UInt8.from_value(abs(to_add.value))))
+            instrs.append(
+                loop(
+                    counter,
+                    [
+                        add(counter, -1),
+                        *func(unit, carries.get(unit, ())),
+                    ],
+                )
             )
-        )
-        instrs.append(free(counter))
+            instrs.append(free(counter))
 
     return loop(value, instrs)
 
