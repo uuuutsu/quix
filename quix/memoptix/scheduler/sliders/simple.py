@@ -55,8 +55,8 @@ def _mappings_intersect(
         right_index = right[right_owner]
 
         if intervals_intersects(
-            (left_index, left_index + left_arrays.get(left_owner, 0)),
-            (right_index, right_index + right_arrays.get(right_owner, 0)),
+            (left_index, left_index + left_arrays.get(left_owner, 1)),
+            (right_index, right_index + right_arrays.get(right_owner, 1)),
         ):
             return left_index + left_arrays.get(left_owner, 1) - right_index
 
@@ -106,5 +106,4 @@ class SimpleSlider(Slider):
             if new_offset != 0:
                 offset += new_offset
                 continue
-
             return Layout(left.blueprint.combine(right.blueprint), root_mapping | sliding_mapping)

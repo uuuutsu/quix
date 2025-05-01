@@ -46,8 +46,6 @@ def _get_all_affected_owners(
 ) -> set[Owner]:
     owners: set[Owner] = set()
 
-    # TODO: optimize
-
     for idx in range(
         anchor,
         anchor + arrays.get(owner, 0) + 1,
