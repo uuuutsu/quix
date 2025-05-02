@@ -48,6 +48,7 @@ __all__ = (
     "loop_wide",
     "init_array",
     "store_array",
+    "load_array",
 )
 
 from .add_unit import add_unit
@@ -81,6 +82,7 @@ from .div_wide import div_wide
 from .free_wide import free_wide
 from .inc_wide import inc_wide
 from .init_array import init_array
+from .load_array import load_array
 from .loop_wide import loop_wide
 from .move_unit import move_unit
 from .move_unit_carry import move_unit_carry
