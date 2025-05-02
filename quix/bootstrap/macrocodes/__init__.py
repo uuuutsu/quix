@@ -49,6 +49,7 @@ __all__ = (
     "init_array",
     "store_array",
     "load_array",
+    "comment",
 )
 
 from .add_unit import add_unit
@@ -75,6 +76,7 @@ from .call_z_unit import call_z_unit
 from .call_z_wide import call_z_wide
 from .clear_unit import clear_unit
 from .clear_wide import clear_wide
+from .comment import comment
 from .copy_unit import copy_unit
 from .dec_wide import dec_wide
 from .div_unit import div_unit

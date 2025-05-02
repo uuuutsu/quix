@@ -24,7 +24,9 @@ class BFPointer:
         self._curr_pos, _curr_pos = ptr, self._curr_pos
         return sign * abs(ptr - _curr_pos)
 
-    def move_by_ref(self, ref: Ref, /) -> Code:
+    def move_by_ref(self, ref: Ref | None, /) -> Code:
+        if ref is None:
+            return ""
         return self.move_by_ptr(self._layout[ref])
 
     @property
