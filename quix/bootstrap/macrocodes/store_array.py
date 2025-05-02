@@ -2,7 +2,7 @@ from quix.bootstrap.dtypes import Array
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.program import ToConvert, convert, to_program
+from quix.bootstrap.program import SmartProgram, ToConvert, convert, to_program
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add, inject, loop
 
@@ -170,14 +170,17 @@ def _array_store_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offse
     return _array_store_unit_in_array(array, unit, (int(index) + 1) * (array.granularity + 1) + offset)
 
 
-def _move_in_array(array: Array, from_: int, to_: int) -> ToConvert:
+def _move_in_array(array: Array, from_: int, *tos_: int) -> ToConvert:
     yield _go_by_value_forward(array, from_)
-    instrs: CoreProgram = to_program(
+    instrs: SmartProgram = to_program(
         add(array, -1),
-        _go_by_value(array, to_ - from_),
-        add(array, 1),
-        _go_by_value(array, from_ - to_),
     )
+    last = from_
+    for to in tos_:
+        instrs |= _go_by_value(array, to - last)
+        instrs |= add(array, 1)
+        last = to
+    instrs |= _go_by_value(array, from_ - last)
 
     yield loop(array, instrs)
     return _go_by_value_backward(array, from_)
