@@ -50,7 +50,7 @@ class _Int(Const[int]):
             new_value = _wrap(self.value, self._MIN, self._MAX)
             warning(
                 f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MIN}]."
-                "\n\tPassed: {self.value}\n\tWrapped to: {new_value}"
+                f"\n\tPassed: {self.value}\n\tWrapped to: {new_value}"
             )
             object.__setattr__(self, "value", new_value)
 
@@ -153,3 +153,9 @@ class DynamicUInt(_DynamicInt[UInt8]): ...
 
 @dtype
 class DynamicInt(_DynamicInt[Int8]): ...
+
+
+@dtype
+class Str(Const[str]):
+    def __iter__(self) -> Iterator[str]:
+        return self.value.__iter__()

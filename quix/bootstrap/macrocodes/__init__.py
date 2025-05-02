@@ -50,6 +50,7 @@ __all__ = (
     "store_array",
     "load_array",
     "comment",
+    "output_str",
 )
 
 from .add_unit import add_unit
@@ -96,6 +97,7 @@ from .not_unit import not_unit
 from .not_wide import not_wide
 from .or_unit import or_unit
 from .or_wide import or_wide
+from .output_str import output_str
 from .store_array import store_array
 from .sub_unit import sub_unit
 from .sub_unit_carry import sub_unit_carry
