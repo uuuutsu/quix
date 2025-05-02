@@ -1,4 +1,5 @@
 from quix.bootstrap.dtypes import Wide
+from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.macrocodes import div_wide
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -90,3 +91,31 @@ def test_div_wide_rem_quot() -> None:
     assert mem[w4[1]] == 0
 
     assert sum(mem.values()) == 250
+
+
+def test_div_wide_by_int() -> None:
+    w1, w3, w4 = (
+        Wide.from_length("w1", 2),
+        Wide.from_length("w3", 2),
+        Wide.from_length("w4", 2),
+    )
+
+    program = to_program(
+        add(w1[0], 137),
+        add(w1[1], 55),
+        add(w3[0], 12),
+        div_wide(w1, DynamicUInt.from_int(716, 2), remainder=w3, quotient=w4),
+    )
+
+    mem = run(program)
+
+    assert mem[w1[0]] == 137
+    assert mem[w1[1]] == 55
+
+    assert mem[w3[0]] == 101
+    assert mem[w3[1]] == 2
+
+    assert mem[w4[0]] == 19
+    assert mem[w4[1]] == 0
+
+    assert sum(mem.values()) == 314

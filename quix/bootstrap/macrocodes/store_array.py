@@ -39,7 +39,6 @@ def _store_wide_in_current_position(array: Array, to_store: Wide) -> ToConvert:
         yield inject(array, "[-]", array)
         yield _move_in_array(array, default_safe_zone - offset, 0)
         yield _go_by_value_backward(array, offset)
-        yield inject(array, "#", array)
 
         if offset % array.granularity == 0:
             offset += 1
@@ -56,13 +55,13 @@ def _array_store_int_by_wide(array: Array, to_store: DynamicUInt, index: Wide) -
 
 
 def _array_move_by_wide_index(array: Array, index: Wide) -> ToConvert:
-    yield _array_move_by_unit(array, index[-1])
+    yield _array_move_by_unit(array, index[0])
 
     rollback = 0
     default_safe_zone = (array.granularity + 1) * 2
 
     step = array.granularity + 1
-    for unit in index[-2::-1]:
+    for unit in index[1:]:
         yield _store_value_at_current_position(array, unit, default_safe_zone)
         yield _go_by_value_forward(array, default_safe_zone)
         rollback += default_safe_zone
@@ -146,6 +145,7 @@ def _go_by_index_in_current_cell(array: Array, step: int | None = None, max: int
     return inject(array, code, array)
 
 
+@convert
 def _array_set_control_unit(array: Array) -> ToConvert:
     return add(array, -1)
 

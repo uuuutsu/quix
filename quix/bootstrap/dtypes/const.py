@@ -35,7 +35,7 @@ def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
     if not byte_list:
         return [0]
 
-    return byte_list[::-1] if little_endian else byte_list
+    return byte_list if little_endian else byte_list[::-1]
 
 
 @dtype
@@ -129,7 +129,7 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
 
     def __int__(self) -> int:
         final_value: int = 0
-        for int_ in self.value:
+        for int_ in self.value[::-1]:
             final_value <<= 8
             final_value += int(int_)
         return final_value
@@ -139,11 +139,11 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
         ints_ = cls.wrap(value)
         if size is None:
             return cls.from_value(ints_)
-        if len(ints_) > size:
+        if len(ints_) >= size:
             return cls.from_value(ints_[:size])
 
         int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
-        ints_ = tuple(int_cls.from_value(0) for _ in range(size - len(ints_))) + ints_
+        ints_ = ints_ + tuple(int_cls.from_value(0) for _ in range(size - len(ints_)))
         return cls.from_value(ints_)
 
 

@@ -51,21 +51,21 @@ def test_store_array_int_by_wide() -> None:
     w1 = Wide.from_length("w1", 2)
     a1 = Array("a1", length=1600)
     program = to_program(
-        add(w1[0], 1),
-        add(w1[1], 70),
+        add(w1[0], 70),
+        add(w1[1], 1),
         init_array(a1),
         store_array(a1, DynamicUInt.from_int(258), w1),
     )
 
     indexes, tape = run_with_tape(program)
 
-    assert tape[indexes[w1[0]]] == 1
-    assert tape[indexes[w1[1]]] == 70
+    assert tape[indexes[w1[0]]] == 70
+    assert tape[indexes[w1[1]]] == 1
 
     index = indexes[a1] + (256 + 70 + 1) * 2
 
-    assert tape[index + 1] == 1
-    assert tape[index + 3] == 2
+    assert tape[index + 1] == 2
+    assert tape[index + 3] == 1
 
     assert sum(tape) == 74
 
@@ -138,8 +138,8 @@ def test_store_array_wide_by_wide_double() -> None:
     store = Wide.from_length("store", 2)
     a1 = Array("a1", length=4092)
     program = to_program(
-        add(index[0], 2),
-        add(index[1], 75),
+        add(index[0], 75),
+        add(index[1], 2),
         add(store[0], 23),
         add(store[1], 124),
         init_array(a1),
@@ -148,8 +148,8 @@ def test_store_array_wide_by_wide_double() -> None:
 
     indexes, tape = run_with_tape(program)
 
-    assert tape[indexes[index[0]]] == 2
-    assert tape[indexes[index[1]]] == 75
+    assert tape[indexes[index[0]]] == 75
+    assert tape[indexes[index[1]]] == 2
     assert tape[indexes[store[0]]] == 23
     assert tape[indexes[store[1]]] == 124
 

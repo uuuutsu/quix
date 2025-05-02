@@ -1,3 +1,5 @@
+from logging import warning
+
 from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.const import DynamicUInt, Int8
 from quix.bootstrap.dtypes.unit import Unit
@@ -26,7 +28,11 @@ def div_wide(
         return None
     elif remainder == quotient:
         raise ValueError("Remainder cannot be Quotient")
-    elif isinstance(left, DynamicUInt) and isinstance(right, DynamicUInt):
+
+    if remainder and remainder.size < left.size:
+        warning("Remainder of size smaller than division arguments may cause unexpected behaviour.")
+
+    if isinstance(left, DynamicUInt) and isinstance(right, DynamicUInt):
         return _div_wide_ints(left, right, quotient, remainder)
     elif left == right:
         return _div_wide_by_itself(quotient, remainder)
