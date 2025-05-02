@@ -22,7 +22,7 @@ def _decode_riscv_code(text: Section) -> dict[int, RISCVOpcode]:
     code = {}
 
     while instr := data.read(4):
-        code[idx] = decode(instr)
+        code[idx] = decode(int.from_bytes(instr, byteorder="little", signed=False))
 
     return code
 
