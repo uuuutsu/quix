@@ -3,6 +3,7 @@ dependencies = [
   "bidict>=0.23.1",
   "mip>=1.15.0",
   "multimethod>=2.0",
+  "pyelftools>=0.32",
   "rich>=14.0.0",
 ]
 description = "Add your description here"
