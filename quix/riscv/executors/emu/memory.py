@@ -1,30 +1,17 @@
-class EmuMemory:
-    __slots__ = "memory"
+from collections.abc import Iterable
+
+import numpy as np
+
+
+class Memory:
+    __slots__ = "_memory"
 
     def __init__(self) -> None:
-        self.memory: dict[int, int] = {}
+        self._memory: dict[int, int] = {}
 
-    def __setitem__(self, address: int, data: int | bytes) -> None:
-        if isinstance(data, bytes):
-            for i, b in enumerate(data):
-                self.memory[address + i] = b
-            return
+    def __setitem__(self, key: int, value: Iterable[int]) -> None:
+        for i, byte in enumerate(value):
+            self._memory[i + np.uint32(key)] = byte  # type: ignore
 
-        if data < 0:
-            data += 1 << 32
-
-        for i, b in enumerate(data.to_bytes(4, byteorder="little", signed=False)):
-            self.memory[address + i] = b
-
-    def __getitem__(self, address: int) -> int:
-        return self.memory.get(address, 0)
-
-    def get_word(self, base_addr: int) -> int:
-        word = 0
-        for offset in range(4):
-            word += self[offset + base_addr] << (offset * 8)
-
-        if word & (1 << 31):
-            return word - (1 << 32)
-
-        return word
+    def __getitem__(self, item: int) -> int:
+        return self._memory.get(np.uint32(item), 0)  # type: ignore
