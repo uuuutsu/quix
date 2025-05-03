@@ -1,7 +1,5 @@
 from typing import Final, override
 
-import numpy as np
-
 from quix.riscv.executors.base import RISCVExecutor
 from quix.riscv.loader import State
 from quix.riscv.opcodes import Imm, Register
@@ -32,7 +30,7 @@ class Emulator(RISCVExecutor):
     )
 
     def __init__(self) -> None:
-        self.registers = np.array((32,), dtype=np.uint32)
+        self.registers = [0] * 32
         self.memory = EmuMemory()
         self.pc = 0
         self.csr: dict[int, int] = {}
@@ -50,7 +48,20 @@ class Emulator(RISCVExecutor):
             self.registers[3] = sbss.header["sh_addr"] + 2048
         self.registers[8] = 4048
 
-        return super().run(state)
+        while True:
+            prev_pc = self.pc
+
+            try:
+                code = state.code[self.pc]
+                getattr(self, code.__id__)(**code.args())
+            except KeyError:
+                print(self.pc, self.pc + 4)
+                print(self.registers)
+                exit()
+
+            if prev_pc == self.pc:
+                self.pc += 4
+            self.registers[0] = 0
 
     @override
     def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:
