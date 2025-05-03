@@ -207,7 +207,7 @@ class Emulator(RISCVExecutor):
 
     @override
     def add(self, rs1: Register, rs2: Register, rd: Register) -> None:
-        self.registers[rd] = self.registers[rs1] + self.registers[rs2]
+        self.registers[rd] = np.array(self.registers[rs1]) + np.array(self.registers[rs2])
 
     @override
     def sub(self, rs1: Register, rs2: Register, rd: Register) -> None:
