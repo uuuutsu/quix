@@ -22,7 +22,10 @@ def _decode_riscv_code(text: Section) -> dict[int, RISCVOpcode]:
     code = {}
 
     while instr := data.read(4):
-        code[idx] = decode(int.from_bytes(instr, byteorder="little", signed=False))
+        int_instr = int.from_bytes(instr, byteorder="little", signed=False)
+        code[idx] = decode(int_instr)
+        # print(f"{int_instr:#034b}", code[idx])
+        idx += 4
 
     return code
 
@@ -33,8 +36,8 @@ class ELFLoader:
     def load(self, data: BytesIO) -> State:
         elf = ELFFile(data)  # type: ignore
 
-        pc = elf.header["e_entry"]
+        entry = elf.header["e_entry"]
         sections = _get_name_data_mapping(elf)
-        code = _decode_riscv_code(sections.pop("text"))
+        code = _decode_riscv_code(sections.pop(".text"))
 
-        return State(code, pc, sections)
+        return State(code, entry, sections)

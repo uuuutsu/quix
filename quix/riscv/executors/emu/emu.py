@@ -2,23 +2,24 @@ from typing import Final, override
 
 import numpy as np
 
-from quix.riscv.decompiler import State
 from quix.riscv.executors.base import RISCVExecutor
+from quix.riscv.loader import State
+from quix.riscv.opcodes import Imm, Register
 
 from .memory import EmuMemory
 
 _DATA_SECTIONS: Final[tuple[str, ...]] = (
-    "rodata",
-    "sdata",
-    "data",
-    "sbss",
-    "bss",
-    "eh_frame",
-    "init_array",
-    "fini_array",
-    "symtab",
-    "strtab",
-    "shstrtab",
+    ".rodata",
+    ".sdata",
+    ".data",
+    ".sbss",
+    ".bss",
+    ".eh_frame",
+    ".init_array",
+    ".fini_array",
+    ".symtab",
+    ".strtab",
+    ".shstrtab",
 )
 
 
@@ -38,7 +39,7 @@ class Emulator(RISCVExecutor):
 
     @override
     def run(self, state: State) -> None:
-        self.pc = state.pc
+        self.pc = state.entry
         for name in _DATA_SECTIONS:
             if section := state.sections.get(name):
                 self.memory[section.header["sh_addr"]] = section.data()  # type: ignore
@@ -52,41 +53,41 @@ class Emulator(RISCVExecutor):
         return super().run(state)
 
     @override
-    def addi(self, imm: int, rs1: int, rd: int) -> None:
+    def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] + imm
 
     @override
-    def sw(self, imm: int, rs1: int, rs2: int) -> None:
+    def sw(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         self.memory[self.registers[rs1] + imm] = self.registers[rs2]
 
     @override
-    def jal(self, imm: int, rd: int) -> None:
+    def jal(self, imm: Imm, rd: Register) -> None:
         self.registers[rd] = self.pc + 4
         self.pc += imm
 
     @override
-    def lw(self, imm: int, rs1: int, rd: int) -> None:
+    def lw(self, imm: Imm, rs1: Register, rd: Register) -> None:
         base_addr = self.registers[rs1] + imm
         self.registers[rd] = self.memory.get_word(base_addr)
 
     @override
-    def andi(self, imm: int, rs1: int, rd: int) -> None:
+    def andi(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] & imm
 
     @override
-    def ori(self, imm: int, rs1: int, rd: int) -> None:
+    def ori(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] | imm
 
     @override
-    def xori(self, imm: int, rs1: int, rd: int) -> None:
+    def xori(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] ^ imm
 
     @override
-    def slli(self, imm: int, rs1: int, rd: int) -> None:
+    def slli(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] << imm
 
     @override
-    def srli(self, imm: int, rs1: int, rd: int) -> None:
+    def srli(self, imm: Imm, rs1: Register, rd: Register) -> None:
         if (imm >> 6) > 0:
             value_to_shift = self.registers[rs1]
 
@@ -99,69 +100,69 @@ class Emulator(RISCVExecutor):
         self.registers[rd] = self.registers[rs1] >> imm
 
     @override
-    def beq(self, imm: int, rs1: int, rs2: int) -> None:
+    def beq(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] == self.registers[rs2]:
             self.pc += imm
 
     @override
-    def bne(self, imm: int, rs1: int, rs2: int) -> None:
+    def bne(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] != self.registers[rs2]:
             self.pc += imm
 
     @override
-    def blt(self, imm: int, rs1: int, rs2: int) -> None:
+    def blt(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] < self.registers[rs2]:
             self.pc += imm
 
     @override
-    def bltu(self, imm: int, rs1: int, rs2: int) -> None:
+    def bltu(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] < self.registers[rs2]:
             self.pc += imm
 
     @override
-    def bgeu(self, imm: int, rs1: int, rs2: int) -> None:
+    def bgeu(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] >= self.registers[rs2]:
             self.pc += imm
 
     @override
-    def lui(self, imm: int, rd: int) -> None:
+    def lui(self, imm: Imm, rd: Register) -> None:
         self.registers[rd] = imm
 
     @override
-    def slti(self, imm: int, rs1: int, rd: int) -> None:
+    def slti(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] < imm
 
     @override
-    def sltiu(self, imm: int, rs1: int, rd: int) -> None:
+    def sltiu(self, imm: Imm, rs1: Register, rd: Register) -> None:
         self.registers[rd] = (self.registers[rs1] & 0xFFFFFFFF) < (imm & 0xFFFFFFFF)
 
     @override
-    def auipc(self, imm: int, rd: int) -> None:
+    def auipc(self, imm: Imm, rd: Register) -> None:
         self.registers[rd] = self.pc + imm
 
     @override
-    def bge(self, imm: int, rs1: int, rs2: int) -> None:
+    def bge(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         if self.registers[rs1] >= self.registers[rs2]:
             self.pc += imm
 
     @override
-    def jalr(self, imm: int, rs1: int, rd: int) -> None:
+    def jalr(self, imm: Imm, rs1: Register, rd: Register) -> None:
         temp = self.pc
         self.pc = (self.registers[rs1] + imm) & ~1
         self.registers[rd] = temp + 4
 
     @override
-    def sb(self, imm: int, rs1: int, rs2: int) -> None:
+    def sb(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         addr = self.registers[rs1] + imm
         self.memory[addr] = self.registers[rs2] & 0xFF
 
     @override
-    def sh(self, imm: int, rs1: int, rs2: int) -> None:
+    def sh(self, imm: Imm, rs1: Register, rs2: Register) -> None:
         addr = self.registers[rs1] + imm
         self.memory[addr] = self.registers[rs2] & 0xFFFF
 
     @override
-    def lb(self, imm: int, rs1: int, rd: int) -> None:
+    def lb(self, imm: Imm, rs1: Register, rd: Register) -> None:
         addr = self.registers[rs1] + imm
         byte = self.memory[addr] & 0xFF
 
@@ -171,53 +172,53 @@ class Emulator(RISCVExecutor):
         self.registers[rd] = byte
 
     @override
-    def lbu(self, imm: int, rs1: int, rd: int) -> None:
+    def lbu(self, imm: Imm, rs1: Register, rd: Register) -> None:
         addr = self.registers[rs1] + imm
         self.registers[rd] = self.memory[addr] & 0xFF
 
     @override
-    def lh(self, imm: int, rs1: int, rd: int) -> None:
+    def lh(self, imm: Imm, rs1: Register, rd: Register) -> None:
         addr = self.registers[rs1] + imm
         hw = self.memory[addr] | (self.memory[addr + 1] << 8)
         hw |= 0xFFFF
         self.registers[rd] = hw
 
     @override
-    def lhu(self, imm: int, rs1: int, rd: int) -> None:
+    def lhu(self, imm: Imm, rs1: Register, rd: Register) -> None:
         addr = self.registers[rs1] + imm
         value = self.memory[addr] | (self.memory[addr + 1] << 8)
         self.registers[rd] = value & 0xFFFF
 
     @override
-    def add(self, rs1: int, rs2: int, rd: int) -> None:
+    def add(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] + self.registers[rs2]
 
     @override
-    def sub(self, rs1: int, rs2: int, rd: int) -> None:
+    def sub(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] - self.registers[rs2]
 
     @override
-    def sll(self, rs1: int, rs2: int, rd: int) -> None:
+    def sll(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] << (self.registers[rs2] & 0x1F)
 
     @override
-    def slt(self, rs1: int, rs2: int, rd: int) -> None:
+    def slt(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] < self.registers[rs2]
 
     @override
-    def sltu(self, rs1: int, rs2: int, rd: int) -> None:
+    def sltu(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = (self.registers[rs1] & 0xFFFFFFFF) < (self.registers[rs2] & 0xFFFFFFFF)
 
     @override
-    def xor(self, rs1: int, rs2: int, rd: int) -> None:
+    def xor(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] ^ self.registers[rs2]
 
     @override
-    def srl(self, rs1: int, rs2: int, rd: int) -> None:
+    def srl(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] >> (self.registers[rs2] & 0x1F)
 
     @override
-    def sra(self, rs1: int, rs2: int, rd: int) -> None:
+    def sra(self, rs1: Register, rs2: Register, rd: Register) -> None:
         value_to_shift = self.registers[rs1]
         shift_amount = self.registers[rs2] & 0x1F
 
@@ -227,78 +228,78 @@ class Emulator(RISCVExecutor):
         self.registers[rd] = value_to_shift >> shift_amount
 
     @override
-    def or_(self, rs1: int, rs2: int, rd: int) -> None:
+    def or_(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] | self.registers[rs2]
 
     @override
-    def and_(self, rs1: int, rs2: int, rd: int) -> None:
+    def and_(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] & self.registers[rs2]
 
     @override
-    def fence(self, rs1: int, rs2: int, rd: int) -> None:
+    def fence(self, rs1: Register, rs2: Register, rd: Register) -> None:
         pass  # Implement as needed
 
     @override
-    def ecall(self, imm: int, rs1: int, rd: int) -> None:
+    def ecall(self, imm: Imm, rs1: Register, rd: Register) -> None:
         if imm > 0:
             exit()
         # Implement syscall handling
 
     @override
-    def csrrw(self, imm: int, rs1: int, rd: int) -> None:
+    def csrrw(self, imm: Imm, rs1: Register, rd: Register) -> None:
         old_value = self.csr.get(imm, 0)
         self.csr[imm] = self.registers[rs1]
         self.registers[rd] = old_value
 
     @override
-    def csrrs(self, imm: int, rs1: int, rd: int) -> None:
+    def csrrs(self, imm: Imm, rs1: Register, rd: Register) -> None:
         old_value = self.csr.get(imm, 0)
         self.csr[imm] = old_value | self.registers[rs1]
         self.registers[rd] = old_value
 
     @override
-    def csrrwi(self, imm: int, rs1: int, rd: int) -> None:
+    def csrrwi(self, imm: Imm, rs1: Register, rd: Register) -> None:
         old_value = self.csr.get(imm, 0)
         self.csr[imm] = rs1
         self.registers[rd] = old_value
 
     @override
-    def csrrsi(self, imm: int, rs1: int, rd: int) -> None:
+    def csrrsi(self, imm: Imm, rs1: Register, rd: Register) -> None:
         old_value = self.csr.get(imm, 0)
         self.csr[imm] = old_value | rs1
         self.registers[rd] = old_value
 
     @override
-    def csrrci(self, imm: int, rs1: int, rd: int) -> None:
+    def csrrci(self, imm: Imm, rs1: Register, rd: Register) -> None:
         old_value = self.csr.get(imm, 0)
         self.csr[imm] = old_value & ~rs1
         self.registers[rd] = old_value
 
     @override
-    def mul(self, rs1: int, rs2: int, rd: int) -> None:
+    def mul(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] * self.registers[rs2]
 
     @override
-    def mulh(self, rs1: int, rs2: int, rd: int) -> None:
+    def mulh(self, rs1: Register, rs2: Register, rd: Register) -> None:
         result = (self.registers[rs1] * self.registers[rs2]) >> 32
         self.registers[rd] = result & 0xFFFFFFFF
 
     @override
-    def mulhsu(self, rs1: int, rs2: int, rd: int) -> None:
+    def mulhsu(self, rs1: Register, rs2: Register, rd: Register) -> None:
         result = (self.registers[rs1] * self.registers[rs2]) >> 32
         self.registers[rd] = result & 0xFFFFFFFF
 
     @override
-    def mulhu(self, rs1: int, rs2: int, rd: int) -> None:
+    def mulhu(self, rs1: Register, rs2: Register, rd: Register) -> None:
         result = (self.registers[rs1] * self.registers[rs2]) >> 32
         self.registers[rd] = result & 0xFFFFFFFF
 
     @override
-    def div(self, rs1: int, rs2: int, rd: int) -> None:
+    def div(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = self.registers[rs1] // self.registers[rs2] if self.registers[rs2] != 0 else -1
 
     @override
-    def divu(self, rs1: int, rs2: int, rd: int) -> None:
+    def divu(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = (
             (self.registers[rs1] & 0xFFFFFFFF) // (self.registers[rs2] & 0xFFFFFFFF)
             if self.registers[rs2] != 0
@@ -306,13 +307,13 @@ class Emulator(RISCVExecutor):
         )
 
     @override
-    def rem(self, rs1: int, rs2: int, rd: int) -> None:
+    def rem(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = (
             self.registers[rs1] % self.registers[rs2] if self.registers[rs2] != 0 else self.registers[rs1]
         )
 
     @override
-    def remu(self, rs1: int, rs2: int, rd: int) -> None:
+    def remu(self, rs1: Register, rs2: Register, rd: Register) -> None:
         self.registers[rd] = (
             (self.registers[rs1] & 0xFFFFFFFF) % (self.registers[rs2] & 0xFFFFFFFF)
             if self.registers[rs2] != 0

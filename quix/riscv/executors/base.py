@@ -1,13 +1,13 @@
 from abc import abstractmethod
 
-from quix.riscv.decompiler import State
+from quix.riscv.loader import State
 from quix.riscv.opcodes import Imm, Register
 
 
 class RISCVExecutor:
     __slots__ = ()
 
-    def run(self, state: State) -> None:
+    def run(self, __state: State, /) -> None:
         raise NotImplementedError
 
     @abstractmethod

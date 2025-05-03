@@ -8,5 +8,5 @@ from quix.riscv.opcodes.base import RISCVOpcode
 @dataclass
 class State:
     code: dict[int, RISCVOpcode]
-    pc: int
+    entry: int
     sections: dict[str, Section]
