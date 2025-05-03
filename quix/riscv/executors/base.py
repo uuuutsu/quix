@@ -1,20 +1,14 @@
 from abc import abstractmethod
-from typing import override
 
-from quix.core.interfaces.visitor import Visitor
-from quix.exceptions.core import NoHandlerFoundException
-from quix.riscv.opcodes import Imm, Register, RISCVOpcode, RISCVProgram
+from quix.riscv.decompiler import State
+from quix.riscv.opcodes import Imm, Register
 
 
-class RISCVVisitor(Visitor[RISCVOpcode]):
+class RISCVExecutor:
     __slots__ = ()
 
-    @override
-    def visit(self, program: RISCVProgram) -> None:
-        for opcode in program:
-            if (method := getattr(self, opcode.__id__, None)) is None:
-                raise NoHandlerFoundException(opcode, self)
-            method(**opcode.args())
+    def run(self, state: State) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:
