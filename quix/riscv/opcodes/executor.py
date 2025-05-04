@@ -1,14 +1,10 @@
 from abc import abstractmethod
 
-from quix.riscv.loader import State
-from quix.riscv.opcodes import Imm, Register
+from .dtypes import Imm, Register
 
 
 class RISCVExecutor:
     __slots__ = ()
-
-    def run(self, __state: State, /) -> None:
-        raise NotImplementedError
 
     @abstractmethod
     def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:

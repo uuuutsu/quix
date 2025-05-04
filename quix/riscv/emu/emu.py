@@ -2,10 +2,9 @@ from typing import Final, override
 
 import numpy as np
 
-from quix.riscv.executors.base import RISCVExecutor
 from quix.riscv.loader import State
 from quix.riscv.loader.decoder.utils import get_bit_section
-from quix.riscv.opcodes import Imm, Register
+from quix.riscv.opcodes import Imm, Register, RISCVExecutor
 
 from .memory import Memory
 
@@ -34,7 +33,6 @@ class Emulator(RISCVExecutor):
         self.csr: dict[int, int] = {}
         self.brk: int = 0
 
-    @override
     def run(self, state: State) -> None:
         self.pc = state.entry
         for name in _DATA_SECTIONS:
