@@ -53,6 +53,8 @@ __all__ = (
     "output_str",
     "output_wide",
     "switch_unit",
+    "sub_wide",
+    "switch_wide",
 )
 
 from .add_unit import add_unit
@@ -107,5 +109,6 @@ from .sub_unit_carry import sub_unit_carry
 from .sub_wide import sub_wide
 from .sub_wide_carry import sub_wide_carry
 from .switch_unit import switch_unit
+from .switch_wide import switch_wide
 from .xor_unit import xor_unit
 from .xor_wide import xor_wide

@@ -112,11 +112,14 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
     def __divmod__[C: _DynamicInt[I]](self: C, other: C | int) -> tuple[C, C]:
         return self._op(other, lambda x, y: x // y), self._op(other, lambda x, y: x % y)
 
+    def __sub__[C: _DynamicInt[I]](self: C, other: C | int) -> C:
+        return self._op(other, lambda x, y: x - y)
+
     def _op[C: _DynamicInt[I]](self: C, other: C | int, func: Callable[[int, int], int]) -> C:
         if isinstance(other, int):
             new_value = func(int(self), other)
             return self.from_value(self.wrap(new_value))
-        return self.from_value(self.wrap(func(int(self), int(other))))
+        return self.from_int(func(int(self), int(other)), size=self.size)
 
     @overload
     def __getitem__(self, item: int) -> I: ...
