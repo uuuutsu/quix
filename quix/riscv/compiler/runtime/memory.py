@@ -1,7 +1,9 @@
 from typing import Final, override
 
 from quix.bootstrap.dtypes.array import Array
-from quix.bootstrap.macrocodes import init_array
+from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.wide import Wide
+from quix.bootstrap.macrocodes import init_array, load_array, store_array
 from quix.bootstrap.program import ToConvert, convert
 from quix.memoptix import index
 
@@ -26,3 +28,11 @@ class Memory(Component):
     @override
     def size(self) -> int:
         return self._array.full_length
+
+    @convert
+    def store(self, idx: DynamicUInt | Wide, value: DynamicUInt | Wide) -> ToConvert:
+        return store_array(self._array, value, idx)
+
+    @convert
+    def load(self, idx: DynamicUInt | Wide, load_in: Wide) -> ToConvert:
+        return load_array(self._array, load_in, idx)
