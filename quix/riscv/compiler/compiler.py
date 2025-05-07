@@ -106,6 +106,9 @@ class Compiler(RISCVExecutor[ToConvert]):
 
     @convert
     def _execute(self, opcode: RISCVOpcode) -> ToConvert:
+        if custom_handler := getattr(self, opcode.__id__, None):
+            return custom_handler(**opcode.args())
+
         new_args: dict[str, Any] = {}
         rs_mapping: dict[Register, Wide] = {}
 
