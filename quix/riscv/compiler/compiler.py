@@ -2,7 +2,7 @@ from typing import Any, Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import add_wide, clear_wide, sub_wide
+from quix.bootstrap.macrocodes import add_wide, assign_wide, clear_wide, sub_wide
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
@@ -139,3 +139,8 @@ class Compiler:
         yield add_wide(rs1, imm, rs1)
         yield self.memory.store(rs1, rs2)
         return self.cpu.next()
+
+    def jal(self, imm: DynamicUInt, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, self.cpu.pc)
+        yield add_wide(rd, DynamicUInt.from_int(4, 4), rd)
+        return add_wide(self.cpu.pc, imm, self.cpu.pc)

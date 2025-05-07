@@ -57,3 +57,7 @@ class CPU(Component):
     @convert
     def load_register(self, idx: DynamicUInt | Wide, load_in: Wide) -> ToConvert:
         return load_array(self._registers, load_in, idx)
+
+    @property
+    def pc(self) -> Wide:
+        return self._pc
