@@ -1,4 +1,4 @@
-from typing import Final
+from typing import Final, override
 
 from quix.bootstrap.dtypes.array import Array
 from quix.bootstrap.macrocodes import init_array
@@ -17,7 +17,12 @@ class Memory(Component):
         self._array = Array("memory", length=size_word, granularity=4)
 
     @convert
+    @override
     def create(self, memory_index: int) -> ToConvert:
         yield init_array(self._array)
         yield index(self._array, memory_index)
         return None
+
+    @override
+    def size(self) -> int:
+        return self._array.full_length
