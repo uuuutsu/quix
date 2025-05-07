@@ -9,14 +9,14 @@ from quix.memoptix import index
 
 from .component import Component
 
-_DEFAULT_SIZE_WORDS: Final[int] = 16384 // 4
+_DEFAULT_SIZE: Final[int] = 84000
 
 
 class Memory(Component):
     __slots__ = "_array"
 
-    def __init__(self, size_word: int = _DEFAULT_SIZE_WORDS) -> None:
-        self._array = Array("memory", length=size_word, granularity=4)
+    def __init__(self, size_bytes: int = _DEFAULT_SIZE) -> None:
+        self._array = Array("memory", length=size_bytes)
 
     @convert
     @override

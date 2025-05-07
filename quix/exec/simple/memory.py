@@ -34,17 +34,24 @@ class Memory:
             self._array[self._pointer] = 0
 
     def load(self) -> int:
+        self._adjust_size()
         return self._array[self._pointer]
 
     def increment_data(self) -> None:
+        self._adjust_size()
         self._array[self._pointer] += 1
         if self._array[self._pointer] > 255:
             self._array[self._pointer] = 0
 
     def decrement_data(self) -> None:
+        self._adjust_size()
         self._array[self._pointer] -= 1
         if self._array[self._pointer] < 0:
             self._array[self._pointer] = 255
+
+    def _adjust_size(self) -> None:
+        if self._pointer >= len(self._array):
+            self._array.extend([0] * (self._pointer - len(self._array) + 1))
 
     @property
     def pointer(self) -> int:

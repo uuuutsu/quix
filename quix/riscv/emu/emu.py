@@ -1,4 +1,4 @@
-from typing import Final, override
+from typing import Final, Self, override
 
 import numpy as np
 
@@ -33,7 +33,7 @@ class Emulator(RISCVExecutor):
         self.csr: dict[int, int] = {}
         self.brk: int = 0
 
-    def run(self, state: State) -> None:
+    def run(self, state: State) -> Self:
         self.pc = state.entry
         for name in _DATA_SECTIONS:
             if section := state.sections.get(name):
@@ -54,11 +54,12 @@ class Emulator(RISCVExecutor):
             except KeyError:
                 print(self.pc, self.pc + 4)
                 print(self.registers)
-                exit()
+                break
 
             if prev_pc == self.pc:
                 self.pc += 4
             self.registers[0] = 0
+        return self
 
     @override
     def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:

@@ -146,6 +146,12 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
         ints_ = ints_ + tuple(int_cls.from_value(0) for _ in range(size - len(ints_)))
         return cls.from_value(ints_)
 
+    @classmethod
+    def from_bytes(cls, value: bytes) -> Self:
+        int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
+        ints_ = tuple(int_cls.from_value(val) for val in value)
+        return cls.from_value(ints_)
+
 
 @dtype
 class DynamicUInt(_DynamicInt[UInt8]): ...

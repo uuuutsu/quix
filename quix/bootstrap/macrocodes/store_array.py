@@ -167,7 +167,7 @@ def _array_store_wide_by_int(array: Array, to_store: Wide, index: DynamicUInt) -
 
 
 def _array_store_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offset: int) -> ToConvert:
-    return _array_store_unit_in_array(array, unit, (int(index) + 1) * (array.granularity + 1) + offset)
+    return _array_store_unit_in_array(array, unit, (int(index) + 1) * (array.granularity + 1) + offset, clear=True)
 
 
 def _move_in_array(array: Array, from_: int, *tos_: int) -> ToConvert:
@@ -192,11 +192,16 @@ def _go_by_value(array: Array, value: int) -> ToConvert:
     return _go_by_value_forward(array, value)
 
 
-def _array_store_unit_in_array(array: Array, unit: Unit, offset: int) -> ToConvert:
+def _array_store_unit_in_array(array: Array, unit: Unit, offset: int, clear: bool = False) -> ToConvert:
     if offset == 1:
         buff, target = array.granularity + 1, offset
     else:
         buff, target = 1, offset
+
+    if clear:
+        yield _go_by_value_forward(array, target)
+        yield inject(array, "[-]", array)
+        yield _go_by_value_backward(array, target)
 
     instrs: CoreProgram = to_program(
         add(unit, -1),
@@ -235,6 +240,7 @@ def _store_int_in_current_position(array: Array, to_store: DynamicUInt) -> ToCon
         offset += 1
 
         yield _go_by_value_forward(array, 1)
+        yield inject(array, "[-]", array)
         yield add(array, value.value)
 
     return _go_by_value_backward(array, offset)

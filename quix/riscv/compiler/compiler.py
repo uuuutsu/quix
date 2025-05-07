@@ -1,11 +1,11 @@
-from typing import Final
+from typing import Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.program import SmartProgram
 from quix.riscv.loader.state import State
 from quix.riscv.opcodes.executor import RISCVExecutor
 
-from .runtime import CPU, Memory
+from .runtime import CPU, Layout, Memory
 
 _DATA_SECTIONS: Final[tuple[str, ...]] = (
     ".rodata",
@@ -22,6 +22,14 @@ _DATA_SECTIONS: Final[tuple[str, ...]] = (
 )
 
 
+def _strip_data(data: bytes) -> tuple[bytes, int]:
+    offset: int = 0
+    while data and (data[0] == 0):
+        offset += 1
+        data = data[1:]
+    return data or b"", offset
+
+
 class Compiler(RISCVExecutor):
     __slots__ = (
         "cpu",
@@ -33,11 +41,16 @@ class Compiler(RISCVExecutor):
         self.cpu = CPU()
         self.memory = Memory()
         self.program = SmartProgram()
+        self._init_runtime()
 
-    def run(self, state: State) -> None:
+    def run(self, state: State) -> Self:
         self._init_cpu(state)
+        self._init_registers(state)
         self._init_memory(state)
-        self._init_memory(state)
+        return self
+
+    def _init_runtime(self) -> None:
+        self.program |= Layout().add_component(self.cpu, 0).add_component(self.memory, 0).create(50)
 
     def _init_cpu(self, state: State) -> None:
         self.program |= self.cpu.set_pc(DynamicUInt.from_int(state.entry, size=4))
@@ -45,9 +58,12 @@ class Compiler(RISCVExecutor):
     def _init_memory(self, state: State) -> None:
         for name in _DATA_SECTIONS:
             if section := state.sections.get(name):
+                data, offset = _strip_data(section.data())  # type: ignore
+                if not data:
+                    continue
                 self.program |= self.memory.store(
-                    DynamicUInt.from_int(section.header["sh_addr"]),
-                    section.data(),  # type: ignore
+                    DynamicUInt.from_int(section.header["sh_addr"] + offset),
+                    DynamicUInt.from_bytes(data),
                 )
 
     def _init_registers(self, state: State) -> None:
