@@ -2,7 +2,16 @@ from typing import Any, Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import add_wide, and_wide, assign_wide, clear_wide, mul_wide, or_wide, sub_wide, xor_wide
+from quix.bootstrap.macrocodes import (
+    add_wide,
+    and_wide,
+    assign_wide,
+    clear_wide,
+    mul_wide,
+    or_wide,
+    sub_wide,
+    xor_wide,
+)
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
