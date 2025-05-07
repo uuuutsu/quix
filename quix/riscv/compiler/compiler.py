@@ -1,13 +1,17 @@
-from typing import Final, Self
+from typing import Any, Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
-from quix.bootstrap.program import SmartProgram, ToConvert, to_program
+from quix.bootstrap.dtypes.wide import Wide
+from quix.bootstrap.macrocodes import clear_wide
+from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.riscv.loader.state import State
 from quix.riscv.opcodes.base import RISCVOpcode
+from quix.riscv.opcodes.dtypes import Imm, Register
 from quix.riscv.opcodes.executor import RISCVExecutor
 
+from . import impls
 from .runtime import CPU, Layout, Memory
 
 _DATA_SECTIONS: Final[tuple[str, ...]] = (
@@ -31,6 +35,10 @@ def _strip_data(data: bytes) -> tuple[bytes, int]:
         offset += 1
         data = data[1:]
     return data or b"", offset
+
+
+def _imm_to_const(imm: Imm) -> DynamicUInt:
+    return DynamicUInt.from_int(imm, 4)
 
 
 class Compiler(RISCVExecutor[ToConvert]):
@@ -96,8 +104,28 @@ class Compiler(RISCVExecutor[ToConvert]):
 
         self.program |= self.cpu.run(mapping)
 
-    def _execute(self, opcode: RISCVOpcode) -> CoreProgram:
-        if (method := getattr(self, opcode.__id__, None)) is None:
-            raise NoHandlerFoundException(opcode, self)
+    @convert
+    def _execute(self, opcode: RISCVOpcode) -> ToConvert:
+        new_args: dict[str, Any] = {}
+        rs_mapping: dict[Register, Wide] = {}
 
-        return to_program(method(**opcode.args()))
+        for name, value in opcode.args().items():
+            if isinstance(value, Imm):
+                new_args[name] = _imm_to_const(value)
+            elif isinstance(value, Register):
+                rs_mapping[value] = buff = Wide.from_length(f"{name}_buff", 4)
+                new_args[name] = buff
+                yield self.cpu.load_register(DynamicUInt.from_int(value), buff)
+            else:
+                raise ValueError(f"Unknown argument type: {type(value)}")
+
+        if (handler := getattr(impls, opcode.__id__)) is None:
+            raise NoHandlerFoundException(opcode, impls)
+
+        yield handler(**new_args)
+
+        for index, from_ in rs_mapping.items():
+            yield self.cpu.store_register(DynamicUInt.from_int(index), from_)
+            yield clear_wide(from_)
+
+        return None

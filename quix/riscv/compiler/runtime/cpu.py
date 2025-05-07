@@ -51,5 +51,5 @@ class CPU(Component):
         return store_array(self._registers, value, idx)
 
     @convert
-    def load(self, idx: DynamicUInt | Wide, load_in: Wide) -> ToConvert:
+    def load_register(self, idx: DynamicUInt | Wide, load_in: Wide) -> ToConvert:
         return load_array(self._registers, load_in, idx)

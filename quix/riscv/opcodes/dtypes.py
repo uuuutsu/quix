@@ -10,5 +10,9 @@ from quix.core.interfaces import Program
 from .base import RISCVOpcode
 
 type RISCVProgram = Program[RISCVOpcode]
-type Imm = int
-type Register = int
+
+
+class Imm(int): ...
+
+
+class Register(int): ...

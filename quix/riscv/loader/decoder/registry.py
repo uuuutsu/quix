@@ -80,10 +80,11 @@ def _create_opcode_from_instr_data[**P, O: RISCVOpcode](opcode: OpcodeFactory[P,
     @wraps(opcode)
     def factory(data: InstructionData) -> O:
         args = {}
-        for name in params:
+        for name, param in params.items():
             if (val := getattr(data, name)) is None:
                 raise RuntimeError(f"Required argument {name!r} of instruction {opcode.__name__!r} is None.")
-            args[name] = val
+
+            args[name] = param.annotation(val)
         return opcode(**args)  # type: ignore
 
     return factory
