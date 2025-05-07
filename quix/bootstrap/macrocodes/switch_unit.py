@@ -2,6 +2,7 @@ from quix.bootstrap.dtypes.const import UInt8
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
+from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 
 from .assign_unit import assign_unit
@@ -11,8 +12,9 @@ from .sub_unit import sub_unit
 
 
 @convert
-def switch_unit(value: Unit, branches: dict[UInt8, CoreProgram]) -> ToConvert:
+def switch_unit(value: Unit, branches: dict[UInt8, CoreProgram], else_: CoreProgram) -> ToConvert:
     buff = Unit(f"{value.name}_buff")
+    else_flag = Unit(f"{value.name}_else_flag")
 
     yield assign_unit(buff, value)
 
@@ -20,8 +22,10 @@ def switch_unit(value: Unit, branches: dict[UInt8, CoreProgram]) -> ToConvert:
     last_val = UInt8.from_value(0)
     for key in sorted_keys:
         yield sub_unit(buff, key - last_val, buff)
-        yield call_z_unit(buff, branches[key], [])
+        yield call_z_unit(buff, [*branches[key], add(else_flag, 1)], [])
         last_val = key
 
+    yield call_z_unit(else_flag, else_, clear_unit(else_flag))
+
     yield clear_unit(buff)
-    return free(buff)
+    return free(buff), free(else_flag)

@@ -18,6 +18,7 @@ def test_switch_unit() -> None:
                 UInt8.from_value(3): [add(u1, 13)],
                 UInt8.from_value(5): [add(u1, 27)],
             },
+            [],
         ),
     )
 
@@ -26,7 +27,7 @@ def test_switch_unit() -> None:
     assert sum(mem.values()) == 16
 
 
-def test_switch_unit_none() -> None:
+def test_switch_unit_else() -> None:
     u1 = Unit("u1")
     program = to_program(
         add(u1, 4),
@@ -37,9 +38,10 @@ def test_switch_unit_none() -> None:
                 UInt8.from_value(3): [add(u1, 13)],
                 UInt8.from_value(5): [add(u1, 27)],
             },
+            [add(u1, -4)],
         ),
     )
 
     mem = run(program)
-    assert mem[u1] == 4
-    assert sum(mem.values()) == 4
+    assert mem[u1] == 0
+    assert sum(mem.values()) == 0

@@ -19,6 +19,7 @@ def test_switch_wide() -> None:
                 DynamicUInt.from_int(257, 2): [add(w1[0], 13)],
                 DynamicUInt.from_int(512, 2): [add(w1[0], 27)],
             },
+            [],
         ),
     )
 

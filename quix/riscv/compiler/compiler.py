@@ -1,8 +1,11 @@
 from typing import Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
-from quix.bootstrap.program import SmartProgram
+from quix.bootstrap.program import SmartProgram, to_program
+from quix.core.opcodes.dtypes import CoreProgram
+from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.riscv.loader.state import State
+from quix.riscv.opcodes.base import RISCVOpcode
 from quix.riscv.opcodes.executor import RISCVExecutor
 
 from .runtime import CPU, Layout, Memory
@@ -47,6 +50,7 @@ class Compiler(RISCVExecutor):
         self._init_cpu(state)
         self._init_registers(state)
         self._init_memory(state)
+        self._compile_exec_loop(state)
         return self
 
     def _init_runtime(self) -> None:
@@ -84,3 +88,16 @@ class Compiler(RISCVExecutor):
             DynamicUInt.from_int(8),
             DynamicUInt.from_int(4048),
         )
+
+    def _compile_exec_loop(self, state: State) -> None:
+        mapping: dict[DynamicUInt, CoreProgram] = {}
+        for index, riscv_opcode in state.code.items():
+            mapping[DynamicUInt.from_int(index, 4)] = self._execute(riscv_opcode)
+
+        self.program |= self.cpu.run(mapping)
+
+    def _execute(self, opcode: RISCVOpcode) -> CoreProgram:
+        if (method := getattr(self, opcode.__id__, None)) is None:
+            raise NoHandlerFoundException(opcode, self)
+
+        return to_program(method(**opcode.args()))
