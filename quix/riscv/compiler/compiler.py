@@ -2,7 +2,7 @@ from typing import Any, Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import add_wide, assign_wide, clear_wide, sub_wide
+from quix.bootstrap.macrocodes import add_wide, and_wide, assign_wide, clear_wide, mul_wide, or_wide, sub_wide, xor_wide
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
@@ -144,3 +144,22 @@ class Compiler:
         yield assign_wide(rd, self.cpu.pc)
         yield add_wide(rd, DynamicUInt.from_int(4, 4), rd)
         return add_wide(self.cpu.pc, imm, self.cpu.pc)
+
+    def lw(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(imm, rs1, rs1)
+        return self.memory.load(rs1, rd)
+
+    def andi(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, imm)
+        return and_wide(rs1, rd, rd)
+
+    def ori(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, imm)
+        return or_wide(rs1, rd, rd)
+
+    def xori(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, imm)
+        return xor_wide(rs1, rd, rd)
+
+    def slli(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        return mul_wide(rs1, DynamicUInt.from_int(2 ** (int(imm) & 0x1F), 4), rd)
