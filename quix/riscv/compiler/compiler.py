@@ -2,17 +2,16 @@ from typing import Any, Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import clear_wide
+from quix.bootstrap.macrocodes import add_wide, clear_wide, sub_wide
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.riscv.loader.state import State
 from quix.riscv.opcodes.base import RISCVOpcode
 from quix.riscv.opcodes.dtypes import Imm, Register
-from quix.riscv.opcodes.executor import RISCVExecutor
 
-from . import impls
 from .runtime import CPU, Layout, Memory
+from .utils import is_signed
 
 _DATA_SECTIONS: Final[tuple[str, ...]] = (
     ".rodata",
@@ -41,7 +40,7 @@ def _imm_to_const(imm: Imm) -> DynamicUInt:
     return DynamicUInt.from_int(imm, 4)
 
 
-class Compiler(RISCVExecutor[ToConvert]):
+class Compiler:
     __slots__ = (
         "cpu",
         "memory",
@@ -106,9 +105,6 @@ class Compiler(RISCVExecutor[ToConvert]):
 
     @convert
     def _execute(self, opcode: RISCVOpcode) -> ToConvert:
-        if custom_handler := getattr(self, opcode.__id__, None):
-            return custom_handler(**opcode.args())
-
         new_args: dict[str, Any] = {}
         rs_mapping: dict[Register, Wide] = {}
 
@@ -122,13 +118,24 @@ class Compiler(RISCVExecutor[ToConvert]):
             else:
                 raise ValueError(f"Unknown argument type: {type(value)}")
 
-        if (handler := getattr(impls, opcode.__id__)) is None:
-            raise NoHandlerFoundException(opcode, impls)
-
-        yield handler(**new_args)
+        if custom_handler := getattr(self, opcode.__id__, None):
+            yield custom_handler(**new_args)
+        else:
+            raise NoHandlerFoundException(opcode, self)
 
         for index, from_ in rs_mapping.items():
             yield self.cpu.store_register(DynamicUInt.from_int(index), from_)
             yield clear_wide(from_)
 
         return None
+
+    def addi(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        if is_signed(imm):
+            return sub_wide(rs1, imm, rd)
+        yield add_wide(rs1, imm, rd)
+        return self.cpu.next()
+
+    def sw(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        yield add_wide(rs1, imm, rs1)
+        yield self.memory.store(rs1, rs2)
+        return self.cpu.next()

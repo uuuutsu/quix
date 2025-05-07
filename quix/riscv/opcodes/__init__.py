@@ -54,12 +54,10 @@ __all__ = (
     "divu",
     "rem",
     "remu",
-    "RISCVExecutor",
 )
 
 from .base import RISCVOpcode
 from .dtypes import Imm, Register, RISCVProgram
-from .executor import RISCVExecutor
 from .opcodes import (
     add,
     addi,

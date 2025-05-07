@@ -171,7 +171,7 @@ def _array_store_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offse
 
 
 def _move_in_array(array: Array, from_: int, *tos_: int) -> ToConvert:
-    yield _go_by_value_forward(array, from_)
+    yield _go_by_value(array, from_)
     instrs: SmartProgram = to_program(
         add(array, -1),
     )
@@ -183,7 +183,7 @@ def _move_in_array(array: Array, from_: int, *tos_: int) -> ToConvert:
     instrs |= _go_by_value(array, from_ - last)
 
     yield loop(array, instrs)
-    return _go_by_value_backward(array, from_)
+    return _go_by_value(array, -from_)
 
 
 def _go_by_value(array: Array, value: int) -> ToConvert:

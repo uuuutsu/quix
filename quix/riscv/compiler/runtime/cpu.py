@@ -4,7 +4,7 @@ from quix.bootstrap.dtypes.array import Array
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import assign_wide, init_array, load_array, store_array, switch_wide
+from quix.bootstrap.macrocodes import add_wide, assign_wide, init_array, load_array, store_array, switch_wide
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add, loop
@@ -39,6 +39,10 @@ class CPU(Component):
     @convert
     def set_pc(self, pc: DynamicUInt) -> ToConvert:
         return assign_wide(self._pc, pc)
+
+    @convert
+    def next(self) -> ToConvert:
+        return add_wide(self._pc, DynamicUInt.from_int(4, 4), self._pc)
 
     @convert
     def run(self, mapping: dict[DynamicUInt, CoreProgram]) -> ToConvert:
