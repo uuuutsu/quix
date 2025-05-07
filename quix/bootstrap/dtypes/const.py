@@ -17,6 +17,9 @@ class Const[C](DType, metaclass=FlyweightMeta):
     def from_value(cls: type[Self], value: C) -> Self:
         return cls(f"Const( {value} )", value=value)
 
+    def __hash__(self) -> int:
+        return hash(self.value)
+
 
 def _wrap(value: int, min: int, max: int) -> int:
     range = max - min + 1

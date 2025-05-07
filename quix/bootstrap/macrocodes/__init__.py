@@ -52,6 +52,7 @@ __all__ = (
     "comment",
     "output_str",
     "output_wide",
+    "switch_unit",
 )
 
 from .add_unit import add_unit
@@ -105,5 +106,6 @@ from .sub_unit import sub_unit
 from .sub_unit_carry import sub_unit_carry
 from .sub_wide import sub_wide
 from .sub_wide_carry import sub_wide_carry
+from .switch_unit import switch_unit
 from .xor_unit import xor_unit
 from .xor_wide import xor_wide
