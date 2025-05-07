@@ -3,7 +3,7 @@ from typing import override
 from quix.bootstrap.dtypes.array import Array
 from quix.bootstrap.dtypes.const import DynamicUInt
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocodes import init_array, load_array, store_array
+from quix.bootstrap.macrocodes import assign_wide, init_array, load_array, store_array
 from quix.bootstrap.program import ToConvert, convert
 from quix.memoptix.opcodes import index
 
@@ -33,8 +33,9 @@ class CPU(Component):
     def size(self) -> int:
         return self._registers.full_length + 4
 
-    def get_pc(self) -> Wide:
-        return self._pc
+    @convert
+    def set_pc(self, pc: DynamicUInt) -> ToConvert:
+        return assign_wide(self._pc, pc)
 
     @convert
     def store_register(self, idx: DynamicUInt | Wide, value: DynamicUInt | Wide) -> ToConvert:
