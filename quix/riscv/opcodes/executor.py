@@ -3,209 +3,209 @@ from abc import abstractmethod
 from .dtypes import Imm, Register
 
 
-class RISCVExecutor:
+class RISCVExecutor[T]:
     __slots__ = ()
 
     @abstractmethod
-    def addi(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def addi(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sw(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def sw(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def jal(self, imm: Imm, rd: Register) -> None:
+    def jal(self, imm: Imm, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lw(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def lw(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def andi(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def andi(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def ori(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def ori(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def xori(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def xori(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def slli(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def slli(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def srli(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def srli(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def beq(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def beq(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def bne(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def bne(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def blt(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def blt(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def bltu(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def bltu(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def bgeu(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def bgeu(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lui(self, imm: Imm, rd: Register) -> None:
+    def lui(self, imm: Imm, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def slti(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def slti(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sltiu(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def sltiu(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def auipc(self, imm: Imm, rd: Register) -> None:
+    def auipc(self, imm: Imm, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def bge(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def bge(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def jalr(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def jalr(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sb(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def sb(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sh(self, imm: Imm, rs1: Register, rs2: Register) -> None:
+    def sh(self, imm: Imm, rs1: Register, rs2: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lb(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def lb(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lbu(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def lbu(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lh(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def lh(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def lhu(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def lhu(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def add(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def add(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sub(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def sub(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sll(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def sll(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def slt(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def slt(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sltu(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def sltu(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def xor(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def xor(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def srl(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def srl(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def sra(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def sra(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def or_(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def or_(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def and_(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def and_(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def fence(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def fence(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def ecall(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def ecall(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def csrrw(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def csrrw(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def csrrs(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def csrrs(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def csrrwi(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def csrrwi(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def csrrsi(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def csrrsi(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def csrrci(self, imm: Imm, rs1: Register, rd: Register) -> None:
+    def csrrci(self, imm: Imm, rs1: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def mul(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def mul(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def mulh(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def mulh(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def mulhsu(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def mulhsu(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def mulhu(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def mulhu(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def div(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def div(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def divu(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def divu(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def rem(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def rem(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def remu(self, rs1: Register, rs2: Register, rd: Register) -> None:
+    def remu(self, rs1: Register, rs2: Register, rd: Register) -> T:
         raise NotImplementedError

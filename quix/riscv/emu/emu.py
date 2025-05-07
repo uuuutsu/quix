@@ -23,7 +23,7 @@ _DATA_SECTIONS: Final[tuple[str, ...]] = (
 )
 
 
-class Emulator(RISCVExecutor):
+class Emulator(RISCVExecutor[None]):
     __slots__ = ("memory", "registers", "pc", "csr", "brk")
 
     def __init__(self) -> None:

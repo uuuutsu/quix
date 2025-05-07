@@ -1,7 +1,7 @@
 from typing import Final, Self
 
 from quix.bootstrap.dtypes.const import DynamicUInt
-from quix.bootstrap.program import SmartProgram, to_program
+from quix.bootstrap.program import SmartProgram, ToConvert, to_program
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.riscv.loader.state import State
@@ -33,7 +33,7 @@ def _strip_data(data: bytes) -> tuple[bytes, int]:
     return data or b"", offset
 
 
-class Compiler(RISCVExecutor):
+class Compiler(RISCVExecutor[ToConvert]):
     __slots__ = (
         "cpu",
         "memory",
