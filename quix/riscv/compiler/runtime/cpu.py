@@ -17,11 +17,13 @@ class CPU(Component):
     __slots__ = (
         "_registers",
         "_pc",
+        "_exit",
     )
 
     def __init__(self) -> None:
         self._registers = Array("registers", length=32, granularity=4)
         self._pc = Wide.from_length("pc", 4)
+        self.exit = Unit("exit")
 
     @convert
     @override
@@ -46,9 +48,8 @@ class CPU(Component):
 
     @convert
     def run(self, mapping: dict[DynamicUInt, CoreProgram]) -> ToConvert:
-        exit = Unit("exit")
-        yield add(exit, 1)
-        return loop(exit, switch_wide(self._pc, mapping, else_=[add(exit, -1)]))
+        yield add(self.exit, 1)
+        return loop(self.exit, switch_wide(self._pc, mapping, else_=[add(self.exit, -1)]))
 
     @convert
     def store_register(self, idx: DynamicUInt | Wide, value: DynamicUInt | Wide) -> ToConvert:

@@ -97,6 +97,7 @@ class Emulator:
 
     def srli(self, imm: Imm, rs1: Register, rd: Register) -> None:
         if get_bit_section(imm, 10, 10):
+            print()
             self.registers[rd] = self.registers[rs1] >> (imm & 0x1F)
             return
 
@@ -219,6 +220,7 @@ class Emulator:
 
     def ecall(self, imm: Imm, rs1: Register, rd: Register) -> None:
         sys_call_number = self.registers[17]  # Assuming a0 (x17) holds the system call number
+        print(sys_call_number)
         if sys_call_number == 93:  # exit
             raise SystemExit(self.registers[10])  # Assuming a0 (x10) holds the exit code
         elif sys_call_number == 64:  # print
@@ -243,7 +245,6 @@ class Emulator:
                 self.registers[10] = len(data)
             else:
                 self.registers[10] = -29
-
         elif sys_call_number == 62:
             self.registers[10] = -29
 

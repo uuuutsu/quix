@@ -1,19 +1,39 @@
 from typing import Any, Final, Self
 
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import DynamicUInt, UInt8
+from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import (
     add_wide,
+    and_unit,
     and_wide,
+    assign_unit,
     assign_wide,
+    call_eq_wide,
+    call_ge_unit,
+    call_ge_wide,
+    call_ge_wide_signed,
+    call_lt_wide,
+    call_lt_wide_signed,
+    call_neq_wide,
+    clear_unit,
     clear_wide,
+    div_wide,
+    free_wide,
+    loop_wide,
+    mul_wide,
+    not_unit,
     or_wide,
     sub_wide,
+    switch_wide,
     xor_wide,
 )
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
+from quix.core.opcodes.opcodes import add, inject, output
 from quix.exceptions.core.visitor import NoHandlerFoundException
+from quix.memoptix.opcodes import free
+from quix.riscv.loader.decoder.utils import get_bit_section
 from quix.riscv.loader.state import State
 from quix.riscv.opcodes.base import RISCVOpcode
 from quix.riscv.opcodes.dtypes import Imm, Register
@@ -106,8 +126,10 @@ class Compiler:
 
     def _compile_exec_loop(self, state: State) -> None:
         mapping: dict[DynamicUInt, CoreProgram] = {}
+        total = len(state.code)
         for index, riscv_opcode in state.code.items():
             mapping[DynamicUInt.from_int(index, 4)] = self._execute(riscv_opcode)
+            print(f"instruction compiler: {index}/{total - 1}")
 
         self.program |= self.cpu.run(mapping)
 
@@ -134,8 +156,9 @@ class Compiler:
         for index, from_ in rs_mapping.items():
             yield self.cpu.store_register(DynamicUInt.from_int(index), from_)
             yield clear_wide(from_)
+            yield free_wide(from_)
 
-        return None
+        return inject(None, "!", None)
 
     def addi(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         if is_signed(imm):
@@ -156,16 +179,302 @@ class Compiler:
 
     def lw(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         yield add_wide(imm, rs1, rs1)
-        return self.memory.load(rs1, rd)
+        yield self.memory.load(rs1, rd)
+        return self.cpu.next()
 
     def andi(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         yield assign_wide(rd, imm)
-        return and_wide(rs1, rd, rd)
+        yield and_wide(rs1, rd, rd)
+        return self.cpu.next()
 
     def ori(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         yield assign_wide(rd, imm)
-        return or_wide(rs1, rd, rd)
+        yield or_wide(rs1, rd, rd)
+        return self.cpu.next()
 
     def xori(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         yield assign_wide(rd, imm)
-        return xor_wide(rs1, rd, rd)
+        yield xor_wide(rs1, rd, rd)
+        return self.cpu.next()
+
+    def slli(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        # SIGNED ARE NOT YET HANDLED
+        yield mul_wide(rs1, DynamicUInt.from_int(2 ** (int(imm) & 0x1F), 4), rd)
+        return self.cpu.next()
+
+    def srli(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        # SIGNED ARE NOT YET HANDLED
+        if get_bit_section(int(imm), 10, 10):
+            yield div_wide(
+                rs1,
+                DynamicUInt.from_int(2 ** (int(imm) & 0x1F)),
+                quotient=rd,
+                remainder=None,
+            )
+        else:
+            yield div_wide(
+                rs1,
+                DynamicUInt.from_int(2 ** (int(imm) & 0x1F)),
+                quotient=rd,
+                remainder=None,
+            )
+        return self.cpu.next()
+
+    def beq(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_eq_wide(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def bne(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_neq_wide(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def bge(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_ge_wide_signed(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def blt(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_lt_wide_signed(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def bltu(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_lt_wide(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def bgeu(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        return call_ge_wide(
+            rs1,
+            rs2,
+            add_wide(self.cpu.pc, imm, self.cpu.pc),
+            [],
+        )
+
+    def lui(self, imm: DynamicUInt, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, imm)
+        return self.cpu.next()
+
+    def slti(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        imm_wide = Wide.from_length("imm", 4)
+        yield assign_wide(imm_wide, imm)
+        yield call_lt_wide_signed(
+            rs1,
+            imm_wide,
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+        )
+        yield clear_wide(imm_wide), free_wide(imm_wide)
+        return self.cpu.next()
+
+    def sltiu(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        imm_wide = Wide.from_length("imm", 4)
+        yield assign_wide(imm_wide, imm)
+        yield call_lt_wide(
+            rs1,
+            imm_wide,
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+        )
+        yield clear_wide(imm_wide), free_wide(imm_wide)
+        return self.cpu.next()
+
+    def auipc(self, imm: DynamicUInt, rd: Wide) -> ToConvert:
+        return add_wide(self.cpu.pc, imm, rd)
+
+    def jalr(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield assign_wide(rd, self.cpu.pc)
+        yield add_wide(rd, DynamicUInt.from_int(4, 4), rd)
+        yield assign_wide(self.cpu.pc, rs1)
+        yield add_wide(self.cpu.pc, imm, self.cpu.pc)
+        mask = Unit("mask")
+        yield assign_unit(mask, UInt8.from_value(0b11111110))
+        yield and_unit(self.cpu.pc[0], mask, self.cpu.pc[0])
+        yield add(mask, 2)  # to zero
+        return free(mask)
+
+    def sb(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        yield add_wide(rs1, imm, rs1)
+        yield self.memory.store(rs1, Wide("lsb", (rs2[0],)))
+        return self.cpu.next()
+
+    def sh(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
+        yield add_wide(rs1, imm, rs1)
+        yield self.memory.store(rs1, Wide("half", rs2[:2]))
+        return self.cpu.next()
+
+    def lb(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(imm, rs1, rs1)
+        yield clear_wide(Wide("rd_upper", rd[1:]))
+        yield self.memory.load(rs1, Wide("lsb", (rd[0],)))
+        lim = Unit("lim")
+        yield assign_unit(lim, UInt8.from_value(128))
+        yield call_ge_unit(
+            rd[0],
+            lim,
+            [add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), *not_unit(rd[0], rd[0])],
+            [],
+        )
+        yield clear_unit(lim), free(lim)
+        return self.cpu.next()
+
+    def lbu(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(imm, rs1, rs1)
+        yield clear_wide(Wide("rd_upper", rd[1:]))
+        yield self.memory.load(rs1, Wide("lsb", (rd[0],)))
+        return self.cpu.next()
+
+    def lh(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(imm, rs1, rs1)
+        yield clear_wide(Wide("rd_upper", rd[2:]))
+        yield self.memory.load(rs1, Wide("lsb", rd[:2]))
+        lim = Unit("lim")
+        yield assign_unit(lim, UInt8.from_value(128))
+        yield call_ge_unit(
+            rd[1],
+            lim,
+            [add(rd[2], -1), add(rd[3], -1), *not_unit(rd[0], rd[0]), *not_unit(rd[1], rd[1])],
+            [],
+        )
+        yield clear_unit(lim), free(lim)
+        return self.cpu.next()
+
+    def lhu(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(imm, rs1, rs1)
+        yield clear_wide(Wide("rd_upper", rd[2:]))
+        yield self.memory.load(rs1, Wide("lsb", rd[:2]))
+        return self.cpu.next()
+
+    def add(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield add_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def sub(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield sub_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def sll(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield mul_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def slt(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield call_lt_wide_signed(
+            rs1,
+            rs2,
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+        )
+        return self.cpu.next()
+
+    def sltu(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield call_lt_wide(
+            rs1,
+            rs2,
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+            assign_wide(rd, DynamicUInt.from_int(1, 4)),
+        )
+        return self.cpu.next()
+
+    def xor(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield xor_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def or_(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield or_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def and_(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        yield and_wide(rs1, rs2, rd)
+        return self.cpu.next()
+
+    def fence(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        pass  # Implement as needed
+
+    def srl(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        # SIGNED ARE NOT YET HANDLED
+        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield div_wide(
+            rs1,
+            rs2,
+            quotient=rd,
+            remainder=None,
+        )
+        return self.cpu.next()
+
+    def sra(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+        # SIGNED ARE NOT YET HANDLED
+        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield div_wide(
+            rs1,
+            rs2,
+            quotient=rd,
+            remainder=None,
+        )
+        return self.cpu.next()
+
+    def ecall(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
+        cases: dict[DynamicUInt, CoreProgram] = {
+            DynamicUInt.from_int(62, 4): self._ecall_lseek(),
+            DynamicUInt.from_int(64, 4): self._ecall_print(),
+            DynamicUInt.from_int(57, 4): self._ecall_close(),
+            DynamicUInt.from_int(93, 4): self._ecall_exit(),
+            DynamicUInt.from_int(10, 4): [],
+        }
+
+        x17 = Wide.from_length("x17", 1)
+        yield self.memory.load(DynamicUInt.from_int(17), x17)
+        yield switch_wide(x17, cases, [])
+
+        yield clear_wide(x17), free_wide(x17)
+        return self.cpu.next()
+
+    @convert
+    def _ecall_close(self) -> ToConvert:
+        return self.memory.store(DynamicUInt.from_int(10), DynamicUInt.from_int(0, 4))
+
+    @convert
+    def _ecall_lseek(self) -> ToConvert:
+        return self.memory.store(DynamicUInt.from_int(10), DynamicUInt.from_int((1 << 32) - 29))
+
+    @convert
+    def _ecall_exit(self) -> ToConvert:
+        return clear_unit(self.cpu.exit)
+
+    @convert
+    def _ecall_print(self) -> ToConvert:
+        addr = Wide.from_length("addr", 4)
+        counter = Wide.from_length("counter", 4)
+        yield self.cpu.load_register(DynamicUInt.from_int(11), addr)
+        yield self.cpu.load_register(DynamicUInt.from_int(12), counter)
+
+        char = Unit("char")
+        yield loop_wide(
+            counter,
+            self.memory.load(addr, Wide("char", (char,)))
+            | output(char)
+            | clear_unit(char)
+            | add_wide(addr, DynamicUInt.from_int(1, 4), addr)
+            | sub_wide(counter, DynamicUInt.from_int(1, 4), counter),
+        )
+
+        # TODO: set x10 to length of written text
+        yield clear_wide(addr), clear_wide(counter)
+        return free_wide(addr), free_wide(counter)
