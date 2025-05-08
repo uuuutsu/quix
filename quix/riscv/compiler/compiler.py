@@ -127,9 +127,9 @@ class Compiler:
     def _compile_exec_loop(self, state: State) -> None:
         mapping: dict[DynamicUInt, CoreProgram] = {}
         total = len(state.code)
-        for index, riscv_opcode in state.code.items():
+        for idx, (index, riscv_opcode) in enumerate(state.code.items()):
             mapping[DynamicUInt.from_int(index, 4)] = self._execute(riscv_opcode)
-            print(f"instruction compiler: {index}/{total - 1}")
+            print(f"instruction compiled: {idx}/{total - 1}")
 
         self.program |= self.cpu.run(mapping)
 
@@ -207,14 +207,14 @@ class Compiler:
         if get_bit_section(int(imm), 10, 10):
             yield div_wide(
                 rs1,
-                DynamicUInt.from_int(2 ** (int(imm) & 0x1F)),
+                DynamicUInt.from_int(2 ** (int(imm) & 0x1F), 4),
                 quotient=rd,
                 remainder=None,
             )
         else:
             yield div_wide(
                 rs1,
-                DynamicUInt.from_int(2 ** (int(imm) & 0x1F)),
+                DynamicUInt.from_int(2 ** (int(imm) & 0x1F), 4),
                 quotient=rd,
                 remainder=None,
             )
@@ -371,7 +371,7 @@ class Compiler:
         return self.cpu.next()
 
     def sll(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
-        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield mul_wide(DynamicUInt.from_int(2, 4), rs2, rs2)
         yield mul_wide(rs1, rs2, rd)
         return self.cpu.next()
 
@@ -410,7 +410,7 @@ class Compiler:
 
     def srl(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
         # SIGNED ARE NOT YET HANDLED
-        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield mul_wide(DynamicUInt.from_int(2, 4), rs2, rs2)
         yield div_wide(
             rs1,
             rs2,
@@ -421,7 +421,7 @@ class Compiler:
 
     def sra(self, rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
         # SIGNED ARE NOT YET HANDLED
-        yield mul_wide(DynamicUInt.from_int(2, 4), Wide("rs2", (rs2[0],)), rs2)
+        yield mul_wide(DynamicUInt.from_int(2, 4), rs2, rs2)
         yield div_wide(
             rs1,
             rs2,
@@ -432,11 +432,11 @@ class Compiler:
 
     def ecall(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         cases: dict[DynamicUInt, CoreProgram] = {
-            DynamicUInt.from_int(62, 4): self._ecall_lseek(),
-            DynamicUInt.from_int(64, 4): self._ecall_print(),
-            DynamicUInt.from_int(57, 4): self._ecall_close(),
-            DynamicUInt.from_int(93, 4): self._ecall_exit(),
-            DynamicUInt.from_int(10, 4): [],
+            DynamicUInt.from_int(62, 1): self._ecall_lseek(),
+            DynamicUInt.from_int(64, 1): self._ecall_print(),
+            DynamicUInt.from_int(57, 1): self._ecall_close(),
+            DynamicUInt.from_int(93, 1): self._ecall_exit(),
+            DynamicUInt.from_int(10, 1): [],
         }
 
         x17 = Wide.from_length("x17", 1)
@@ -478,3 +478,9 @@ class Compiler:
         # TODO: set x10 to length of written text
         yield clear_wide(addr), clear_wide(counter)
         return free_wide(addr), free_wide(counter)
+
+    def rem(self, **kwargs: Any) -> ToConvert:
+        return self.cpu.next()
+
+    def remu(self, **kwargs: Any) -> ToConvert:
+        return self.cpu.next()
