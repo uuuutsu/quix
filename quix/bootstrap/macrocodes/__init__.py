@@ -55,6 +55,7 @@ __all__ = (
     "switch_unit",
     "sub_wide",
     "switch_wide",
+    "call_ge_unit_signed",
 )
 
 from .add_unit import add_unit
@@ -68,6 +69,7 @@ from .assign_wide import assign_wide
 from .call_eq_unit import call_eq_unit
 from .call_eq_wide import call_eq_wide
 from .call_ge_unit import call_ge_unit
+from .call_ge_unit_signed import call_ge_unit_signed
 from .call_ge_wide import call_ge_wide
 from .call_gt_unit import call_gt_unit
 from .call_gt_wide import call_gt_wide
