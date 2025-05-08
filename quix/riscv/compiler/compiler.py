@@ -7,7 +7,6 @@ from quix.bootstrap.macrocodes import (
     and_wide,
     assign_wide,
     clear_wide,
-    mul_wide,
     or_wide,
     sub_wide,
     xor_wide,
@@ -140,8 +139,9 @@ class Compiler:
 
     def addi(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         if is_signed(imm):
-            return sub_wide(rs1, imm, rd)
-        yield add_wide(rs1, imm, rd)
+            yield sub_wide(rs1, imm, rd)
+        else:
+            yield add_wide(rs1, imm, rd)
         return self.cpu.next()
 
     def sw(self, imm: DynamicUInt, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -169,6 +169,3 @@ class Compiler:
     def xori(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
         yield assign_wide(rd, imm)
         return xor_wide(rs1, rd, rd)
-
-    def slli(self, imm: DynamicUInt, rs1: Wide, rd: Wide) -> ToConvert:
-        return mul_wide(rs1, DynamicUInt.from_int(2 ** (int(imm) & 0x1F), 4), rd)
