@@ -26,12 +26,12 @@ def _recursive_call_ge_unit_flag(left: tuple[Unit, ...], right: tuple[Unit, ...]
     if (len(left) == 0) or (len(right) == 0):
         return None
     return call_ge_unit(
-        left[0],
-        right[0],
+        left[-1],
+        right[-1],
         call_eq_unit(
-            left[0],
-            right[0],
-            _recursive_call_ge_unit_flag(left[1:], right[1:], ge_flag),
+            left[-1],
+            right[-1],
+            _recursive_call_ge_unit_flag(left[:-1], right[:-1], ge_flag),
             [],
         ),
         [add(ge_flag, -1)],
