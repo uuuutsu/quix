@@ -59,6 +59,7 @@ __all__ = (
     "call_gt_unit_signed",
     "call_le_unit_signed",
     "call_lt_unit_signed",
+    "call_ge_wide_signed",
 )
 
 from .add_unit import add_unit
@@ -74,6 +75,7 @@ from .call_eq_wide import call_eq_wide
 from .call_ge_unit import call_ge_unit
 from .call_ge_unit_signed import call_ge_unit_signed
 from .call_ge_wide import call_ge_wide
+from .call_ge_wide_signed import call_ge_wide_signed
 from .call_gt_unit import call_gt_unit
 from .call_gt_unit_signed import call_gt_unit_signed
 from .call_gt_wide import call_gt_wide
