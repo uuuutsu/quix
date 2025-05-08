@@ -60,6 +60,9 @@ __all__ = (
     "call_le_unit_signed",
     "call_lt_unit_signed",
     "call_ge_wide_signed",
+    "call_gt_wide_signed",
+    "call_le_wide_signed",
+    "call_lt_wide_signed",
 )
 
 from .add_unit import add_unit
@@ -79,12 +82,15 @@ from .call_ge_wide_signed import call_ge_wide_signed
 from .call_gt_unit import call_gt_unit
 from .call_gt_unit_signed import call_gt_unit_signed
 from .call_gt_wide import call_gt_wide
+from .call_gt_wide_signed import call_gt_wide_signed
 from .call_le_unit import call_le_unit
 from .call_le_unit_signed import call_le_unit_signed
 from .call_le_wide import call_le_wide
+from .call_le_wide_signed import call_le_wide_signed
 from .call_lt_unit import call_lt_unit
 from .call_lt_unit_signed import call_lt_unit_signed
 from .call_lt_wide import call_lt_wide
+from .call_lt_wide_signed import call_lt_wide_signed
 from .call_neq_unit import call_neq_unit
 from .call_neq_wide import call_neq_wide
 from .call_z_unit import call_z_unit
