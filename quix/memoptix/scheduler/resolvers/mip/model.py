@@ -4,6 +4,7 @@ import mip  # type: ignore
 
 from quix.exceptions.scheduler import IndexIsNotYetResolvedError, UnknownOwnerException
 from quix.memoptix.scheduler.owner import Owner
+from quix.tools import silence
 
 
 def owner_to_str_key(owner: Owner) -> str:
@@ -62,15 +63,16 @@ class Model:
         relax: bool = False,
         verbose: int = 0,
     ) -> mip.OptimizationStatus:
-        self._mip_model.verbose = verbose
-        return self._mip_model.optimize(
-            max_seconds=max_seconds,
-            max_nodes=max_nodes,
-            max_solutions=max_solutions,
-            max_seconds_same_incumbent=max_seconds_same_incumbent,
-            max_nodes_same_incumbent=max_nodes_same_incumbent,
-            relax=relax,
-        )
+        with silence():
+            self._mip_model.verbose = verbose
+            return self._mip_model.optimize(
+                max_seconds=max_seconds,
+                max_nodes=max_nodes,
+                max_solutions=max_solutions,
+                max_seconds_same_incumbent=max_seconds_same_incumbent,
+                max_nodes_same_incumbent=max_nodes_same_incumbent,
+                relax=relax,
+            )
 
     def get_var_by_owner(self, owner: Owner) -> mip.Var:
         var = self._mip_model.var_by_name(owner_to_str_key(owner))
