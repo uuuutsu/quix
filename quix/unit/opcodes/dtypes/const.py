@@ -18,10 +18,16 @@ class Const[C](DType, metaclass=FlyweightMeta):
 
     @classmethod
     def from_value(cls: type[Self], value: C) -> Self:
-        return cls(f"Const( {value} )", value=value)
+        return cls(cls.__name__, value=value)
 
     def __hash__(self) -> int:
         return hash(self.value)
+
+    def __repr__(self) -> str:
+        return str(self.value)
+
+    def __str__(self) -> str:
+        return f"{type(self).__name__}( {self.name} )"
 
 
 def _wrap(value: int, min: int, max: int) -> int:
