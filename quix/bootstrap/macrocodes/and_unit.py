@@ -1,6 +1,6 @@
 from quix.bootstrap.dtypes import Int8, UInt8, Unit
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.opcodes import add, loop
+from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 from .add_unit import add_unit
@@ -25,21 +25,22 @@ def and_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
     yield copy_unit(right, {rquot: Int8.from_value(1)})
     yield add(break_, 8), add(bit_scale, 1), clear_unit(target)
 
-    instrs = div_unit(lquot, UInt8.from_value(2), lquot, lrem)
-    instrs |= div_unit(rquot, UInt8.from_value(2), rquot, rrem)
-    instrs |= loop(
-        lrem,
-        [
-            loop(rrem, add_unit(bit_scale, target, target) | add(rrem, -1)),
-            add(lrem, -1),
-        ],
-    )
-    instrs |= add(break_, -1)
-    instrs |= mul_unit(bit_scale, UInt8.from_value(2), bit_scale)
+    yield start_loop(break_)
+    yield div_unit(lquot, UInt8.from_value(2), lquot, lrem)
+    yield div_unit(rquot, UInt8.from_value(2), rquot, rrem)
 
-    yield loop(break_, instrs)
+    yield start_loop(lrem)
+    yield start_loop(rrem)
+    yield add_unit(bit_scale, target, target) | add(rrem, -1)
+    yield end_loop()
+    yield add(lrem, -1)
+    yield end_loop()
+
+    yield add(break_, -1)
+    yield mul_unit(bit_scale, UInt8.from_value(2), bit_scale)
+    yield end_loop()
+
     yield clear_unit(lrem), clear_unit(rrem), clear_unit(bit_scale)
-
     return [
         free(lrem),
         free(rrem),

@@ -1,4 +1,4 @@
-from quix.core.opcodes import input, loop
+from quix.core.opcodes import end_loop, input, start_loop
 from quix.memoptix import get_ref_scopes
 from quix.memoptix.opcodes import free
 
@@ -50,12 +50,9 @@ def test_loop_two_var() -> None:
     program = [
         input(1),
         input(1),
-        loop(
-            1,
-            [
-                input(2),
-            ],
-        ),
+        start_loop(1),
+        input(2),
+        end_loop(),
         input(1),
     ]
     scopes = get_ref_scopes(program)
@@ -66,13 +63,10 @@ def test_loop_enclosed_two_var() -> None:
     program = [
         input(1),
         input(1),
-        loop(
-            1,
-            [
-                input(2),
-                free(2),
-            ],
-        ),
+        start_loop(1),
+        input(2),
+        free(2),
+        end_loop(),
         input(1),
     ]
     scopes = get_ref_scopes(program)
@@ -83,45 +77,31 @@ def test_double_loop() -> None:
     program = [
         input(1),
         input(1),
-        loop(
-            1,
-            [
-                input(2),
-                loop(
-                    1,
-                    [
-                        free(2),
-                    ],
-                ),
-                input(1),
-            ],
-        ),
+        start_loop(1),
+        input(2),
+        start_loop(1),
+        free(2),
+        end_loop(),
+        end_loop(),
         input(1),
     ]
     scopes = get_ref_scopes(program)
-    assert scopes == {1: (0, 9), 2: (3, 6)}
+    assert scopes == {1: (0, 8), 2: (3, 6)}
 
 
 def test_complex() -> None:
     program = [
         input(1),
         input(1),
-        loop(
-            1,
-            [
-                input(2),
-                loop(
-                    3,
-                    [
-                        input(2),
-                        free(2),
-                    ],
-                ),
-                input(3),
-            ],
-        ),
+        start_loop(1),
+        input(2),
+        start_loop(3),
+        input(2),
+        free(2),
+        end_loop(),
+        end_loop(),
         free(1),
         input(3),
     ]
     scopes = get_ref_scopes(program)
-    assert scopes == {1: (0, 10), 2: (3, 7), 3: (2, 11)}
+    assert scopes == {1: (0, 9), 2: (3, 7), 3: (2, 10)}

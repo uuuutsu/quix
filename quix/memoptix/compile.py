@@ -3,7 +3,6 @@ from logging import warning
 from typing import Literal, overload
 
 from quix.core.opcodes import CoreOpcode, CoreOpcodes, CoreProgram, Ref
-from quix.core.opcodes.opcodes import loop
 from quix.memoptix.scheduler import (
     Array,
     BaseConstraint,
@@ -77,42 +76,21 @@ def get_ref_scopes(
 ):
     rough_usages: dict[Ref, tuple[int, int | None]] = {}
     loops: list[tuple[int, int]] = []
+    stack: list[tuple[Ref, int]] = []
     curr_opcode_idx: int = 0
     length: int = 0
 
     for opcode in program:
-        if (ref := opcode.args().get("ref")) is None:
+        if opcode.__id__ == CoreOpcodes.END_LOOP:
+            ref, idx = stack.pop()
+            loops.append((idx, curr_opcode_idx))
+        elif (ref := opcode.args().get("ref")) is None:
             ...
-        elif opcode.__id__ == CoreOpcodes.LOOP:
-            loop_program = opcode.args()["program"]
-            internal_rough_usages, internal_loops, in_length = get_ref_scopes(loop_program, close=False)
-            length += in_length
-            adjusted_idx = curr_opcode_idx + 1
-            for in_start, in_end in internal_loops:
-                loops.append((in_start + adjusted_idx, in_end + adjusted_idx))
 
-            for ref, (start, end) in internal_rough_usages.items():
-                if ref not in rough_usages:
-                    adjusted_end = None if end is None else adjusted_idx + end
-                    rough_usages[ref] = adjusted_idx + start, adjusted_end
-                else:
-                    if rough_usages[ref][-1] is not None:
-                        warning(f"Used freed reference. Freeing discarded: {ref}")
+        if opcode.__id__ == CoreOpcodes.START_LOOP:
+            stack.append((ref, curr_opcode_idx))
 
-                    adjusted_end = None if end is None else adjusted_idx + end
-                    rough_usages[ref] = rough_usages[ref][0], adjusted_end
-
-            loop_ref = opcode.args()["ref"]
-            if (loop_ref in rough_usages) and (rough_usages[loop_ref][-1] is not None):
-                rough_usages[loop_ref] = rough_usages[loop_ref][0], None
-            elif loop_ref not in rough_usages:
-                rough_usages[loop_ref] = curr_opcode_idx, None
-
-            loops.append((curr_opcode_idx, curr_opcode_idx + in_length + 1))
-            curr_opcode_idx += in_length + 1
-            length += 1
-
-        elif opcode.__id__ == MemoptixOpcodes.FREE:
+        if opcode.__id__ == MemoptixOpcodes.FREE:
             if ref not in rough_usages:
                 if close is True:
                     warning(f"Freeing unused reference: {ref}")
@@ -186,8 +164,10 @@ def create_constraints(
     for opcode in program:
         args = opcode.args()
 
-        own_constrs = constrs.setdefault(mapping[args.pop("ref")], [])
+        if (ref := args.pop("ref", None)) is None:
+            continue
 
+        own_constrs = constrs.setdefault(mapping[ref], [])
         match opcode.__id__:
             case MemoptixOpcodes.INDEX:
                 own_constrs.append(Index(**args))
@@ -199,10 +179,6 @@ def create_constraints(
             case MemoptixOpcodes.SOFT_LINK:
                 soft_to_: dict[Owner, int] = {mapping[ref]: scale for ref, scale in args["to_"].items()}
                 own_constrs.append(SoftLink(soft_to_))
-            case CoreOpcodes.LOOP:
-                sub_program: CoreProgram = opcode.args()["program"]
-                sub_owner_constrs = create_constraints(sub_program, mapping)
-                constrs = merge_constraints(constrs, sub_owner_constrs)
 
     return constrs
 
@@ -268,8 +244,5 @@ def strip_program(program: CoreProgram) -> CoreProgram:
     for opcode in program:
         if opcode.__id__ in MemoptixOpcodes:
             continue
-        if opcode.__id__ == CoreOpcodes.LOOP:
-            args = opcode.args()
-            opcode = loop(args["ref"], program=strip_program(args["program"]))
         new_program.append(opcode)
     return new_program

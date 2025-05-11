@@ -29,6 +29,9 @@ class BFPointer:
             return ""
         return self.move_by_ptr(self._layout[ref])
 
+    def get_ptr(self, ref: Ref | None) -> Ptr:
+        return self._curr_pos if ref is None else self._layout[ref]
+
     @property
     def position(self) -> int:
         return self._curr_pos

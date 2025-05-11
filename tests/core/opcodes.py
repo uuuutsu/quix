@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from quix.core.opcodes import add, inject, input, loop, output
+from quix.core.opcodes import add, end_loop, inject, input, output, start_loop
 
 
 @pytest.mark.parametrize(
@@ -47,15 +47,21 @@ def test_output(args: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "args",
     [
-        {"ref": 5, "program": []},
-        {"ref": -10, "program": [add(-10, 50)]},
-        {"ref": -10, "program": [input(130)]},
+        {"ref": 5},
+        {"ref": -10},
+        {"ref": -10},
     ],
 )
-def test_loop(args: dict[str, Any]) -> None:
-    assert loop(**args).args() == args
-    assert loop(**args).__id__ == "loop"
-    assert loop(**args).__class__.__name__ == "Loop"
+def test_start_loop(args: dict[str, Any]) -> None:
+    assert start_loop(**args).args() == args
+    assert start_loop(**args).__id__ == "start_loop"
+    assert start_loop(**args).__class__.__name__ == "StartLoop"
+
+
+def test_end_loop() -> None:
+    assert end_loop().args() == {}
+    assert end_loop().__id__ == "end_loop"
+    assert end_loop().__class__.__name__ == "EndLoop"
 
 
 @pytest.mark.parametrize(

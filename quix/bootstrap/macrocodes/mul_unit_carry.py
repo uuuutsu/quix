@@ -2,7 +2,7 @@ from quix.bootstrap.dtypes import UInt8, Unit
 from quix.bootstrap.dtypes.const import Int8
 from quix.bootstrap.macrocodes.assign_unit import assign_unit
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.opcodes import add, loop
+from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 from .add_unit_carry import add_unit_carry
@@ -70,11 +70,12 @@ def _mulc_two_units(
     if target not in (left, right):
         yield clear_unit(target)
 
-    instrs = add_unit_carry(left_buff, target, target, carry=carry)
+    yield start_loop(right_buff)
+    yield add_unit_carry(left_buff, target, target, carry=carry)
     if left != right != target:
-        instrs |= add(right, 1)
-    instrs |= add(right_buff, -1)
-    yield loop(right_buff, instrs)
+        yield add(right, 1)
+    yield add(right_buff, -1)
+    yield end_loop()
 
     if left != target:
         yield move_unit(left_buff, {left: Int8.from_value(1)})

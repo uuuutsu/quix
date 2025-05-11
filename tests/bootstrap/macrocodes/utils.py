@@ -12,7 +12,6 @@ from quix.memoptix import mem_compile
 def run_with_output(program: SmartProgram) -> str:
     core_program, mapping = mem_compile(program.build(), garbage_collector=False)
     code = _compile_to_bf(core_program, mapping)
-
     output = StringIO()
     Executor(code, output=output).run()
     return output.getvalue()

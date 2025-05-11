@@ -1,6 +1,6 @@
 from quix.core.interfaces import Readable
 from quix.core.opcodes import CoreOpcode, CoreProgram, Ref, add, input, output
-from quix.core.opcodes.opcodes import loop
+from quix.core.opcodes.opcodes import end_loop, start_loop
 from quix.core.values import BFCommands
 from quix.tools import generate_unique_id
 
@@ -10,7 +10,7 @@ def decompile(
     start_ptr: int = 0,
     start_memory: dict[int, Ref] | None = None,
 ) -> tuple[CoreProgram, dict[int, Ref]]:
-    loop_stack: list[tuple[list[CoreOpcode], int, dict[int, Ref]]] = []
+    loop_stack: list[int] = []
     program: list[CoreOpcode] = []
     curr_ptr: int = start_ptr
     memory = start_memory or {}
@@ -35,18 +35,18 @@ def decompile(
             case BFCommands.STDIN:
                 program.append(output(get_current_ref()))
             case BFCommands.START_LOOP:
-                loop_stack.append((program, curr_ptr, memory))
-                program, memory = [], {}
+                loop_stack.append(curr_ptr)
+                program.append(start_loop(get_current_ref()))
             case BFCommands.END_LOOP:
-                old_program, old_curr_ptr, old_memory = loop_stack.pop()
-                if curr_ptr != old_curr_ptr:
+                if not loop_stack:
+                    raise RuntimeError("Unopened loop")
+                old_ptr = loop_stack.pop()
+                if curr_ptr != old_ptr:
                     raise RuntimeError("Unbalanced loops are not supported")
 
-                memory.update(old_memory)
-                old_program.append(loop(get_current_ref(), program))
-                program = old_program
+                program.append(end_loop())
 
     if loop_stack:
-        raise ValueError(f"Unclosed loop: {loop_stack[-1][1]}")
+        raise ValueError("Unclosed loop.")
 
     return program, memory

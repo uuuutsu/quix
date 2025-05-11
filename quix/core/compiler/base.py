@@ -31,7 +31,11 @@ class CoreVisitor(Visitor[CoreOpcode]):
         raise NotImplementedError
 
     @abstractmethod
-    def loop(self, ref: Ref | None, program: CoreProgram) -> None:
+    def start_loop(self, ref: Ref | None) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def end_loop(self) -> None:
         raise NotImplementedError
 
     @abstractmethod

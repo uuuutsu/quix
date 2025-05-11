@@ -3,15 +3,16 @@ __all__ = (
     "add",
     "input",
     "output",
-    "loop",
     "inject",
     "Ref",
     "CoreProgram",
     "Value",
     "Code",
     "CoreOpcodes",
+    "start_loop",
+    "end_loop",
 )
 
 from .base import CoreOpcode
 from .dtypes import Code, CoreProgram, Ref, Value
-from .opcodes import CoreOpcodes, add, inject, input, loop, output
+from .opcodes import CoreOpcodes, add, end_loop, inject, input, output, start_loop

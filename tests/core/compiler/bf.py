@@ -4,7 +4,7 @@ from quix.core.compiler import BFVisitor
 from quix.core.compiler.layout import BFMemoryLayout
 from quix.core.compiler.pointer import BFPointer
 from quix.core.opcodes.dtypes import CoreProgram
-from quix.core.opcodes.opcodes import add, inject, input, loop, output
+from quix.core.opcodes.opcodes import add, end_loop, inject, input, output, start_loop
 
 L = BFMemoryLayout
 
@@ -26,7 +26,7 @@ def test_input() -> None:
 
 
 def test_loop() -> None:
-    assert compile([loop(3, [add(1, 1)])], L({3: 4, 1: 2})) == ">>>>[<<+>>]"
+    assert compile([start_loop(3), add(1, 1), end_loop()], L({3: 4, 1: 2})) == ">>>>[<<+>>]"
 
 
 def test_inject() -> None:

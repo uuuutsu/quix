@@ -4,7 +4,7 @@ import re
 
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.opcodes import inject, loop
+from quix.core.opcodes.opcodes import end_loop, inject, start_loop
 from quix.memoptix.opcodes import free
 
 
@@ -18,5 +18,7 @@ def comment(text: str) -> ToConvert:
         return inject(None, text, None, sortable=True)
 
     u1 = Unit("comment_unit")
-    yield loop(u1, [inject(None, text, None)])
+    yield start_loop(u1)
+    yield inject(None, text, None)
+    yield end_loop()
     return free(u1)

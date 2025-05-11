@@ -3,7 +3,8 @@ from collections.abc import Callable
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import Int8, UInt8
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
-from quix.core.opcodes import add, loop
+from quix.core.opcodes import add
+from quix.core.opcodes.opcodes import end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 from .assign_unit import assign_unit
@@ -15,7 +16,9 @@ def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple
     if value in to:
         raise ValueError("Target set cannot contain origin `Unit`: {value}.")
 
-    instrs = [add(value, -1)]
+    yield start_loop(value)
+    yield add(value, -1)
+
     for unit, to_add in to.items():
         if value in carries.get(unit, ()):
             raise ValueError(f"Carry cannot reference origin: {value}")
@@ -28,22 +31,18 @@ def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple
 
         if abs(to_add.value) <= 2:
             for _ in range(abs(to_add.value)):
-                instrs.extend(func(unit, carries.get(unit, ())))
+                yield func(unit, carries.get(unit, ()))
         else:
             counter = Unit("counter")
-            instrs.extend(assign_unit(counter, UInt8.from_value(abs(to_add.value))))
-            instrs.append(
-                loop(
-                    counter,
-                    [
-                        add(counter, -1),
-                        *func(unit, carries.get(unit, ())),
-                    ],
-                )
-            )
-            instrs.append(free(counter))
+            yield assign_unit(counter, UInt8.from_value(abs(to_add.value)))
+            yield start_loop(counter)
+            yield add(counter, -1)
+            yield func(unit, carries.get(unit, ()))
+            yield end_loop()
 
-    return loop(value, instrs)
+            yield free(counter)
+
+    return end_loop()
 
 
 @convert

@@ -1,6 +1,6 @@
 from quix.bootstrap.dtypes import Int8, UInt8, Unit
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.opcodes import add, loop
+from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 from .add_unit import add_unit
@@ -49,11 +49,12 @@ def _mul_two_units(
     if target not in (left, right):
         yield clear_unit(target)
 
-    loop_instrs = add_unit(left_buff, target, target)
+    yield start_loop(right_buff)
+    yield add_unit(left_buff, target, target)
     if left != right != target:
-        loop_instrs |= add(right, 1)
-    loop_instrs |= add(right_buff, -1)
-    yield loop(right_buff, loop_instrs)
+        yield add(right, 1)
+    yield add(right_buff, -1)
+    yield end_loop()
 
     if left != target:
         yield move_unit(left_buff, {left: Int8.from_value(1)})

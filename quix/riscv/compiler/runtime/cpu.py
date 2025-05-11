@@ -7,7 +7,7 @@ from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import add_wide, assign_wide, init_array, load_array, store_array, switch_wide
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
-from quix.core.opcodes.opcodes import add, loop
+from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import index
 
 from .component import Component
@@ -49,7 +49,9 @@ class CPU(Component):
     @convert
     def run(self, mapping: dict[DynamicUInt, CoreProgram]) -> ToConvert:
         yield add(self.exit, 1)
-        return loop(self.exit, switch_wide(self._pc, mapping, else_=[add(self.exit, -1)]))
+        yield start_loop(self.exit)
+        yield switch_wide(self._pc, mapping, else_=[add(self.exit, -1)])
+        return end_loop()
 
     @convert
     def store_register(self, idx: DynamicUInt | Wide, value: DynamicUInt | Wide) -> ToConvert:

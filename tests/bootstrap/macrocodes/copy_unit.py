@@ -6,7 +6,7 @@ from quix.core.opcodes.opcodes import add
 from .utils import run
 
 
-def test_move_unit_simple() -> None:
+def test_copy_unit_simple() -> None:
     u1, u2 = Unit("u1"), Unit("u2")
     program = to_program(
         add(u1, 10),

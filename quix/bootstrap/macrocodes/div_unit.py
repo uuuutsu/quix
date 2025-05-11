@@ -1,7 +1,7 @@
 from quix.bootstrap.dtypes import UInt8, Unit
 from quix.bootstrap.dtypes.const import Int8
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.opcodes import add, loop
+from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 from .assign_unit import assign_unit
@@ -87,17 +87,16 @@ def _div_units_and_ints(
     if quotient:
         yield clear_unit(quotient)
 
-    instrs = [add(left_buff, -1), add(right_unit, -1), add(rem_buff, 1)]
-    if (left not in (remainder, quotient)) and isinstance(left, Unit):
-        instrs.append(add(left, 1))
+    yield start_loop(left_buff)
+    yield add(left_buff, -1), add(right_unit, -1), add(rem_buff, 1)
 
+    if (left not in (remainder, quotient)) and isinstance(left, Unit):
+        yield add(left, 1)
     if_ = move_unit(rem_buff, {right_unit: Int8.from_value(1)})
     if quotient:
         if_ |= add(quotient, 1)
-
-    instrs.extend(call_z_unit(right_unit, if_, []))
-
-    yield loop(left_buff, instrs)
+    yield call_z_unit(right_unit, if_, [])
+    yield end_loop()
 
     if dynamic_right:
         yield clear_unit(right_unit), free(right_unit)
