@@ -6,8 +6,7 @@ __all__ = (
     "UCell",
     "Wide",
     "UDynamic",
-    "CELL_MAX",
-    "CELL_MIN",
+    "CELL_SIZE",
     "Array",
     "Str",
     "Label",
@@ -15,7 +14,7 @@ __all__ = (
 
 from .array import Array
 from .base import DType
-from .const import CELL_MAX, CELL_MIN, Cell, Const, Str, UCell, UDynamic
+from .const import CELL_SIZE, Cell, Const, Str, UCell, UDynamic
 from .label import Label
 from .unit import Unit
 from .wide import Wide

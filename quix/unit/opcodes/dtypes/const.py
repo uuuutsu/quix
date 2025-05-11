@@ -8,8 +8,7 @@ from quix.tools import FlyweightMeta
 
 from .base import DType, dtype
 
-CELL_MAX: Final[int] = 255
-CELL_MIN: Final[int] = 0
+CELL_SIZE: Final[int] = 8
 
 
 @dtype
@@ -27,7 +26,7 @@ class Const[C](DType, metaclass=FlyweightMeta):
         return str(self.value)
 
     def __str__(self) -> str:
-        return f"{type(self).__name__}( {self.name} )"
+        return f"{type(self).__name__}( {self.value} )"
 
 
 def _wrap(value: int, min: int, max: int) -> int:
@@ -42,7 +41,7 @@ def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
     byte_list = []
     while number > 0:
         byte_list.append(number & 0xFF)
-        number >>= 8
+        number >>= CELL_SIZE
 
     if not byte_list:
         return [0]
@@ -61,7 +60,7 @@ class _Int(Const[int]):
         if not (self._MIN <= self.value <= self._MAX):
             new_value = _wrap(self.value, self._MIN, self._MAX)
             warning(
-                f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MIN}]."
+                f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MAX}]."
                 f"\n\tPassed: {self.value}\n\tWrapped to: {new_value}"
             )
             object.__setattr__(self, "value", new_value)
@@ -99,14 +98,14 @@ class _Int(Const[int]):
 
 @dtype
 class UCell(_Int):
-    _MIN: ClassVar[int] = CELL_MIN
-    _MAX: ClassVar[int] = CELL_MAX
+    _MIN: ClassVar[int] = 0
+    _MAX: ClassVar[int] = (1 << CELL_SIZE) - 1
 
 
 @dtype
 class Cell(_Int):
-    _MIN: ClassVar[int] = -(CELL_MAX // 2 - CELL_MAX)
-    _MAX: ClassVar[int] = CELL_MAX // 2
+    _MIN: ClassVar[int] = -(1 << CELL_SIZE - 1)
+    _MAX: ClassVar[int] = (1 << CELL_SIZE - 1) - 1
 
 
 @dtype
@@ -154,8 +153,10 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
         ints_ = cls.wrap(value)
         if size is None:
             return cls.from_value(ints_)
-        if len(ints_) >= size:
+        if len(ints_) == size:
             return cls.from_value(ints_[:size])
+        elif len(ints_) > size:
+            raise RuntimeError(f"Cannot store {value} in {size} cell(s).")
 
         int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
         ints_ = ints_ + tuple(int_cls.from_value(0) for _ in range(size - len(ints_)))
