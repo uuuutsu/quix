@@ -87,10 +87,7 @@ def get_ref_scopes(
         elif (ref := opcode.args().get("ref")) is None:
             ...
 
-        if opcode.__id__ == CoreOpcodes.START_LOOP:
-            stack.append((ref, curr_opcode_idx))
-
-        if opcode.__id__ == MemoptixOpcodes.FREE:
+        elif opcode.__id__ == MemoptixOpcodes.FREE:
             if ref not in rough_usages:
                 if close is True:
                     warning(f"Freeing unused reference: {ref}")
@@ -105,6 +102,9 @@ def get_ref_scopes(
             rough_usages[ref] = rough_usages[ref][0], None
         elif ref not in rough_usages:
             rough_usages[ref] = curr_opcode_idx, None
+
+        if opcode.__id__ == CoreOpcodes.START_LOOP:
+            stack.append((ref, curr_opcode_idx))
 
         curr_opcode_idx += 1
         length += 1

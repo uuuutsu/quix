@@ -4,6 +4,7 @@ from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.const import DynamicUInt, Int8
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.program import ToConvert, convert
+from quix.core.opcodes.opcodes import inject
 from quix.tools import Arg, check
 
 from .assign_wide import assign_wide
@@ -114,6 +115,7 @@ def _div_wides_and_ints(
     if dynamic_right:
         yield clear_wide(right_wide), free_wide(right_wide)
 
+    yield inject(None, "#", None)
     if remainder:
         yield clear_wide(remainder)
     if remainder and not dynamic_right:
