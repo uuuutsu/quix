@@ -1,5 +1,5 @@
-from quix.bootstrap.dtypes import UInt8, Unit
-from quix.bootstrap.dtypes.const import Int8
+from quix.bootstrap.dtypes import UCell, Unit
+from quix.bootstrap.dtypes.const import Cell
 from quix.bootstrap.program import ToConvert, convert
 from quix.memoptix.opcodes import free
 
@@ -11,8 +11,8 @@ from .move_unit_carry import move_unit_carry
 
 @convert
 def add_unit_carry(
-    left: Unit | UInt8,
-    right: Unit | UInt8,
+    left: Unit | UCell,
+    right: Unit | UCell,
     target: Unit,
     carry: tuple[Unit, ...],
 ) -> ToConvert:
@@ -24,12 +24,12 @@ def add_unit_carry(
     return clear_unit(target), _addc_to_target(left, target, carry), _addc_to_target(right, target, carry)
 
 
-def _addc_to_target(argument: Unit | UInt8, target: Unit, carry: tuple[Unit, ...]) -> ToConvert:
-    if isinstance(argument, UInt8):
+def _addc_to_target(argument: Unit | UCell, target: Unit, carry: tuple[Unit, ...]) -> ToConvert:
+    if isinstance(argument, UCell):
         buffer = Unit("buffer")
 
         yield assign_unit(buffer, argument)
-        yield move_unit_carry(buffer, {target: Int8.from_value(1)}, {target: carry})
+        yield move_unit_carry(buffer, {target: Cell.from_value(1)}, {target: carry})
         return free(buffer)
 
     return _move_without_clear_with_carry_increment(argument, target, carry)
@@ -41,10 +41,10 @@ def _move_without_clear_with_carry_increment(
     carry: tuple[Unit, ...],
 ) -> ToConvert:
     buffer = Unit("buffer")
-    yield move_unit(from_, {buffer: Int8.from_value(1)})
+    yield move_unit(from_, {buffer: Cell.from_value(1)})
 
     if from_ == to_:
-        yield move_unit_carry(buffer, {from_: Int8.from_value(2)}, {to_: carry})
+        yield move_unit_carry(buffer, {from_: Cell.from_value(2)}, {to_: carry})
     else:
-        yield move_unit_carry(buffer, {from_: Int8.from_value(1), to_: Int8.from_value(1)}, {to_: carry})
+        yield move_unit_carry(buffer, {from_: Cell.from_value(1), to_: Cell.from_value(1)}, {to_: carry})
     return free(buffer)

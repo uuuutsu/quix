@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Str
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import output
@@ -20,9 +20,9 @@ def output_str(string: Str) -> ToConvert:
         last_val = ord(char)
 
         if diff > 0:
-            yield add_unit(buff, UInt8.from_value(abs(diff)), buff)
+            yield add_unit(buff, UCell.from_value(abs(diff)), buff)
         else:
-            yield sub_unit(buff, UInt8.from_value(abs(diff)), buff)
+            yield sub_unit(buff, UCell.from_value(abs(diff)), buff)
 
         yield output(buff)
 

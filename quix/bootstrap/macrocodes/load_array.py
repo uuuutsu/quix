@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Array
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.program import ToConvert, convert
@@ -19,10 +19,10 @@ from .store_array import (
 
 
 @convert
-def load_array(array: Array, load_in: Wide, index: Wide | DynamicUInt) -> ToConvert:
+def load_array(array: Array, load_in: Wide, index: Wide | UDynamic) -> ToConvert:
     yield clear_wide(load_in)
 
-    if isinstance(index, DynamicUInt):
+    if isinstance(index, UDynamic):
         return _array_load_by_int(array, load_in, index)
 
     return _array_load_by_wide(array, load_in, index)
@@ -81,7 +81,7 @@ def _copy_in_array(array: Array, from_: int, buff: int, to: int) -> ToConvert:
     return _move_in_array(array, buff, from_, to)
 
 
-def _array_load_by_int(array: Array, load_in: Wide, index: DynamicUInt) -> ToConvert:
+def _array_load_by_int(array: Array, load_in: Wide, index: UDynamic) -> ToConvert:
     offset: int = 1
     for unit in load_in:
         yield _array_load_unit_by_int(array, unit, index, offset)
@@ -89,7 +89,7 @@ def _array_load_by_int(array: Array, load_in: Wide, index: DynamicUInt) -> ToCon
     return None
 
 
-def _array_load_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offset: int) -> ToConvert:
+def _array_load_unit_by_int(array: Array, unit: Unit, index: UDynamic, offset: int) -> ToConvert:
     abs_offset = (int(index) + 1) * (array.granularity + 1) + offset
     yield _go_by_value(array, abs_offset)
 

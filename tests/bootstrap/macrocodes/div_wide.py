@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Wide
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.macrocodes import div_wide
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -104,7 +104,7 @@ def test_div_wide_by_int() -> None:
         add(w1[0], 137),
         add(w1[1], 55),
         add(w3[0], 12),
-        div_wide(w1, DynamicUInt.from_int(716, 2), remainder=w3, quotient=w4),
+        div_wide(w1, UDynamic.from_int(716, 2), remainder=w3, quotient=w4),
     )
 
     mem = run(program)

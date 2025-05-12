@@ -1,5 +1,5 @@
-from quix.bootstrap.dtypes import UInt8, Unit
-from quix.bootstrap.dtypes.const import Int8
+from quix.bootstrap.dtypes import UCell, Unit
+from quix.bootstrap.dtypes.const import Cell
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
@@ -12,8 +12,8 @@ from .move_unit import move_unit
 
 @convert
 def div_unit(
-    left: Unit | UInt8,
-    right: Unit | UInt8,
+    left: Unit | UCell,
+    right: Unit | UCell,
     quotient: Unit | None,
     remainder: Unit | None,
 ) -> ToConvert:
@@ -21,7 +21,7 @@ def div_unit(
         return None
     elif remainder == quotient:
         raise ValueError("Remainder cannot be Quotient")
-    elif isinstance(left, UInt8) and isinstance(right, UInt8):
+    elif isinstance(left, UCell) and isinstance(right, UCell):
         return _div_ints(left, right, quotient, remainder)
     elif left == right:
         return _div_by_itself(quotient, remainder)
@@ -30,8 +30,8 @@ def div_unit(
 
 
 def _div_ints(
-    left: UInt8,
-    right: UInt8,
+    left: UCell,
+    right: UCell,
     quotient: Unit | None,
     remainder: Unit | None,
 ) -> ToConvert:
@@ -51,7 +51,7 @@ def _div_by_itself(
     remainder: Unit | None,
 ) -> ToConvert:
     if quotient:
-        yield assign_unit(quotient, UInt8.from_value(1))
+        yield assign_unit(quotient, UCell.from_value(1))
 
     if remainder:
         yield clear_unit(remainder)
@@ -60,29 +60,29 @@ def _div_by_itself(
 
 
 def _div_units_and_ints(
-    left: Unit | UInt8,
-    right: Unit | UInt8,
+    left: Unit | UCell,
+    right: Unit | UCell,
     quotient: Unit | None,
     remainder: Unit | None,
 ) -> ToConvert:
     rem_buff, left_buff = Unit("rem_buff"), Unit("left_buff")
 
     dynamic_right: bool = False
-    if isinstance(right, UInt8):
+    if isinstance(right, UCell):
         right_unit = Unit("right_unit")
         yield assign_unit(right_unit, right)
         dynamic_right = True
     elif right in [quotient, remainder]:
         right_unit = Unit("right_unit")
-        yield move_unit(right, {right_unit: Int8.from_value(1)})
+        yield move_unit(right, {right_unit: Cell.from_value(1)})
         dynamic_right = True
     else:
         right_unit = right
 
-    if isinstance(left, UInt8):
+    if isinstance(left, UCell):
         yield assign_unit(left_buff, left)
     else:
-        yield move_unit(left, {left_buff: Int8.from_value(1)})
+        yield move_unit(left, {left_buff: Cell.from_value(1)})
 
     if quotient:
         yield clear_unit(quotient)
@@ -92,7 +92,7 @@ def _div_units_and_ints(
 
     if (left not in (remainder, quotient)) and isinstance(left, Unit):
         yield add(left, 1)
-    if_ = move_unit(rem_buff, {right_unit: Int8.from_value(1)})
+    if_ = move_unit(rem_buff, {right_unit: Cell.from_value(1)})
     if quotient:
         if_ |= add(quotient, 1)
     yield call_z_unit(right_unit, if_, [])
@@ -105,11 +105,11 @@ def _div_units_and_ints(
         yield clear_unit(remainder)
 
     if remainder and not dynamic_right:
-        yield move_unit(rem_buff, {right_unit: Int8.from_value(1), remainder: Int8.from_value(1)})
+        yield move_unit(rem_buff, {right_unit: Cell.from_value(1), remainder: Cell.from_value(1)})
     elif remainder:
-        yield move_unit(rem_buff, {remainder: Int8.from_value(1)})
+        yield move_unit(rem_buff, {remainder: Cell.from_value(1)})
     elif not dynamic_right:
-        yield move_unit(rem_buff, {right_unit: Int8.from_value(1)})
+        yield move_unit(rem_buff, {right_unit: Cell.from_value(1)})
     else:
         yield clear_unit(rem_buff)
 

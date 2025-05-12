@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.program import ToConvert, convert
@@ -16,14 +16,14 @@ from .sub_wide import sub_wide
 
 
 @convert
-def switch_wide(value: Wide, branches: dict[DynamicUInt, CoreProgram], else_: CoreProgram) -> ToConvert:
+def switch_wide(value: Wide, branches: dict[UDynamic, CoreProgram], else_: CoreProgram) -> ToConvert:
     buff = Wide.from_length(f"{value.name}_buff", value.size)
     else_flag = Unit(f"{value.name}_else_flag")
 
     yield assign_wide(buff, value)
 
     sorted_keys = sorted(branches, key=lambda x: int(x))
-    last_val = DynamicUInt.from_int(0, value.size)
+    last_val = UDynamic.from_int(0, value.size)
     for key in sorted_keys:
         yield sub_wide(buff, key - last_val, buff)
         yield call_z_wide(buff, [*branches[key], add(else_flag, 1)], [])

@@ -1,5 +1,5 @@
-from quix.bootstrap.dtypes import DynamicUInt, Unit, Wide
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes import UDynamic, Unit, Wide
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.program import ToConvert, convert
 from quix.tools import Arg, check
 
@@ -9,12 +9,12 @@ from .add_unit_carry import add_unit_carry
 @convert
 @check(Arg("left").size == Arg("right").size == Arg("target").size)
 def add_wide_carry(
-    left: Wide | DynamicUInt,
-    right: Wide | DynamicUInt,
+    left: Wide | UDynamic,
+    right: Wide | UDynamic,
     target: Wide,
     carry: tuple[Unit, ...],
 ) -> ToConvert:
-    args: tuple[tuple[UInt8 | Unit, UInt8 | Unit, Unit]] = tuple(zip(left, right, target, strict=True))  # type: ignore
+    args: tuple[tuple[UCell | Unit, UCell | Unit, Unit]] = tuple(zip(left, right, target, strict=True))  # type: ignore
     # We must start adding from the end, to avoid zeroing carries
     inv_args = args[::-1]
 

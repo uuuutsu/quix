@@ -2,17 +2,17 @@ __all__ = (
     "Unit",
     "DType",
     "Const",
-    "UInt8",
-    "Int8",
     "Wide",
-    "DynamicUInt",
-    "DynamicInt",
+    "UDynamic",
+    "Cell",
+    "UCell",
+    "CELL_SIZE",
     "Array",
     "Str",
 )
 
 from .array import Array
 from .base import DType
-from .const import Const, DynamicInt, DynamicUInt, Int8, Str, UInt8
+from .const import CELL_SIZE, Cell, Const, Str, UCell, UDynamic
 from .unit import Unit
 from .wide import Wide

@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.macrocodes import add_unit_carry
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -11,7 +11,7 @@ def test_add_unit_carry_int() -> None:
     u1, u2, u3 = Unit("u1"), Unit("u2"), Unit("u3")
     program = to_program(
         add(u1, 100),
-        add_unit_carry(u1, UInt8.from_value(250), u2, (u3,)),
+        add_unit_carry(u1, UCell.from_value(250), u2, (u3,)),
     )
 
     mem = run(program)
@@ -60,7 +60,7 @@ def test_add_unit_carry_two_ints() -> None:
     u1 = Unit("u1")
     program = to_program(
         add(u1, 100),
-        add_unit_carry(UInt8.from_value(250), UInt8.from_value(250), u1, (u1,)),
+        add_unit_carry(UCell.from_value(250), UCell.from_value(250), u1, (u1,)),
     )
 
     mem = run(program)

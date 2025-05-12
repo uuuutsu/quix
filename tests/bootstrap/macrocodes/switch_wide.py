@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import switch_wide
 from quix.bootstrap.program import to_program
@@ -15,9 +15,9 @@ def test_switch_wide() -> None:
         switch_wide(
             w1,
             {
-                DynamicUInt.from_int(256, 2): [add(w1[0], 5)],
-                DynamicUInt.from_int(257, 2): [add(w1[0], 13)],
-                DynamicUInt.from_int(512, 2): [add(w1[0], 27)],
+                UDynamic.from_int(256, 2): [add(w1[0], 5)],
+                UDynamic.from_int(257, 2): [add(w1[0], 13)],
+                UDynamic.from_int(512, 2): [add(w1[0], 27)],
             },
             [],
         ),

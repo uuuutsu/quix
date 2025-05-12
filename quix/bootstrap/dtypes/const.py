@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator
 from logging import warning
-from typing import ClassVar, Self, get_args, overload
+from typing import ClassVar, Final, Self, get_args, overload
 
 from quix.tools import FlyweightMeta
 
 from .base import DType, dtype
+
+CELL_SIZE: Final[int] = 8
 
 
 @dtype
@@ -15,10 +17,16 @@ class Const[C](DType, metaclass=FlyweightMeta):
 
     @classmethod
     def from_value(cls: type[Self], value: C) -> Self:
-        return cls(f"Const( {value} )", value=value)
+        return cls(cls.__name__, value=value)
 
     def __hash__(self) -> int:
         return hash(self.value)
+
+    def __repr__(self) -> str:
+        return str(self.value)
+
+    def __str__(self) -> str:
+        return f"{type(self).__name__}( {self.value} )"
 
 
 def _wrap(value: int, min: int, max: int) -> int:
@@ -33,7 +41,7 @@ def _int_to_cell_size(number: int, *, little_endian: bool = True) -> list[int]:
     byte_list = []
     while number > 0:
         byte_list.append(number & 0xFF)
-        number >>= 8
+        number >>= CELL_SIZE
 
     if not byte_list:
         return [0]
@@ -52,7 +60,7 @@ class _Int(Const[int]):
         if not (self._MIN <= self.value <= self._MAX):
             new_value = _wrap(self.value, self._MIN, self._MAX)
             warning(
-                f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MIN}]."
+                f"{type(self).__name__}'s value must be in range [{self._MIN}, {self._MAX}]."
                 f"\n\tPassed: {self.value}\n\tWrapped to: {new_value}"
             )
             object.__setattr__(self, "value", new_value)
@@ -89,15 +97,15 @@ class _Int(Const[int]):
 
 
 @dtype
-class UInt8(_Int):
+class UCell(_Int):
     _MIN: ClassVar[int] = 0
-    _MAX: ClassVar[int] = 255
+    _MAX: ClassVar[int] = (1 << CELL_SIZE) - 1
 
 
 @dtype
-class Int8(_Int):
-    _MIN: ClassVar[int] = -128
-    _MAX: ClassVar[int] = 127
+class Cell(_Int):
+    _MIN: ClassVar[int] = -(1 << CELL_SIZE - 1)
+    _MAX: ClassVar[int] = (1 << CELL_SIZE - 1) - 1
 
 
 @dtype
@@ -145,8 +153,10 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
         ints_ = cls.wrap(value)
         if size is None:
             return cls.from_value(ints_)
-        if len(ints_) >= size:
+        if len(ints_) == size:
             return cls.from_value(ints_[:size])
+        elif len(ints_) > size:
+            raise RuntimeError(f"Cannot store {value} in {size} cell(s).")
 
         int_cls: type[I] = get_args(cls.__orig_bases__[0])[0]  # type: ignore
         ints_ = ints_ + tuple(int_cls.from_value(0) for _ in range(size - len(ints_)))
@@ -160,11 +170,7 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
 
 
 @dtype
-class DynamicUInt(_DynamicInt[UInt8]): ...
-
-
-@dtype
-class DynamicInt(_DynamicInt[Int8]): ...
+class UDynamic(_DynamicInt[UCell]): ...
 
 
 @dtype

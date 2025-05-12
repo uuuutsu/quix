@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import Int8, UInt8, Unit
+from quix.bootstrap.dtypes import Cell, UCell, Unit
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
@@ -11,12 +11,12 @@ from .move_unit import move_unit
 
 
 @convert
-def mul_unit(left: Unit | UInt8, right: Unit | UInt8, target: Unit) -> ToConvert:
-    if isinstance(left, UInt8) and isinstance(right, UInt8):
+def mul_unit(left: Unit | UCell, right: Unit | UCell, target: Unit) -> ToConvert:
+    if isinstance(left, UCell) and isinstance(right, UCell):
         return assign_unit(target, left * right)
-    elif isinstance(right, UInt8):
+    elif isinstance(right, UCell):
         return _mul_by_int(left, right, target)  # type: ignore
-    elif isinstance(left, UInt8):
+    elif isinstance(left, UCell):
         return _mul_by_int(right, left, target)
 
     return _mul_two_units(left, right, target)
@@ -24,13 +24,13 @@ def mul_unit(left: Unit | UInt8, right: Unit | UInt8, target: Unit) -> ToConvert
 
 def _mul_by_int(
     left: Unit,
-    right: UInt8,
+    right: UCell,
     target: Unit,
 ) -> ToConvert:
     if left == target:
-        return copy_unit(left, {target: (right - 1).to(Int8)})
+        return copy_unit(left, {target: (right - 1).to(Cell)})
 
-    return clear_unit(target) | copy_unit(left, {target: right.to(Int8)})
+    return clear_unit(target) | copy_unit(left, {target: right.to(Cell)})
 
 
 def _mul_two_units(
@@ -41,10 +41,10 @@ def _mul_two_units(
     left_buff, right_buff = Unit(f"{left.name}_buff"), Unit(f"{right.name}_buff")
 
     if left == right:
-        yield move_unit(left, {left_buff: Int8.from_value(1), right_buff: Int8.from_value(1)})
+        yield move_unit(left, {left_buff: Cell.from_value(1), right_buff: Cell.from_value(1)})
     else:
-        yield move_unit(left, {left_buff: Int8.from_value(1)})
-        yield move_unit(right, {right_buff: Int8.from_value(1)})
+        yield move_unit(left, {left_buff: Cell.from_value(1)})
+        yield move_unit(right, {right_buff: Cell.from_value(1)})
 
     if target not in (left, right):
         yield clear_unit(target)
@@ -57,7 +57,7 @@ def _mul_two_units(
     yield end_loop()
 
     if left != target:
-        yield move_unit(left_buff, {left: Int8.from_value(1)})
+        yield move_unit(left_buff, {left: Cell.from_value(1)})
     else:
         yield clear_unit(left_buff)
 

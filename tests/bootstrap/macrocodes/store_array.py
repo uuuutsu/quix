@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import Array, DynamicUInt, Unit, Wide
+from quix.bootstrap.dtypes import Array, UDynamic, Unit, Wide
 from quix.bootstrap.macrocodes import init_array, store_array
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -10,7 +10,7 @@ def test_store_array_int_by_int() -> None:
     a1, u1 = Array("a1", length=10), Unit("u1")
     program = to_program(
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(257, 2), DynamicUInt.from_int(5)),
+        store_array(a1, UDynamic.from_int(257, 2), UDynamic.from_int(5)),
         add(u1, 5),
     )
 
@@ -30,7 +30,7 @@ def test_store_array_wide_by_int() -> None:
         add(w1[0], 100),
         add(w1[1], 70),
         init_array(a1),
-        store_array(a1, w1, DynamicUInt.from_int(5)),
+        store_array(a1, w1, UDynamic.from_int(5)),
         add(u1, 5),
     )
 
@@ -54,7 +54,7 @@ def test_store_array_int_by_wide() -> None:
         add(w1[0], 70),
         add(w1[1], 1),
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(258), w1),
+        store_array(a1, UDynamic.from_int(258), w1),
     )
 
     indexes, tape = run_with_tape(program)
@@ -76,7 +76,7 @@ def test_store_array_int_by_wide_zero_index() -> None:
     program = to_program(
         add(w1[0], 0),
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(100), w1),
+        store_array(a1, UDynamic.from_int(100), w1),
     )
 
     indexes, tape = run_with_tape(program)

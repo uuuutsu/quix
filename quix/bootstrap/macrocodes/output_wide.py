@@ -1,6 +1,6 @@
 from math import ceil, log
 
-from quix.bootstrap.dtypes import Array, DynamicUInt, Unit, Wide
+from quix.bootstrap.dtypes import Array, UDynamic, Unit, Wide
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.memoptix.opcodes import free
@@ -32,7 +32,7 @@ def output_wide(wide: Wide) -> ToConvert:
     to_print = Wide.from_length("to_print", wide.size)
     yield assign_wide(to_div, wide)
 
-    instrs = div_wide(to_div, DynamicUInt.from_int(10, to_div.size), to_div, to_print)
+    instrs = div_wide(to_div, UDynamic.from_int(10, to_div.size), to_div, to_print)
     instrs |= call_z_unit(
         to_print[0],
         [],

@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add
@@ -16,7 +16,7 @@ from .sub_unit import sub_unit
 @convert
 def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
     lim = Unit("128")
-    yield assign_unit(lim, UInt8.from_value(128))
+    yield assign_unit(lim, UCell.from_value(128))
 
     same_msb = Unit("same_msb")
     left_pos = Unit("left_pos")

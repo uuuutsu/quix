@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import DynamicUInt, UInt8, Wide
+from quix.bootstrap.dtypes import UCell, UDynamic, Wide
 from quix.bootstrap.macrocodes import not_wide
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -11,7 +11,7 @@ def test_not_wide_int() -> None:
     program = to_program(
         add(w1[0], 10),
         add(w1[1], 20),
-        not_wide(DynamicUInt.from_value((UInt8.from_value(5), UInt8.from_value(15))), w1),
+        not_wide(UDynamic.from_value((UCell.from_value(5), UCell.from_value(15))), w1),
     )
 
     mem = run(program)

@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import Int8
+from quix.bootstrap.dtypes.const import Cell
 from quix.bootstrap.macrocodes.call_z_unit import call_z_unit
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.move_unit import move_unit
@@ -14,8 +14,8 @@ def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) 
     else_flag = Unit(f"{left.name}_ge_{right.name}_else_flag")
     left_buffer, right_buffer = Unit(f"{left.name}_buffer"), Unit(f"{right.name}_buffer")
 
-    yield move_unit(left, {left_buffer: Int8.from_value(1)})
-    yield move_unit(right, {right_buffer: Int8.from_value(1)})
+    yield move_unit(left, {left_buffer: Cell.from_value(1)})
+    yield move_unit(right, {right_buffer: Cell.from_value(1)})
 
     yield start_loop(right_buffer)
     yield add(right_buffer, -1)
@@ -25,7 +25,7 @@ def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) 
         [
             *move_unit(
                 right_buffer,
-                {right: Int8.from_value(1)},
+                {right: Cell.from_value(1)},
             ),
             add(else_flag, 1),
         ],
@@ -36,7 +36,7 @@ def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) 
     )
     yield end_loop()
 
-    yield move_unit(left_buffer, {left: Int8.from_value(1)})
+    yield move_unit(left_buffer, {left: Cell.from_value(1)})
     yield call_z_unit(else_flag, if_, else_)
 
     return [

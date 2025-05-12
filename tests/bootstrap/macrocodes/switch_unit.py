@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.macrocodes import switch_unit
 from quix.bootstrap.program import to_program
@@ -14,9 +14,9 @@ def test_switch_unit() -> None:
         switch_unit(
             u1,
             {
-                UInt8.from_value(1): [add(u1, 5)],
-                UInt8.from_value(3): [add(u1, 13)],
-                UInt8.from_value(5): [add(u1, 27)],
+                UCell.from_value(1): [add(u1, 5)],
+                UCell.from_value(3): [add(u1, 13)],
+                UCell.from_value(5): [add(u1, 27)],
             },
             [],
         ),
@@ -34,9 +34,9 @@ def test_switch_unit_else() -> None:
         switch_unit(
             u1,
             {
-                UInt8.from_value(1): [add(u1, 5)],
-                UInt8.from_value(3): [add(u1, 13)],
-                UInt8.from_value(5): [add(u1, 27)],
+                UCell.from_value(1): [add(u1, 5)],
+                UCell.from_value(3): [add(u1, 13)],
+                UCell.from_value(5): [add(u1, 27)],
             },
             [add(u1, -4)],
         ),

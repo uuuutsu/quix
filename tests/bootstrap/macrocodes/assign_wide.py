@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Wide
-from quix.bootstrap.dtypes.const import DynamicUInt, UInt8
+from quix.bootstrap.dtypes.const import UCell, UDynamic
 from quix.bootstrap.macrocodes import assign_wide
 from quix.bootstrap.program import to_program
 
@@ -12,10 +12,10 @@ def test_assign_wide_short() -> None:
     program = to_program(
         assign_wide(
             w1,
-            DynamicUInt.from_value(
+            UDynamic.from_value(
                 (
-                    UInt8.from_value(50),
-                    UInt8.from_value(150),
+                    UCell.from_value(50),
+                    UCell.from_value(150),
                 )
             ),
         )

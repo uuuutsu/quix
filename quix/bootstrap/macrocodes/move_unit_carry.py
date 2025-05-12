@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import Int8, UInt8
+from quix.bootstrap.dtypes.const import Cell, UCell
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes import add
 from quix.core.opcodes.opcodes import end_loop, start_loop
@@ -12,7 +12,7 @@ from .call_z_unit import call_z_unit
 
 
 @convert
-def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple[Unit, ...]]) -> ToConvert:
+def move_unit_carry(value: Unit, to: dict[Unit, Cell], carries: dict[Unit, tuple[Unit, ...]]) -> ToConvert:
     if value in to:
         raise ValueError("Target set cannot contain origin `Unit`: {value}.")
 
@@ -34,7 +34,7 @@ def move_unit_carry(value: Unit, to: dict[Unit, Int8], carries: dict[Unit, tuple
                 yield func(unit, carries.get(unit, ()))
         else:
             counter = Unit("counter")
-            yield assign_unit(counter, UInt8.from_value(abs(to_add.value)))
+            yield assign_unit(counter, UCell.from_value(abs(to_add.value)))
             yield start_loop(counter)
             yield add(counter, -1)
             yield func(unit, carries.get(unit, ()))

@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import Int8, UInt8, Unit
+from quix.bootstrap.dtypes import Cell, UCell, Unit
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
@@ -16,22 +16,22 @@ def or_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
     if left == right == target:
         return None
     if left == right:
-        return clear_unit(target), copy_unit(left, {target: Int8.from_value(1)})
+        return clear_unit(target), copy_unit(left, {target: Cell.from_value(1)})
 
     lquot, rquot = Unit("lquot"), Unit("rquot")
     lrem, rrem = Unit("lrem"), Unit("rrem")
     bit_scale, break_ = Unit("bit_scale"), Unit("break_")
     ored_bit = Unit("ored_bit")
 
-    yield copy_unit(left, {lquot: Int8.from_value(1)})
-    yield copy_unit(right, {rquot: Int8.from_value(1)})
+    yield copy_unit(left, {lquot: Cell.from_value(1)})
+    yield copy_unit(right, {rquot: Cell.from_value(1)})
     yield add(break_, 8), add(bit_scale, 1), clear_unit(target)
 
     yield start_loop(break_)
-    yield div_unit(lquot, UInt8.from_value(2), lquot, lrem)
-    yield div_unit(rquot, UInt8.from_value(2), rquot, rrem)
-    yield move_unit(lrem, {ored_bit: Int8.from_value(1)})
-    yield move_unit(rrem, {ored_bit: Int8.from_value(1)})
+    yield div_unit(lquot, UCell.from_value(2), lquot, lrem)
+    yield div_unit(rquot, UCell.from_value(2), rquot, rrem)
+    yield move_unit(lrem, {ored_bit: Cell.from_value(1)})
+    yield move_unit(rrem, {ored_bit: Cell.from_value(1)})
 
     yield start_loop(ored_bit)
     yield add_unit(bit_scale, target, target)
@@ -39,7 +39,7 @@ def or_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
     yield end_loop()
 
     yield add(break_, -1)
-    yield mul_unit(bit_scale, UInt8.from_value(2), bit_scale)
+    yield mul_unit(bit_scale, UCell.from_value(2), bit_scale)
     return end_loop()
 
     yield clear_unit(bit_scale)

@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.dtypes import CoreProgram
@@ -12,14 +12,14 @@ from .sub_unit import sub_unit
 
 
 @convert
-def switch_unit(value: Unit, branches: dict[UInt8, CoreProgram], else_: CoreProgram) -> ToConvert:
+def switch_unit(value: Unit, branches: dict[UCell, CoreProgram], else_: CoreProgram) -> ToConvert:
     buff = Unit(f"{value.name}_buff")
     else_flag = Unit(f"{value.name}_else_flag")
 
     yield assign_unit(buff, value)
 
     sorted_keys = sorted(branches, key=lambda x: int(x))
-    last_val = UInt8.from_value(0)
+    last_val = UCell.from_value(0)
     for key in sorted_keys:
         yield sub_unit(buff, key - last_val, buff)
         yield call_z_unit(buff, [*branches[key], add(else_flag, 1)], [])

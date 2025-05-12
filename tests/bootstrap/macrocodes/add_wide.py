@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Wide
-from quix.bootstrap.dtypes.const import DynamicUInt, UInt8
+from quix.bootstrap.dtypes.const import UCell, UDynamic
 from quix.bootstrap.macrocodes import add_wide
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -81,10 +81,10 @@ def test_add_wide_ints() -> None:
         add(w2[1], 5),
         add_wide(
             w1,
-            DynamicUInt.from_value(
+            UDynamic.from_value(
                 (
-                    UInt8.from_value(106),
-                    UInt8.from_value(50),
+                    UCell.from_value(106),
+                    UCell.from_value(50),
                 )
             ),
             w2,

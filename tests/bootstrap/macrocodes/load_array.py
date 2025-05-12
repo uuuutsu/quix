@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import Array, DynamicUInt, Unit, Wide
+from quix.bootstrap.dtypes import Array, UDynamic, Unit, Wide
 from quix.bootstrap.macrocodes import init_array, load_array, store_array
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -11,8 +11,8 @@ def test_load_array_wide_by_int() -> None:
     w1 = Wide.from_length("w1", 2)
     program = to_program(
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(258, 2), DynamicUInt.from_int(5)),
-        load_array(a1, w1, DynamicUInt.from_int(5)),
+        store_array(a1, UDynamic.from_int(258, 2), UDynamic.from_int(5)),
+        load_array(a1, w1, UDynamic.from_int(5)),
         add(u1, 5),
     )
 
@@ -35,7 +35,7 @@ def test_load_array_wide_by_wide_cell_sized() -> None:
     idx = Wide.from_length("idx", 1)
     program = to_program(
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(258, 2), DynamicUInt.from_int(5)),
+        store_array(a1, UDynamic.from_int(258, 2), UDynamic.from_int(5)),
         add(idx[0], 5),
         load_array(a1, w1, idx),
         add(u1, 5),
@@ -62,7 +62,7 @@ def test_load_array_wide_by_wide_double() -> None:
     idx = Wide.from_length("idx", 2)
     program = to_program(
         init_array(a1),
-        store_array(a1, DynamicUInt.from_int(519, 2), DynamicUInt.from_int(258, 2)),
+        store_array(a1, UDynamic.from_int(519, 2), UDynamic.from_int(258, 2)),
         add(idx[0], 2),
         add(idx[1], 1),
         load_array(a1, w1, idx),

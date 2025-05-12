@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import UInt8
+from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.macrocodes import sub_unit
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -11,7 +11,7 @@ def test_sub_unit_int() -> None:
     u1, u2 = Unit("u1"), Unit("u2")
     program = to_program(
         add(u1, 10),
-        sub_unit(u1, UInt8.from_value(20), u2),
+        sub_unit(u1, UCell.from_value(20), u2),
     )
 
     mem = run(program)

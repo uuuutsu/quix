@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Array
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.program import ToConvert, convert
@@ -7,15 +7,15 @@ from quix.core.opcodes.opcodes import add, end_loop, inject, start_loop
 
 
 @convert
-def store_array(array: Array, to_store: Wide | DynamicUInt, index: Wide | DynamicUInt) -> ToConvert:
-    if isinstance(index, DynamicUInt):
+def store_array(array: Array, to_store: Wide | UDynamic, index: Wide | UDynamic) -> ToConvert:
+    if isinstance(index, UDynamic):
         return _array_store_by_int(array, to_store, index)
 
     return _array_store_by_wide(array, to_store, index)
 
 
-def _array_store_by_wide(array: Array, to_store: Wide | DynamicUInt, index: Wide) -> ToConvert:
-    if isinstance(to_store, DynamicUInt):
+def _array_store_by_wide(array: Array, to_store: Wide | UDynamic, index: Wide) -> ToConvert:
+    if isinstance(to_store, UDynamic):
         return _array_store_int_by_wide(array, to_store, index)
 
     return _array_store_wide_by_wide(array, to_store, index)
@@ -46,7 +46,7 @@ def _store_wide_in_current_position(array: Array, to_store: Wide) -> ToConvert:
     return None
 
 
-def _array_store_int_by_wide(array: Array, to_store: DynamicUInt, index: Wide) -> ToConvert:
+def _array_store_int_by_wide(array: Array, to_store: UDynamic, index: Wide) -> ToConvert:
     yield _array_set_control_unit(array)
     yield _array_move_by_wide_index(array, index)
     yield _store_int_in_current_position(array, to_store)
@@ -149,14 +149,14 @@ def _array_set_control_unit(array: Array) -> ToConvert:
     return add(array, -1)
 
 
-def _array_store_by_int(array: Array, to_store: Wide | DynamicUInt, index: DynamicUInt) -> ToConvert:
-    if isinstance(to_store, DynamicUInt):
+def _array_store_by_int(array: Array, to_store: Wide | UDynamic, index: UDynamic) -> ToConvert:
+    if isinstance(to_store, UDynamic):
         return _array_store_int_by_int(array, to_store, index)
 
     return _array_store_wide_by_int(array, to_store, index)
 
 
-def _array_store_wide_by_int(array: Array, to_store: Wide, index: DynamicUInt) -> ToConvert:
+def _array_store_wide_by_int(array: Array, to_store: Wide, index: UDynamic) -> ToConvert:
     offset: int = 1
     for unit in to_store:
         yield _array_store_unit_by_int(array, unit, index, offset)
@@ -165,7 +165,7 @@ def _array_store_wide_by_int(array: Array, to_store: Wide, index: DynamicUInt) -
     return None
 
 
-def _array_store_unit_by_int(array: Array, unit: Unit, index: DynamicUInt, offset: int) -> ToConvert:
+def _array_store_unit_by_int(array: Array, unit: Unit, index: UDynamic, offset: int) -> ToConvert:
     return _array_store_unit_in_array(array, unit, (int(index) + 1) * (array.granularity + 1) + offset, clear=True)
 
 
@@ -224,13 +224,13 @@ def _array_store_unit_in_array(array: Array, unit: Unit, offset: int, clear: boo
     return _go_by_value_backward(array, buff)
 
 
-def _array_store_int_by_int(array: Array, to_store: DynamicUInt, index: DynamicUInt) -> ToConvert:
+def _array_store_int_by_int(array: Array, to_store: UDynamic, index: UDynamic) -> ToConvert:
     yield _go_by_index_forward(array, index)
     yield _store_int_in_current_position(array, to_store)
     return _go_by_index_backward(array, index)
 
 
-def _store_int_in_current_position(array: Array, to_store: DynamicUInt) -> ToConvert:
+def _store_int_in_current_position(array: Array, to_store: UDynamic) -> ToConvert:
     offset: int = 0
     for idx, value in enumerate(to_store):
         if idx and (idx % array.granularity == 0):
@@ -245,11 +245,11 @@ def _store_int_in_current_position(array: Array, to_store: DynamicUInt) -> ToCon
     return _go_by_value_backward(array, offset)
 
 
-def _go_by_index_backward(array: Array, index: DynamicUInt, start_offset: int = 0) -> ToConvert:
+def _go_by_index_backward(array: Array, index: UDynamic, start_offset: int = 0) -> ToConvert:
     return _go_by_value_backward(array, (int(index) + 1) * (array.granularity + 1) - start_offset)
 
 
-def _go_by_index_forward(array: Array, index: DynamicUInt, start_offset: int = 0) -> ToConvert:
+def _go_by_index_forward(array: Array, index: UDynamic, start_offset: int = 0) -> ToConvert:
     return _go_by_value_forward(array, (int(index) + 1) * (array.granularity + 1) - start_offset)
 
 

@@ -1,7 +1,7 @@
 from typing import override
 
 from quix.bootstrap.dtypes.array import Array
-from quix.bootstrap.dtypes.const import DynamicUInt
+from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import add_wide, assign_wide, init_array, load_array, store_array, switch_wide
@@ -39,26 +39,26 @@ class CPU(Component):
         return self._registers.full_length + 4
 
     @convert
-    def set_pc(self, pc: DynamicUInt) -> ToConvert:
+    def set_pc(self, pc: UDynamic) -> ToConvert:
         return assign_wide(self._pc, pc)
 
     @convert
     def next(self) -> ToConvert:
-        return add_wide(self._pc, DynamicUInt.from_int(4, 4), self._pc)
+        return add_wide(self._pc, UDynamic.from_int(4, 4), self._pc)
 
     @convert
-    def run(self, mapping: dict[DynamicUInt, CoreProgram]) -> ToConvert:
+    def run(self, mapping: dict[UDynamic, CoreProgram]) -> ToConvert:
         yield add(self.exit, 1)
         yield start_loop(self.exit)
         yield switch_wide(self._pc, mapping, else_=[add(self.exit, -1)])
         return end_loop()
 
     @convert
-    def store_register(self, idx: DynamicUInt | Wide, value: DynamicUInt | Wide) -> ToConvert:
+    def store_register(self, idx: UDynamic | Wide, value: UDynamic | Wide) -> ToConvert:
         return store_array(self._registers, value, idx)
 
     @convert
-    def load_register(self, idx: DynamicUInt | Wide, load_in: Wide) -> ToConvert:
+    def load_register(self, idx: UDynamic | Wide, load_in: Wide) -> ToConvert:
         return load_array(self._registers, load_in, idx)
 
     @property

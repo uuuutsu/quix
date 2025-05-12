@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit
-from quix.bootstrap.dtypes.const import Int8
+from quix.bootstrap.dtypes.const import Cell
 from quix.bootstrap.macrocodes import move_unit_carry
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -13,7 +13,7 @@ def test_move_unit_carry_inc() -> None:
         add(u1, 100),
         add(u2, 250),
         add(u3, 1),
-        move_unit_carry(u1, {u2: Int8.from_value(1)}, {u2: (u3,)}),
+        move_unit_carry(u1, {u2: Cell.from_value(1)}, {u2: (u3,)}),
     )
 
     mem = run(program)
@@ -30,7 +30,7 @@ def test_move_unit_carry_dec() -> None:
         add(u1, 2),
         add(u2, 1),
         add(u3, 0),
-        move_unit_carry(u1, {u2: Int8.from_value(-1)}, {u2: (u3,)}),
+        move_unit_carry(u1, {u2: Cell.from_value(-1)}, {u2: (u3,)}),
     )
 
     mem = run(program)

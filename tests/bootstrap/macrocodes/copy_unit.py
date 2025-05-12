@@ -1,4 +1,4 @@
-from quix.bootstrap.dtypes import Int8, Unit
+from quix.bootstrap.dtypes import Cell, Unit
 from quix.bootstrap.macrocodes.copy_unit import copy_unit
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -11,7 +11,7 @@ def test_copy_unit_simple() -> None:
     program = to_program(
         add(u1, 10),
         add(u2, 30),
-        copy_unit(u1, {u2: Int8.from_value(-2)}),
+        copy_unit(u1, {u2: Cell.from_value(-2)}),
     )
 
     mem = run(program)
