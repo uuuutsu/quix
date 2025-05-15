@@ -31,7 +31,7 @@ def run_with_tape(code: ToConvert) -> tuple[dict[Ref, int], list[int]]:
 def run(code: ToConvert) -> dict[Ref, int]:
     core_program, mapping = mem_compile(reduce(code), garbage_collector=False)
     code = _compile_to_bf(core_program, mapping)
-
+    # print(code, len(code))
     executor = Executor(code).run()
     memory = executor.memory.cells
     values = {ref: memory[idx] for ref, idx in mapping.items()}

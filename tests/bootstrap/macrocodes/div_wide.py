@@ -7,7 +7,7 @@ from quix.core.opcodes.opcodes import add
 from .utils import run
 
 
-def test_div_wide_rem() -> None:
+def test_div_wide_rem_1() -> None:
     w1, w2, w3 = Wide.from_length("w1", 2), Wide.from_length("w2", 2), Wide.from_length("w3", 2)
 
     program = to_program(

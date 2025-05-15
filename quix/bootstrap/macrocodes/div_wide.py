@@ -5,7 +5,6 @@ from quix.bootstrap.dtypes.const import Cell, UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.program import ToConvert
-from quix.core.opcodes.opcodes import inject
 from quix.tools import Arg, check
 
 from .assign_wide import assign_wide
@@ -118,11 +117,11 @@ def _div_wides_and_ints(
         return call_z_wide(right_wide, if_(), [])
 
     yield loop_wide(left_buff, body())
+    yield free_wide(left_buff)
 
     if dynamic_right:
         yield clear_wide(right_wide), free_wide(right_wide)
 
-    yield inject(None, "#", None)
     if remainder:
         yield clear_wide(remainder)
     if remainder and not dynamic_right:
@@ -134,7 +133,7 @@ def _div_wides_and_ints(
     else:
         yield clear_wide(rem_buff)
 
-    return [free_wide(rem_buff), free_wide(left_buff)]
+    return free_wide(rem_buff)
 
 
 @macrocode
