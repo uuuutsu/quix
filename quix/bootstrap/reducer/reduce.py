@@ -1,28 +1,14 @@
-from quix.bootstrap.macrocode import MacroCode
-from quix.bootstrap.program import SmartProgram, ToConvert, to_program
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.dtypes import CoreProgram
+
+from .ast import Node, build_ast, compile
 
 
 def reduce(code: ToConvert) -> CoreProgram:
-    return _iterative_compiler(code)
+    ast = build_ast(code)
+    ast = _optimize(ast)
+    return compile(ast)
 
 
-def _iterative_compiler(code: ToConvert) -> CoreProgram:
-    program: SmartProgram = SmartProgram()
-    reduce: bool = False
-    for opcode in to_program(code):
-        if isinstance(opcode, MacroCode):
-            program |= opcode()
-            reduce = True
-        else:
-            program |= opcode
-
-    program = _optimize_iteration(program)
-    if reduce:
-        return _iterative_compiler(program)
-
-    return program
-
-
-def _optimize_iteration[P: CoreProgram](program: P) -> P:
-    return program
+def _optimize(ast: Node) -> Node:
+    return ast
