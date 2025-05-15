@@ -1,7 +1,7 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import UCell
-from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 
@@ -13,8 +13,8 @@ from .clear_unit import clear_unit
 from .sub_unit import sub_unit
 
 
-@convert
-def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
+@macrocode
+def call_ge_unit_signed(left: Unit, right: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
     lim = Unit("128")
     yield assign_unit(lim, UCell.from_value(128))
 
@@ -27,7 +27,7 @@ def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreProgram, else_: CorePr
     diff = Unit("diff")
     yield call_z_unit(
         same_msb,
-        sub_unit(left, right, diff) | call_le_unit(diff, lim, [add(ge_flag, 1)], []),
+        [sub_unit(left, right, diff), call_le_unit(diff, lim, add(ge_flag, 1), [])],
         call_z_unit(left_pos, [], [add(ge_flag, 1)]),
     )
 

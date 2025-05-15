@@ -1,12 +1,13 @@
 from quix.bootstrap.dtypes import Cell, UDynamic, Unit, Wide
 from quix.bootstrap.dtypes.const import UCell
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.tools import Arg, check
 
 from .assign_unit import assign_unit
 
 
-@convert
+@macrocode
 @check(Arg("to").size == Arg("value").size)
 def assign_wide(
     to: Wide,

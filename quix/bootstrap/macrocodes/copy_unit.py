@@ -1,11 +1,12 @@
 from quix.bootstrap.dtypes import Cell, Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.memoptix.opcodes import free
 
 from .move_unit import move_unit
 
 
-@convert
+@macrocode
 def copy_unit(value: Unit, to: dict[Unit, Cell]) -> ToConvert:
     buff = Unit(f"{value.name}_buffer")
 

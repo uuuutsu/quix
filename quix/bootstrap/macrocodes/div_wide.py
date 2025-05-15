@@ -3,7 +3,8 @@ from logging import warning
 from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.const import Cell, UDynamic
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import inject
 from quix.tools import Arg, check
 
@@ -17,7 +18,7 @@ from .loop_wide import loop_wide
 from .move_unit_carry import move_unit_carry
 
 
-@convert
+@macrocode
 @check(Arg("left").size == Arg("right").size)
 def div_wide(
     left: Wide | UDynamic,
@@ -100,17 +101,23 @@ def _div_wides_and_ints(
     if quotient:
         yield clear_wide(quotient)
 
-    instrs = dec_wide(left_buff) | dec_wide(right_wide) | inc_wide(rem_buff)
-    if (left not in (remainder, quotient)) and isinstance(left, Wide):
-        instrs |= inc_wide(left)
+    def body() -> ToConvert:
+        yield dec_wide(left_buff)
+        yield dec_wide(right_wide)
+        yield inc_wide(rem_buff)
 
-    if_ = _move_wide(rem_buff, {right_wide: Cell.from_value(1)})
-    if quotient:
-        if_ |= inc_wide(quotient)
+        if (left not in (remainder, quotient)) and isinstance(left, Wide):
+            yield inc_wide(left)
 
-    instrs |= call_z_wide(right_wide, if_, [])
+        def if_() -> ToConvert:
+            yield _move_wide(rem_buff, {right_wide: Cell.from_value(1)})
+            if quotient:
+                yield inc_wide(quotient)
+            return None
 
-    yield loop_wide(left_buff, instrs)
+        return call_z_wide(right_wide, if_(), [])
+
+    yield loop_wide(left_buff, body())
 
     if dynamic_right:
         yield clear_wide(right_wide), free_wide(right_wide)
@@ -130,7 +137,7 @@ def _div_wides_and_ints(
     return [free_wide(rem_buff), free_wide(left_buff)]
 
 
-@convert
+@macrocode
 def _move_wide(orig: Wide, to: dict[Wide, Cell]) -> ToConvert:
     for idx, unit in enumerate(orig):
         unit_target: dict[Unit, Cell] = {}

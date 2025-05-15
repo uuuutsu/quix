@@ -28,8 +28,7 @@ from quix.bootstrap.macrocodes import (
     switch_wide,
     xor_wide,
 )
-from quix.bootstrap.program import SmartProgram, ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.program import SmartProgram, ToConvert
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.memoptix.opcodes import free
@@ -125,7 +124,7 @@ class Compiler:
         )
 
     def _compile_exec_loop(self, state: State) -> None:
-        mapping: dict[UDynamic, CoreProgram] = {}
+        mapping: dict[UDynamic, ToConvert] = {}
         total = len(state.code)
         for idx, (index, riscv_opcode) in enumerate(state.code.items()):
             mapping[UDynamic.from_int(index, 4)] = self._execute(riscv_opcode)
@@ -133,7 +132,6 @@ class Compiler:
 
         self.program |= self.cpu.run(mapping)
 
-    @convert
     def _execute(self, opcode: RISCVOpcode) -> ToConvert:
         new_args: dict[str, Any] = {}
         rs_mapping: dict[Register, Wide] = {}
@@ -329,7 +327,7 @@ class Compiler:
         yield call_ge_unit(
             rd[0],
             lim,
-            [add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), *not_unit(rd[0], rd[0])],
+            [add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0])],
             [],
         )
         yield clear_unit(lim), free(lim)
@@ -350,7 +348,7 @@ class Compiler:
         yield call_ge_unit(
             rd[1],
             lim,
-            [add(rd[2], -1), add(rd[3], -1), *not_unit(rd[0], rd[0]), *not_unit(rd[1], rd[1])],
+            [add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0]), not_unit(rd[1], rd[1])],
             [],
         )
         yield clear_unit(lim), free(lim)
@@ -431,7 +429,7 @@ class Compiler:
         return self.cpu.next()
 
     def ecall(self, imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
-        cases: dict[UDynamic, CoreProgram] = {
+        cases: dict[UDynamic, ToConvert] = {
             UDynamic.from_int(62, 1): self._ecall_lseek(),
             UDynamic.from_int(64, 1): self._ecall_print(),
             UDynamic.from_int(57, 1): self._ecall_close(),
@@ -446,19 +444,15 @@ class Compiler:
         yield clear_wide(x17), free_wide(x17)
         return self.cpu.next()
 
-    @convert
     def _ecall_close(self) -> ToConvert:
         return self.memory.store(UDynamic.from_int(10), UDynamic.from_int(0, 4))
 
-    @convert
     def _ecall_lseek(self) -> ToConvert:
         return self.memory.store(UDynamic.from_int(10), UDynamic.from_int((1 << 32) - 29))
 
-    @convert
     def _ecall_exit(self) -> ToConvert:
         return clear_unit(self.cpu.exit)
 
-    @convert
     def _ecall_print(self) -> ToConvert:
         addr = Wide.from_length("addr", 4)
         counter = Wide.from_length("counter", 4)

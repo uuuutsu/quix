@@ -1,7 +1,8 @@
 from math import ceil, log
 
 from quix.bootstrap.dtypes import Array, UDynamic, Unit, Wide
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.memoptix.opcodes import free
 
@@ -16,7 +17,7 @@ from .loop_wide import loop_wide
 from .store_array import _array_move_by_wide_index, _array_set_control_unit, _go_by_value, store_array
 
 
-@convert
+@macrocode
 def output_wide(wide: Wide) -> ToConvert:
     # TODO: optimize
     # We can use custom array and modify `div_wide` to store remainder
@@ -32,14 +33,16 @@ def output_wide(wide: Wide) -> ToConvert:
     to_print = Wide.from_length("to_print", wide.size)
     yield assign_wide(to_div, wide)
 
-    instrs = div_wide(to_div, UDynamic.from_int(10, to_div.size), to_div, to_print)
-    instrs |= call_z_unit(
-        to_print[0],
-        [],
-        store_array(output_arr, Wide("value", to_print[0:1]), Wide("index", (counter,))),
-    )
-    instrs |= add(counter, 1)
-    yield loop_wide(to_div, instrs)
+    def body() -> ToConvert:
+        yield div_wide(to_div, UDynamic.from_int(10, to_div.size), to_div, to_print)
+        yield call_z_unit(
+            to_print[0],
+            [],
+            store_array(output_arr, Wide("value", to_print[0:1]), Wide("index", (counter,))),
+        )
+        return add(counter, 1)
+
+    yield loop_wide(to_div, body())
     yield add(counter, -1)
 
     yield _array_set_control_unit(output_arr)

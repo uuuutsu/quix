@@ -86,7 +86,7 @@ def test_call_ge_unit_if_if() -> None:
             u1,
             [
                 add(u1, 25),
-                *call_ge_unit(
+                call_ge_unit(
                     u1,
                     u2,
                     [
@@ -120,7 +120,7 @@ def test_call_ge_unit_if_else() -> None:
             u2,
             [
                 add(u1, -5),
-                *call_ge_unit(
+                call_ge_unit(
                     u1,
                     u2,
                     [
@@ -160,7 +160,7 @@ def test_call_ge_unit_else_if() -> None:
             [
                 add(u1, -2),
                 add(u2, 1),
-                *call_ge_unit(
+                call_ge_unit(
                     u1,
                     u2,
                     [
@@ -197,7 +197,7 @@ def test_call_ge_unit_else_else() -> None:
             [
                 add(u1, 3),
                 add(u2, 1),
-                *call_ge_unit(
+                call_ge_unit(
                     u2,
                     u1,
                     [

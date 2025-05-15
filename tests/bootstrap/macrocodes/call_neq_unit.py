@@ -63,7 +63,7 @@ def test_call_neq_unit_if_if() -> None:
             u1,
             [
                 add(u1, 26),
-                *call_neq_unit(
+                call_neq_unit(
                     u1,
                     u2,
                     [
@@ -97,7 +97,7 @@ def test_call_neq_unit_if_else() -> None:
             u2,
             [
                 add(u1, 1),
-                *call_neq_unit(
+                call_neq_unit(
                     u2,
                     u1,
                     [
@@ -136,7 +136,7 @@ def test_call_neq_unit_else_if() -> None:
             [
                 add(u1, -2),
                 add(u2, 1),
-                *call_neq_unit(
+                call_neq_unit(
                     u1,
                     u2,
                     [
@@ -174,7 +174,7 @@ def test_call_neq_unit_else_else() -> None:
             [
                 add(u1, 2),
                 add(u2, 2),
-                *call_neq_unit(
+                call_neq_unit(
                     u2,
                     u2,
                     [

@@ -1,5 +1,6 @@
 from quix.bootstrap.dtypes import Cell, UCell, Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
@@ -10,7 +11,7 @@ from .copy_unit import copy_unit
 from .move_unit import move_unit
 
 
-@convert
+@macrocode
 def mul_unit(left: Unit | UCell, right: Unit | UCell, target: Unit) -> ToConvert:
     if isinstance(left, UCell) and isinstance(right, UCell):
         return assign_unit(target, left * right)
@@ -30,7 +31,7 @@ def _mul_by_int(
     if left == target:
         return copy_unit(left, {target: (right - 1).to(Cell)})
 
-    return clear_unit(target) | copy_unit(left, {target: right.to(Cell)})
+    return clear_unit(target), copy_unit(left, {target: right.to(Cell)})
 
 
 def _mul_two_units(

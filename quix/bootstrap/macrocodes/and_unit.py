@@ -1,5 +1,6 @@
 from quix.bootstrap.dtypes import Cell, UCell, Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
@@ -10,7 +11,7 @@ from .div_unit import div_unit
 from .mul_unit import mul_unit
 
 
-@convert
+@macrocode
 def and_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
     if left == right == target:
         return None
@@ -31,7 +32,8 @@ def and_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
 
     yield start_loop(lrem)
     yield start_loop(rrem)
-    yield add_unit(bit_scale, target, target) | add(rrem, -1)
+    yield add_unit(bit_scale, target, target)
+    yield add(rrem, -1)
     yield end_loop()
     yield add(lrem, -1)
     yield end_loop()

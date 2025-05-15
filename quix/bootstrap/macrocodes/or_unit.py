@@ -1,5 +1,6 @@
 from quix.bootstrap.dtypes import Cell, UCell, Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
@@ -11,7 +12,7 @@ from .move_unit import move_unit
 from .mul_unit import mul_unit
 
 
-@convert
+@macrocode
 def or_unit(left: Unit, right: Unit, target: Unit) -> ToConvert:
     if left == right == target:
         return None

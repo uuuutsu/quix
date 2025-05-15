@@ -1,6 +1,7 @@
 from quix.bootstrap.dtypes import UCell, Unit
 from quix.bootstrap.dtypes.const import Cell
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
@@ -10,7 +11,7 @@ from .clear_unit import clear_unit
 from .move_unit import move_unit
 
 
-@convert
+@macrocode
 def div_unit(
     left: Unit | UCell,
     right: Unit | UCell,
@@ -92,10 +93,14 @@ def _div_units_and_ints(
 
     if (left not in (remainder, quotient)) and isinstance(left, Unit):
         yield add(left, 1)
-    if_ = move_unit(rem_buff, {right_unit: Cell.from_value(1)})
-    if quotient:
-        if_ |= add(quotient, 1)
-    yield call_z_unit(right_unit, if_, [])
+
+    def body() -> ToConvert:
+        yield move_unit(rem_buff, {right_unit: Cell.from_value(1)})
+        if quotient:
+            yield add(quotient, 1)
+        return None
+
+    yield call_z_unit(right_unit, body(), [])
     yield end_loop()
 
     if dynamic_right:

@@ -2,7 +2,8 @@ from quix.bootstrap.dtypes import Array
 from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, inject
 
 from .clear_wide import clear_wide
@@ -18,7 +19,7 @@ from .store_array import (
 )
 
 
-@convert
+@macrocode
 def load_array(array: Array, load_in: Wide, index: Wide | UDynamic) -> ToConvert:
     yield clear_wide(load_in)
 

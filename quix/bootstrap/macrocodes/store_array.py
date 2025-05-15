@@ -2,11 +2,12 @@ from quix.bootstrap.dtypes import Array
 from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, inject, start_loop
 
 
-@convert
+@macrocode
 def store_array(array: Array, to_store: Wide | UDynamic, index: Wide | UDynamic) -> ToConvert:
     if isinstance(index, UDynamic):
         return _array_store_by_int(array, to_store, index)
@@ -144,7 +145,7 @@ def _go_by_index_in_current_cell(array: Array, step: int | None = None, max: int
     return inject(array, code, array)
 
 
-@convert
+@macrocode
 def _array_set_control_unit(array: Array) -> ToConvert:
     return add(array, -1)
 

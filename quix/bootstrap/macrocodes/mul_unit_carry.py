@@ -1,7 +1,8 @@
 from quix.bootstrap.dtypes import UCell, Unit
 from quix.bootstrap.dtypes.const import Cell
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.assign_unit import assign_unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
@@ -10,7 +11,7 @@ from .clear_unit import clear_unit
 from .move_unit import move_unit
 
 
-@convert
+@macrocode
 def mul_unit_carry(
     left: Unit | UCell,
     right: Unit | UCell,

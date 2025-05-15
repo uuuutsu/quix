@@ -1,6 +1,7 @@
 from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
@@ -11,7 +12,7 @@ from .clear_unit import clear_unit
 from .sub_unit import sub_unit
 
 
-@convert
+@macrocode
 def switch_unit(value: Unit, branches: dict[UCell, CoreProgram], else_: CoreProgram) -> ToConvert:
     buff = Unit(f"{value.name}_buff")
     else_flag = Unit(f"{value.name}_else_flag")

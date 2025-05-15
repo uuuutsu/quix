@@ -76,14 +76,3 @@ def test_inject(args: dict[str, Any]) -> None:
     assert inject(**args).args() == args
     assert inject(**args).__id__ == "inject"
     assert inject(**args).__class__.__name__ == "Inject"
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        {"ref": 5, "value": 10},
-        {"ref": 0, "value": -15},
-    ],
-)
-def test_flyweight(args: dict[str, Any]) -> None:
-    assert add(**args) is add(**args)

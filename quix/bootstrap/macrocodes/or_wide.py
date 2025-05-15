@@ -1,11 +1,12 @@
 from quix.bootstrap.dtypes import Unit, Wide
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.tools import Arg, check
 
 from .or_unit import or_unit
 
 
-@convert
+@macrocode
 @check(Arg("left").size == Arg("right").size == Arg("target").size)
 def or_wide(
     left: Wide,

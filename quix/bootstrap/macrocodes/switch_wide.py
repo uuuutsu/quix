@@ -1,8 +1,8 @@
 from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 
@@ -15,8 +15,8 @@ from .free_wide import free_wide
 from .sub_wide import sub_wide
 
 
-@convert
-def switch_wide(value: Wide, branches: dict[UDynamic, CoreProgram], else_: CoreProgram) -> ToConvert:
+@macrocode
+def switch_wide(value: Wide, branches: dict[UDynamic, ToConvert], else_: ToConvert) -> ToConvert:
     buff = Wide.from_length(f"{value.name}_buff", value.size)
     else_flag = Unit(f"{value.name}_else_flag")
 
@@ -26,7 +26,7 @@ def switch_wide(value: Wide, branches: dict[UDynamic, CoreProgram], else_: CoreP
     last_val = UDynamic.from_int(0, value.size)
     for key in sorted_keys:
         yield sub_wide(buff, key - last_val, buff)
-        yield call_z_wide(buff, [*branches[key], add(else_flag, 1)], [])
+        yield call_z_wide(buff, [branches[key], add(else_flag, 1)], [])
         last_val = key
 
     yield call_z_unit(else_flag, else_, clear_unit(else_flag))

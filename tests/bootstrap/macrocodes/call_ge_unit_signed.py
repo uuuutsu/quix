@@ -86,7 +86,7 @@ def test_call_ge_unit_signed_if_if() -> None:
             u1,
             [
                 add(u1, 125),
-                *call_ge_unit_signed(
+                call_ge_unit_signed(
                     u2,
                     u1,
                     [

@@ -1,10 +1,11 @@
 from quix.bootstrap.dtypes import Cell, Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes import add
 from quix.core.opcodes.opcodes import end_loop, start_loop
 
 
-@convert
+@macrocode
 def move_unit(value: Unit, to: dict[Unit, Cell]) -> ToConvert:
     if value in to:
         raise ValueError("Target set cannot contain origin `Unit`: {value}.")

@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import Cell, UCell
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.program import SmartProgram, ToConvert, convert
 from quix.core.opcodes import add
 from quix.core.opcodes.opcodes import end_loop, start_loop
@@ -11,7 +12,7 @@ from .assign_unit import assign_unit
 from .call_z_unit import call_z_unit
 
 
-@convert
+@macrocode
 def move_unit_carry(value: Unit, to: dict[Unit, Cell], carries: dict[Unit, tuple[Unit, ...]]) -> ToConvert:
     if value in to:
         raise ValueError("Target set cannot contain origin `Unit`: {value}.")

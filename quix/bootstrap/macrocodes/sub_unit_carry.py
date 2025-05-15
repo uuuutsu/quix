@@ -1,9 +1,10 @@
 from quix.bootstrap.dtypes import UCell, Unit
 from quix.bootstrap.dtypes.const import Cell
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.call_z_unit import call_z_unit
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.copy_unit import copy_unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.program import ToConvert
 from quix.memoptix.opcodes import free
 
 from .add_unit_carry import add_unit_carry
@@ -13,7 +14,7 @@ from .move_unit_carry import _recursive_carry_decrement, move_unit_carry
 from .sub_unit import _sub_from_target
 
 
-@convert
+@macrocode
 def sub_unit_carry(
     left: Unit | UCell,
     right: Unit | UCell,

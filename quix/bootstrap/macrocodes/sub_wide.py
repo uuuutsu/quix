@@ -1,12 +1,13 @@
 from quix.bootstrap.dtypes import UDynamic, Unit, Wide
 from quix.bootstrap.dtypes.const import UCell
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.tools import Arg, check
 
 from .sub_unit_carry import sub_unit_carry
 
 
-@convert
+@macrocode
 @check(Arg("left").size == Arg("right").size == Arg("target").size)
 def sub_wide(
     left: Wide | UDynamic,

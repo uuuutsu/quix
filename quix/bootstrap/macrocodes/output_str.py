@@ -1,7 +1,8 @@
 from quix.bootstrap.dtypes import Str
 from quix.bootstrap.dtypes.const import UCell
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.program import ToConvert, convert
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import output
 from quix.memoptix.opcodes import free
 
@@ -10,7 +11,7 @@ from .clear_unit import clear_unit
 from .sub_unit import sub_unit
 
 
-@convert
+@macrocode
 def output_str(string: Str) -> ToConvert:
     buff = Unit("string_buff")
 

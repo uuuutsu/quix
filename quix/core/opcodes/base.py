@@ -6,11 +6,11 @@ from typing import Any, ClassVar, cast, override
 from rich.repr import Result, rich_repr
 
 from quix.core.interfaces import Opcode, OpcodeFactory
-from quix.tools import FlyweightMeta, pascal_case_to_snake_case, snake_case_to_pascal_case
+from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
 
 
 @rich_repr
-class CoreOpcode(Opcode, metaclass=FlyweightMeta):
+class CoreOpcode(Opcode):
     __slots__ = ("_args",)
 
     __id__: ClassVar[str]

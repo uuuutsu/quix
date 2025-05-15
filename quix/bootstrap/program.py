@@ -9,7 +9,14 @@ from rich.repr import Result, rich_repr
 from quix.core.opcodes import CoreOpcode, CoreProgram
 
 type ToConvert = (
-    CoreProgram | CoreOpcode | SmartProgram | Iterable[ToConvert] | Generator[ToConvert, None, ToConvert] | None
+    CoreProgram
+    | CoreOpcode
+    | SmartProgram
+    | Iterable[ToConvert]
+    | list[ToConvert]
+    | tuple[ToConvert, ...]
+    | Generator[ToConvert, None, ToConvert]
+    | None
 )
 
 
@@ -39,7 +46,7 @@ class SmartProgram:
         return self._program
 
     def __iter__(self) -> Iterator[CoreOpcode]:
-        return self._program.__iter__()
+        return self.build().__iter__()
 
     def __rich_repr__(self) -> Result:
         yield from self._program

@@ -1,16 +1,16 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import Cell
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.call_z_unit import call_z_unit
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.move_unit import move_unit
-from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 
-@convert
-def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
+@macrocode
+def call_ge_unit(left: Unit, right: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
     else_flag = Unit(f"{left.name}_ge_{right.name}_else_flag")
     left_buffer, right_buffer = Unit(f"{left.name}_buffer"), Unit(f"{right.name}_buffer")
 
@@ -23,7 +23,7 @@ def call_ge_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) 
     yield call_z_unit(
         left_buffer,
         [
-            *move_unit(
+            move_unit(
                 right_buffer,
                 {right: Cell.from_value(1)},
             ),

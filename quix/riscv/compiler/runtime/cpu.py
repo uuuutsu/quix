@@ -6,7 +6,6 @@ from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import add_wide, assign_wide, init_array, load_array, store_array, switch_wide
 from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import index
 
@@ -47,7 +46,7 @@ class CPU(Component):
         return add_wide(self._pc, UDynamic.from_int(4, 4), self._pc)
 
     @convert
-    def run(self, mapping: dict[UDynamic, CoreProgram]) -> ToConvert:
+    def run(self, mapping: dict[UDynamic, ToConvert]) -> ToConvert:
         yield add(self.exit, 1)
         yield start_loop(self.exit)
         yield switch_wide(self._pc, mapping, else_=[add(self.exit, -1)])

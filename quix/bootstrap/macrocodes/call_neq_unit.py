@@ -1,14 +1,14 @@
 from quix.bootstrap.dtypes import Unit
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.sub_unit import sub_unit
-from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
 from quix.memoptix.opcodes import free
 
 
-@convert
-def call_neq_unit(left: Unit, right: Unit, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
+@macrocode
+def call_neq_unit(left: Unit, right: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
     else_flag, buffer = Unit("else_flag"), Unit("buffer")
 
     yield sub_unit(left, right, buffer)

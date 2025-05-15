@@ -1,24 +1,24 @@
 from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.program import ToConvert, convert
-from quix.core.opcodes.dtypes import CoreProgram
+from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 
 from .call_z_unit import call_z_unit
 
 
-@convert
-def call_z_wide(value: Wide, if_: CoreProgram, else_: CoreProgram) -> ToConvert:
+@macrocode
+def call_z_wide(value: Wide, if_: ToConvert, else_: ToConvert) -> ToConvert:
     zero_flag = Unit(f"{value.name}_zero_flag")
 
     yield add(zero_flag, 1)
     yield _recursive_call_z_zero_flag(value.units, zero_flag)
-    yield call_z_unit(zero_flag, else_, [add(zero_flag, -1), *if_])
+    yield call_z_unit(zero_flag, else_, [add(zero_flag, -1), if_])
     return free(zero_flag)
 
 
-@convert
+@macrocode
 def _recursive_call_z_zero_flag(units: tuple[Unit, ...], zero_flag: Unit) -> ToConvert:
     if len(units) == 0:
         return None

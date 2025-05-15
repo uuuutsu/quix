@@ -55,7 +55,7 @@ def test_call_z_unit_if_if() -> None:
             u1,
             [
                 add(u2, 1),
-                *call_z_unit(
+                call_z_unit(
                     u1,
                     [
                         add(u2, 10),
@@ -86,7 +86,7 @@ def test_call_z_unit_if_else() -> None:
             [
                 add(u2, 1),
                 add(u1, 1),
-                *call_z_unit(
+                call_z_unit(
                     u1,
                     [
                         add(u2, 10),
@@ -121,7 +121,7 @@ def test_call_z_unit_else_if() -> None:
             ],
             [
                 add(u1, -1),
-                *call_z_unit(
+                call_z_unit(
                     u1,
                     [
                         add(u2, 10),
@@ -154,7 +154,7 @@ def test_call_z_unit_else_else() -> None:
             ],
             [
                 add(u1, 2),
-                *call_z_unit(
+                call_z_unit(
                     u1,
                     [
                         add(u2, 10),
