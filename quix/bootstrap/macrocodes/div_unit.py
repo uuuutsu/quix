@@ -102,6 +102,7 @@ def _div_units_and_ints(
 
     yield call_z_unit(right_unit, body(), [])
     yield end_loop()
+    yield free(left_buff)
 
     if dynamic_right:
         yield clear_unit(right_unit), free(right_unit)
@@ -118,4 +119,4 @@ def _div_units_and_ints(
     else:
         yield clear_unit(rem_buff)
 
-    return [free(rem_buff), free(left_buff)]
+    return free(left_buff)
