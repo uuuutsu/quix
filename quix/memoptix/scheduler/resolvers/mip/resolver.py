@@ -1,5 +1,7 @@
 from typing import override
 
+from mip import OptimizationStatus  # type: ignore
+
 from quix.memoptix.scheduler.blueprint import Blueprint
 from quix.memoptix.scheduler.constraints import Array, HardLink, Index, LifeCycle, SoftLink
 from quix.memoptix.scheduler.layout import Layout
@@ -21,11 +23,14 @@ class MIPResolver(Resolver):
 
         for owner in blueprint.get_owners():
             model.add_var(owner)
-
         mappers = get_constraint_mappers(blueprint)
+
         expr_index(mappers.get(Index, {}), model)  # type: ignore
         expr_lifecycle(mappers.get(LifeCycle, {}), mappers.get(Array, {}), model)  # type: ignore
         expr_links(mappers.get(HardLink, {}), mappers.get(SoftLink, {}), model)  # type: ignore
 
-        model.optimize()
+        status = model.optimize()
+        match status:
+            case OptimizationStatus.INFEASIBLE:
+                raise RuntimeError(f"{model!r} cannot be optimized.")
         return Layout(blueprint, model.get_mapping())

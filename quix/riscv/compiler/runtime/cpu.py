@@ -7,7 +7,6 @@ from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocodes import add_wide, assign_wide, init_array, load_array, store_array, switch_wide
 from quix.bootstrap.program import ToConvert, convert
 from quix.core.opcodes.opcodes import add, end_loop, start_loop
-from quix.memoptix.opcodes import index
 
 from .component import Component
 
@@ -27,10 +26,10 @@ class CPU(Component):
     @convert
     @override
     def create(self, memory_index: int) -> ToConvert:
-        for idx, unit in enumerate(self._pc):
-            yield index(unit, memory_index + idx)
+        # for idx, unit in enumerate(self._pc):
+        # yield index(unit, memory_index + idx)
         yield init_array(self._registers)
-        yield index(self._registers, memory_index + 4)
+        # yield index(self._registers, memory_index + 4)
         return None
 
     @override

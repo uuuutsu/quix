@@ -119,4 +119,4 @@ def _div_units_and_ints(
     else:
         yield clear_unit(rem_buff)
 
-    return free(left_buff)
+    return None

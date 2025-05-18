@@ -32,13 +32,13 @@ from quix.bootstrap.program import SmartProgram, ToConvert
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.memoptix.opcodes import free
+from quix.riscv.compiler.utils import is_signed
 from quix.riscv.loader.decoder.utils import get_bit_section
 from quix.riscv.loader.state import State
 from quix.riscv.opcodes.base import RISCVOpcode
 from quix.riscv.opcodes.dtypes import Imm, Register
 
 from .runtime import CPU, Layout, Memory
-from .utils import is_signed
 
 _DATA_SECTIONS: Final[tuple[str, ...]] = (
     ".rodata",
@@ -88,7 +88,7 @@ class Compiler:
         return self
 
     def _init_runtime(self) -> None:
-        self.program |= Layout().add_component(self.cpu, 0).add_component(self.memory, 0).create(50)
+        self.program |= Layout().add_component(self.cpu, 1).add_component(self.memory, 70).create(0)
 
     def _init_cpu(self, state: State) -> None:
         self.program |= self.cpu.set_pc(UDynamic.from_int(state.entry, size=4))
@@ -125,11 +125,11 @@ class Compiler:
 
     def _compile_exec_loop(self, state: State) -> None:
         mapping: dict[UDynamic, ToConvert] = {}
-        total = len(state.code)
-        for idx, (index, riscv_opcode) in enumerate(state.code.items()):
+        print(f"Found: {len(state.code)} instructions")
+        for _idx, (index, riscv_opcode) in enumerate(state.code.items()):
             mapping[UDynamic.from_int(index, 4)] = self._execute(riscv_opcode)
-            print(f"instruction compiled: {idx}/{total - 1}")
-
+            if _idx == 99:
+                break
         self.program |= self.cpu.run(mapping)
 
     def _execute(self, opcode: RISCVOpcode) -> ToConvert:
