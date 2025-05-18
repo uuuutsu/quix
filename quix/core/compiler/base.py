@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import override
+from typing import Self, override
 
 from quix.core.interfaces.visitor import Visitor
 from quix.core.opcodes import CoreOpcode
@@ -11,12 +11,13 @@ class CoreVisitor(Visitor[CoreOpcode]):
     __slots__ = ()
 
     @override
-    def visit(self, program: CoreProgram) -> None:
+    def visit(self, program: CoreProgram) -> Self:
         for opcode in program:
             if (method := getattr(self, opcode.__id__, None)) is None:
                 raise NoHandlerFoundException(opcode, self)
 
             method(**opcode.args())
+        return self
 
     @abstractmethod
     def add(self, ref: Ref | None, value: Value) -> None:

@@ -1,9 +1,9 @@
 __all__ = (
     "build_ast",
-    "compile",
+    "reduce",
     "Node",
 )
 
 from .build import build_ast
-from .compile import compile
 from .node import Node
+from .reduce import reduce
