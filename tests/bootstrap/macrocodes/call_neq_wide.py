@@ -18,12 +18,8 @@ def test_call_neq_wide_else() -> None:
         call_neq_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 
@@ -51,12 +47,8 @@ def test_call_neq_wide_if() -> None:
         call_neq_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 

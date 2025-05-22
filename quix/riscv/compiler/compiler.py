@@ -3,6 +3,7 @@ from typing import Any, Final, Self
 from quix.bootstrap.dtypes.const import UCell, UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
+from quix.bootstrap.macrocode import from_program, macrocode
 from quix.bootstrap.macrocodes import (
     add_wide,
     and_unit,
@@ -28,7 +29,9 @@ from quix.bootstrap.macrocodes import (
     switch_wide,
     xor_wide,
 )
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import SmartProgram, ToConvert
+from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.memoptix.opcodes import free
@@ -124,7 +127,7 @@ class Compiler:
         )
 
     def _compile_exec_loop(self, state: State) -> None:
-        mapping: dict[UDynamic, ToConvert] = {}
+        mapping: dict[UDynamic, CoreOpcode] = {}
         print(f"Found: {len(state.code)} instructions")
         for _idx, (index, riscv_opcode) in enumerate(state.code.items()):
             mapping[UDynamic.from_int(index, 4)] = self._execute(riscv_opcode)
@@ -132,6 +135,7 @@ class Compiler:
                 break
         self.program |= self.cpu.run(mapping)
 
+    @macrocode
     def _execute(self, opcode: RISCVOpcode) -> ToConvert:
         new_args: dict[str, Any] = {}
         rs_mapping: dict[Register, Wide] = {}
@@ -223,7 +227,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def bne(self, imm: UDynamic, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -231,7 +235,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def bge(self, imm: UDynamic, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -239,7 +243,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def blt(self, imm: UDynamic, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -247,7 +251,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def bltu(self, imm: UDynamic, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -255,7 +259,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def bgeu(self, imm: UDynamic, rs1: Wide, rs2: Wide) -> ToConvert:
@@ -263,7 +267,7 @@ class Compiler:
             rs1,
             rs2,
             add_wide(self.cpu.pc, imm, self.cpu.pc),
-            [],
+            NOP,
         )
 
     def lui(self, imm: UDynamic, rd: Wide) -> ToConvert:
@@ -327,8 +331,8 @@ class Compiler:
         yield call_ge_unit(
             rd[0],
             lim,
-            [add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0])],
-            [],
+            from_program(add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0])),
+            NOP,
         )
         yield clear_unit(lim), free(lim)
         return self.cpu.next()
@@ -348,8 +352,8 @@ class Compiler:
         yield call_ge_unit(
             rd[1],
             lim,
-            [add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0]), not_unit(rd[1], rd[1])],
-            [],
+            from_program(add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0]), not_unit(rd[1], rd[1])),
+            NOP,
         )
         yield clear_unit(lim), free(lim)
         return self.cpu.next()
@@ -429,30 +433,34 @@ class Compiler:
         return self.cpu.next()
 
     def ecall(self, imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
-        cases: dict[UDynamic, ToConvert] = {
+        cases: dict[UDynamic, CoreOpcode] = {
             UDynamic.from_int(62, 1): self._ecall_lseek(),
             UDynamic.from_int(64, 1): self._ecall_print(),
             UDynamic.from_int(57, 1): self._ecall_close(),
             UDynamic.from_int(93, 1): self._ecall_exit(),
-            UDynamic.from_int(10, 1): [],
+            UDynamic.from_int(10, 1): NOP,
         }
 
         x17 = Wide.from_length("x17", 1)
         yield self.memory.load(UDynamic.from_int(17), x17)
-        yield switch_wide(x17, cases, [])
+        yield switch_wide(x17, cases, NOP)
 
         yield clear_wide(x17), free_wide(x17)
         return self.cpu.next()
 
+    @macrocode
     def _ecall_close(self) -> ToConvert:
         return self.memory.store(UDynamic.from_int(10), UDynamic.from_int(0, 4))
 
+    @macrocode
     def _ecall_lseek(self) -> ToConvert:
         return self.memory.store(UDynamic.from_int(10), UDynamic.from_int((1 << 32) - 29))
 
+    @macrocode
     def _ecall_exit(self) -> ToConvert:
         return clear_unit(self.cpu.exit)
 
+    @macrocode
     def _ecall_print(self) -> ToConvert:
         addr = Wide.from_length("addr", 4)
         counter = Wide.from_length("counter", 4)

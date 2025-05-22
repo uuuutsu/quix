@@ -13,7 +13,10 @@ __all__ = (
     "silence",
     "log",
     "get_root",
+    "Statable",
+    "statable",
 )
+
 
 from .case import pascal_case_to_snake_case, snake_case_to_pascal_case
 from .check import Arg, check
@@ -24,4 +27,5 @@ from .log import log
 from .math import intervals_intersects
 from .silence import silence
 from .singleton import SingletonMeta
+from .state import Statable, statable
 from .unique import generate_unique_id

@@ -2,8 +2,9 @@ from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.call_ge_unit_signed import call_ge_unit_signed
 from quix.bootstrap.program import ToConvert
+from quix.core.opcodes.base import CoreOpcode
 
 
 @macrocode
-def call_lt_unit_signed(left: Unit, right: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
+def call_lt_unit_signed(left: Unit, right: Unit, if_: CoreOpcode, else_: CoreOpcode) -> ToConvert:
     return call_ge_unit_signed(left, right, else_, if_)

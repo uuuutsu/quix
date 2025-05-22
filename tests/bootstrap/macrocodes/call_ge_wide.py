@@ -18,12 +18,8 @@ def test_call_ge_wide_if_eq() -> None:
         call_ge_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 
@@ -51,12 +47,8 @@ def test_call_ge_wide_if_gt() -> None:
         call_ge_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 
@@ -84,12 +76,8 @@ def test_call_ge_wide_else() -> None:
         call_ge_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 

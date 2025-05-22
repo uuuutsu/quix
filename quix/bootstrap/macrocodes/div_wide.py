@@ -4,6 +4,7 @@ from quix.bootstrap.dtypes import Wide
 from quix.bootstrap.dtypes.const import Cell, UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
 from quix.tools import Arg, check
 
@@ -108,13 +109,11 @@ def _div_wides_and_ints(
         if (left not in (remainder, quotient)) and isinstance(left, Wide):
             yield inc_wide(left)
 
-        def if_() -> ToConvert:
-            yield _move_wide(rem_buff, {right_wide: Cell.from_value(1)})
-            if quotient:
-                yield inc_wide(quotient)
-            return None
-
-        return call_z_wide(right_wide, if_(), [])
+        return call_z_wide(
+            right_wide,
+            _move_wide_inc_quot(rem_buff, right_wide, quotient),
+            NOP,
+        )
 
     yield loop_wide(left_buff, body())
     yield free_wide(left_buff)
@@ -134,6 +133,14 @@ def _div_wides_and_ints(
         yield clear_wide(rem_buff)
 
     return free_wide(rem_buff)
+
+
+@macrocode
+def _move_wide_inc_quot(rem_buff: Wide, right_wide: Wide, quot: Wide | None) -> ToConvert:
+    yield _move_wide(rem_buff, {right_wide: Cell.from_value(1)})
+    if quot:
+        yield inc_wide(quot)
+    return None
 
 
 @macrocode

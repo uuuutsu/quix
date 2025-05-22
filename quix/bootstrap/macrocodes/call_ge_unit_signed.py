@@ -1,7 +1,9 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import UCell
-from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
+from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 
@@ -14,21 +16,26 @@ from .sub_unit import sub_unit
 
 
 @macrocode
-def call_ge_unit_signed(left: Unit, right: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
+def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreOpcode, else_: CoreOpcode) -> ToConvert:
     lim = Unit("128")
     yield assign_unit(lim, UCell.from_value(128))
 
     same_msb = Unit("same_msb")
     left_pos = Unit("left_pos")
-    yield call_gt_unit(left, lim, [add(same_msb, 1)], [add(same_msb, -1), add(left_pos, 1)])
-    yield call_gt_unit(right, lim, [add(same_msb, -1)], [add(same_msb, 1)])
+    yield call_gt_unit(
+        left,
+        lim,
+        add(same_msb, 1),
+        from_program(add(same_msb, -1), add(left_pos, 1)),
+    )
+    yield call_gt_unit(right, lim, add(same_msb, -1), add(same_msb, 1))
 
     ge_flag = Unit("ge_flag")
     diff = Unit("diff")
     yield call_z_unit(
         same_msb,
-        [sub_unit(left, right, diff), call_le_unit(diff, lim, add(ge_flag, 1), [])],
-        call_z_unit(left_pos, [], [add(ge_flag, 1)]),
+        from_program(sub_unit(left, right, diff), call_le_unit(diff, lim, add(ge_flag, 1), NOP)),
+        call_z_unit(left_pos, NOP, add(ge_flag, 1)),
     )
 
     yield call_z_unit(ge_flag, else_, if_)

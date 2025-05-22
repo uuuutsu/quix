@@ -13,12 +13,8 @@ def test_call_z_wide_else() -> None:
         add(w1[1], 1),
         call_z_wide(
             w1,
-            [
-                add(u2, 1),
-            ],
-            [
-                add(u2, 2),
-            ],
+            add(u2, 1),
+            add(u2, 2),
         ),
     )
 
@@ -38,12 +34,8 @@ def test_call_z_wide_if() -> None:
         add(u2, 10),
         call_z_wide(
             w1,
-            [
-                add(u2, 1),
-            ],
-            [
-                add(u2, 2),
-            ],
+            add(u2, 1),
+            add(u2, 2),
         ),
     )
 

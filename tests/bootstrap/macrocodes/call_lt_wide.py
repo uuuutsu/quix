@@ -18,12 +18,8 @@ def test_call_lt_wide_if() -> None:
         call_lt_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 

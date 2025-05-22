@@ -1,6 +1,8 @@
 from quix.bootstrap.dtypes import Unit, Wide
-from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
+from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.opcodes import add
 from quix.memoptix.opcodes import free
 from quix.tools import Arg, check
@@ -13,7 +15,7 @@ from .call_z_unit import call_z_unit
 
 @macrocode
 @check(Arg("left").size == Arg("right").size)
-def call_ge_wide_signed(left: Wide, right: Wide, if_: ToConvert, else_: ToConvert) -> ToConvert:
+def call_ge_wide_signed(left: Wide, right: Wide, if_: CoreOpcode, else_: CoreOpcode) -> ToConvert:
     ge_flag = Unit(f"{left.name}_ge_{right.name}_flag")
     yield add(ge_flag, 1)
 
@@ -27,12 +29,12 @@ def call_ge_wide_signed(left: Wide, right: Wide, if_: ToConvert, else_: ToConver
             left[-1],
             right[-1],
             _recursive_call_ge_unit_flag(left.units[:-1], right.units[:-1], ge_flag),
-            [],
+            NOP,
         ),
-        [add(ge_flag, -1)],
+        add(ge_flag, -1),
     )
 
-    yield call_z_unit(ge_flag, else_, [add(ge_flag, -1), if_])
+    yield call_z_unit(ge_flag, else_, from_program(add(ge_flag, -1), if_))
     return free(ge_flag)
 
 
@@ -47,7 +49,7 @@ def _recursive_call_ge_unit_flag(left: tuple[Unit, ...], right: tuple[Unit, ...]
             left[-1],
             right[-1],
             _recursive_call_ge_unit_flag(left[:-1], right[:-1], ge_flag),
-            [],
+            NOP,
         ),
-        [add(ge_flag, -1)],
+        add(ge_flag, -1),
     )

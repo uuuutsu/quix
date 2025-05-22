@@ -1,12 +1,13 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.program import ToConvert
+from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.opcodes import add, inject
 from quix.memoptix.opcodes import free, soft_link
 
 
 @macrocode
-def call_z_unit(value: Unit, if_: ToConvert, else_: ToConvert) -> ToConvert:
+def call_z_unit(value: Unit, if_: CoreOpcode, else_: CoreOpcode) -> ToConvert:
     else_flag, zero = Unit(f"{value.name}_else_z_flag"), Unit(f"{value.name}_zero")
 
     yield soft_link(value, {else_flag: 1, zero: 2})

@@ -15,7 +15,7 @@ def loop_wide(value: Wide, program: ToConvert) -> ToConvert:
     yield add(buffer, 1)
 
     yield start_loop(buffer)
-    yield call_z_wide(value, [add(buffer, -1)], [add(new_buff, 1)], inline=True)
+    yield call_z_wide(value, add(buffer, -1), add(new_buff, 1), inline=True)
 
     yield start_loop(new_buff)
     yield program

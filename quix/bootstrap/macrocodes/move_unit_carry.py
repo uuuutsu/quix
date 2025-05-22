@@ -2,8 +2,9 @@ from collections.abc import Callable
 
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import Cell, UCell
-from quix.bootstrap.macrocode import macrocode
-from quix.bootstrap.program import SmartProgram, ToConvert, convert
+from quix.bootstrap.macrocode import MacroCode, macrocode
+from quix.bootstrap.macrocodes.nop import NOP
+from quix.bootstrap.program import ToConvert
 from quix.core.opcodes import add
 from quix.core.opcodes.opcodes import end_loop, start_loop
 from quix.memoptix.opcodes import free
@@ -24,7 +25,7 @@ def move_unit_carry(value: Unit, to: dict[Unit, Cell], carries: dict[Unit, tuple
         if value in carries.get(unit, ()):
             raise ValueError(f"Carry cannot reference origin: {value}")
 
-        func: Callable[[Unit, tuple[Unit, ...]], SmartProgram]
+        func: Callable[..., MacroCode]
         if to_add.value < 0:
             func = _recursive_carry_decrement
         else:
@@ -46,7 +47,7 @@ def move_unit_carry(value: Unit, to: dict[Unit, Cell], carries: dict[Unit, tuple
     return end_loop()
 
 
-@convert
+@macrocode
 def _recursive_carry_increment(
     owner: Unit,
     carry: tuple[Unit, ...],
@@ -55,10 +56,10 @@ def _recursive_carry_increment(
         return add(owner, 1)
 
     yield add(owner, 1)
-    return call_z_unit(owner, _recursive_carry_increment(carry[0], carry[1:]), [])
+    return call_z_unit(owner, _recursive_carry_increment(carry[0], carry[1:]), NOP)
 
 
-@convert
+@macrocode
 def _recursive_carry_decrement(
     owner: Unit,
     carry: tuple[Unit, ...],
@@ -66,5 +67,5 @@ def _recursive_carry_decrement(
     if not carry:
         return add(owner, -1)
 
-    yield call_z_unit(owner, _recursive_carry_decrement(carry[0], carry[1:]), [])
+    yield call_z_unit(owner, _recursive_carry_decrement(carry[0], carry[1:]), NOP)
     return add(owner, -1)

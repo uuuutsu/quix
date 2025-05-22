@@ -2,8 +2,9 @@ from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
-from quix.core.opcodes.opcodes import add
+from quix.core.opcodes.base import CoreOpcode
 from quix.memoptix.opcodes import free
 
 from .assign_wide import assign_wide
@@ -13,10 +14,11 @@ from .clear_unit import clear_unit
 from .clear_wide import clear_wide
 from .free_wide import free_wide
 from .sub_wide import sub_wide
+from .switch_unit import _execute_branch_and_set_else_flag
 
 
 @macrocode
-def switch_wide(value: Wide, branches: dict[UDynamic, ToConvert], else_: ToConvert) -> ToConvert:
+def switch_wide(value: Wide, branches: dict[UDynamic, CoreOpcode], else_: CoreOpcode) -> ToConvert:
     buff = Wide.from_length(f"{value.name}_buff", value.size)
     else_flag = Unit(f"{value.name}_else_flag")
 
@@ -26,7 +28,11 @@ def switch_wide(value: Wide, branches: dict[UDynamic, ToConvert], else_: ToConve
     last_val = UDynamic.from_int(0, value.size)
     for key in sorted_keys:
         yield sub_wide(buff, key - last_val, buff)
-        yield call_z_wide(buff, [branches[key], add(else_flag, 1)], [])
+        yield call_z_wide(
+            buff,
+            _execute_branch_and_set_else_flag(branches[key], else_flag),
+            NOP,
+        )
         last_val = key
 
     yield call_z_unit(else_flag, else_, clear_unit(else_flag))

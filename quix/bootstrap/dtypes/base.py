@@ -1,5 +1,7 @@
-from dataclasses import dataclass
-from typing import dataclass_transform
+from dataclasses import asdict, dataclass
+from typing import Any, Self, dataclass_transform
+
+from quix.tools import statable
 
 
 @dataclass_transform()
@@ -8,6 +10,7 @@ def dtype[C](cls: type[C]) -> type[C]:
 
 
 @dtype
+@statable
 class DType:
     name: str
 
@@ -16,3 +19,10 @@ class DType:
 
     def __hash__(self) -> int:
         raise NotImplementedError
+
+    def __store__(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def __load__(cls, data: dict[str, Any]) -> Self:
+        return cls(**data)

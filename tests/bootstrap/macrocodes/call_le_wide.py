@@ -18,12 +18,8 @@ def test_call_le_wide_if() -> None:
         call_le_wide(
             w1,
             w2,
-            [
-                add(u1, 1),
-            ],
-            [
-                add(u1, 2),
-            ],
+            add(u1, 1),
+            add(u1, 2),
         ),
     )
 

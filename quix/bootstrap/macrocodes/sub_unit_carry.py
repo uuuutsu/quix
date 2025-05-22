@@ -4,6 +4,7 @@ from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.call_z_unit import call_z_unit
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.copy_unit import copy_unit
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
 from quix.memoptix.opcodes import free
 
@@ -32,7 +33,7 @@ def _clear_target_and_sub_carry(value: Unit | UCell, target: Unit, carry: tuple[
     if isinstance(value, Unit) and (value == target):
         yield call_z_unit(
             value,
-            [],
+            NOP,
             else_=_recursive_carry_decrement(carry[0], carry[1:]),
         )
         return copy_unit(value, {target: Cell.from_value(-3)})
@@ -44,7 +45,7 @@ def _clear_target_and_sub_carry(value: Unit | UCell, target: Unit, carry: tuple[
     elif isinstance(value, Unit) and carry:
         yield call_z_unit(
             value,
-            [],
+            NOP,
             _recursive_carry_decrement(carry[0], carry[1:]),
         )
 

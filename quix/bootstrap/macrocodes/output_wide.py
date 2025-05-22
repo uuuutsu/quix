@@ -2,6 +2,7 @@ from math import ceil, log
 
 from quix.bootstrap.dtypes import Array, UDynamic, Unit, Wide
 from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, inject, output
 from quix.memoptix.opcodes import free
@@ -37,7 +38,7 @@ def output_wide(wide: Wide) -> ToConvert:
         yield div_wide(to_div, UDynamic.from_int(10, to_div.size), to_div, to_print)
         yield call_z_unit(
             to_print[0],
-            [],
+            NOP,
             store_array(output_arr, Wide("value", to_print[0:1]), Wide("index", (counter,))),
         )
         return add(counter, 1)
