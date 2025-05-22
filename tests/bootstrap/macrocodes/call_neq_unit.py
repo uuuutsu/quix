@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.macrocode import from_program
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes import call_neq_unit
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -54,12 +54,12 @@ def test_call_neq_unit_if_if() -> None:
         call_neq_unit(
             u2,
             u1,
-            from_program(
+            macrocode(
                 add(u1, 26),
                 call_neq_unit(
                     u1,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
@@ -84,16 +84,16 @@ def test_call_neq_unit_if_else() -> None:
         call_neq_unit(
             u1,
             u2,
-            from_program(
+            macrocode(
                 add(u1, 1),
                 call_neq_unit(
                     u2,
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 5),
                         add(u1, -1),
                     ),
@@ -116,21 +116,21 @@ def test_call_neq_unit_else_if() -> None:
         call_neq_unit(
             u1,
             u2,
-            from_program(
+            macrocode(
                 add(u1, 1),
                 add(u2, -1),
             ),
-            from_program(
+            macrocode(
                 add(u1, -2),
                 add(u2, 1),
                 call_neq_unit(
                     u1,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),
@@ -156,17 +156,17 @@ def test_call_neq_unit_else_else() -> None:
             u1,
             u2,
             add(u2, -1),
-            from_program(
+            macrocode(
                 add(u1, 2),
                 add(u2, 2),
                 call_neq_unit(
                     u2,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),

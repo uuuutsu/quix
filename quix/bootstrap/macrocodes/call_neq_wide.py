@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit, Wide
-from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.opcodes import add
@@ -16,7 +16,7 @@ def call_neq_wide(left: Wide, right: Wide, if_: CoreOpcode, else_: CoreOpcode) -
     neq_flag = Unit(f"{left.name}_neq_{right.name}_flag")
 
     yield _recursive_call_neq_unit_flag(left.units, right.units, neq_flag)
-    yield call_z_unit(neq_flag, else_, from_program(add(neq_flag, -1), if_))
+    yield call_z_unit(neq_flag, else_, macrocode(add(neq_flag, -1), if_))
     return free(neq_flag)
 
 

@@ -1,6 +1,6 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import UCell
-from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.base import CoreOpcode
@@ -26,7 +26,7 @@ def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreOpcode, else_: CoreOpc
         left,
         lim,
         add(same_msb, 1),
-        from_program(add(same_msb, -1), add(left_pos, 1)),
+        macrocode(add(same_msb, -1), add(left_pos, 1)),
     )
     yield call_gt_unit(right, lim, add(same_msb, -1), add(same_msb, 1))
 
@@ -34,7 +34,7 @@ def call_ge_unit_signed(left: Unit, right: Unit, if_: CoreOpcode, else_: CoreOpc
     diff = Unit("diff")
     yield call_z_unit(
         same_msb,
-        from_program(sub_unit(left, right, diff), call_le_unit(diff, lim, add(ge_flag, 1), NOP)),
+        macrocode(sub_unit(left, right, diff), call_le_unit(diff, lim, add(ge_flag, 1), NOP)),
         call_z_unit(left_pos, NOP, add(ge_flag, 1)),
     )
 

@@ -3,7 +3,7 @@ from typing import Any, Final, Self
 from quix.bootstrap.dtypes.const import UCell, UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
-from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes import (
     add_wide,
     and_unit,
@@ -331,7 +331,7 @@ class Compiler:
         yield call_ge_unit(
             rd[0],
             lim,
-            from_program(add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0])),
+            macrocode(add(rd[1], -1), add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0])),
             NOP,
         )
         yield clear_unit(lim), free(lim)
@@ -352,7 +352,7 @@ class Compiler:
         yield call_ge_unit(
             rd[1],
             lim,
-            from_program(add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0]), not_unit(rd[1], rd[1])),
+            macrocode(add(rd[2], -1), add(rd[3], -1), not_unit(rd[0], rd[0]), not_unit(rd[1], rd[1])),
             NOP,
         )
         yield clear_unit(lim), free(lim)

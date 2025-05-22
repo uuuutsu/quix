@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.macrocode import from_program
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes import call_ge_unit
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -73,12 +73,12 @@ def test_call_ge_unit_if_if() -> None:
         call_ge_unit(
             u2,
             u1,
-            from_program(
+            macrocode(
                 add(u1, 25),
                 call_ge_unit(
                     u1,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
@@ -103,16 +103,16 @@ def test_call_ge_unit_if_else() -> None:
         call_ge_unit(
             u1,
             u2,
-            from_program(
+            macrocode(
                 add(u1, -5),
                 call_ge_unit(
                     u1,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 5),
                         add(u1, -1),
                     ),
@@ -136,21 +136,21 @@ def test_call_ge_unit_else_if() -> None:
         call_ge_unit(
             u1,
             u2,
-            from_program(
+            macrocode(
                 add(u1, 1),
                 add(u2, -1),
             ),
-            from_program(
+            macrocode(
                 add(u1, -2),
                 add(u2, 1),
                 call_ge_unit(
                     u1,
                     u2,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),
@@ -175,17 +175,17 @@ def test_call_ge_unit_else_else() -> None:
             u1,
             u2,
             add(u2, -1),
-            from_program(
+            macrocode(
                 add(u1, 3),
                 add(u2, 1),
                 call_ge_unit(
                     u2,
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),

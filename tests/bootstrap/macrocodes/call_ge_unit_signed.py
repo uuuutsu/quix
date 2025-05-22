@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.macrocode import from_program
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes import call_ge_unit_signed
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -73,12 +73,12 @@ def test_call_ge_unit_signed_if_if() -> None:
         call_ge_unit_signed(
             u2,
             u1,
-            from_program(
+            macrocode(
                 add(u1, 125),
                 call_ge_unit_signed(
                     u2,
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),

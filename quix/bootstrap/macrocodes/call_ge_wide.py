@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes import Unit, Wide
-from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.nop import NOP
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.base import CoreOpcode
@@ -19,7 +19,7 @@ def call_ge_wide(left: Wide, right: Wide, if_: CoreOpcode, else_: CoreOpcode) ->
 
     yield add(ge_flag, 1)
     yield _recursive_call_ge_unit_flag(left.units, right.units, ge_flag)
-    yield call_z_unit(ge_flag, else_, from_program(add(ge_flag, -1), if_))
+    yield call_z_unit(ge_flag, else_, macrocode(add(ge_flag, -1), if_))
     return free(ge_flag)
 
 

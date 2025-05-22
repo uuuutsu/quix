@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable
 from functools import wraps
-from typing import ClassVar, cast
+from typing import ClassVar, cast, overload
 
 from quix.bootstrap.program import ToConvert, to_program
 from quix.core.interfaces.opcode import OpcodeFactory
@@ -18,29 +18,45 @@ class MacroCode(CoreOpcode):
         return type(self)._handler(**self.args())
 
 
-def macrocode[**P](func: Callable[P, ToConvert]) -> OpcodeFactory[P, MacroCode]:
-    new_opcode_cls = type(
-        snake_case_to_pascal_case(func.__name__),
-        (MacroCode,),
-        {"__id__": func.__name__, "_handler": func},
-    )
-    signature = inspect.signature(func)
+@overload
+def macrocode[**P](func: Callable[P, ToConvert]) -> OpcodeFactory[P, MacroCode]: ...
+@overload
+def macrocode(func: ToConvert, *other: ToConvert) -> MacroCode: ...
+@overload
+def macrocode(func: ToConvert, *other: ToConvert, name: str) -> MacroCode: ...
+def macrocode[**P](
+    func: Callable[P, ToConvert] | ToConvert, *other: ToConvert, name: str | None = None
+) -> OpcodeFactory[P, MacroCode] | MacroCode:
+    if (not callable(func)) or isinstance(func, MacroCode):
+        name = name or build_name()
 
-    @wraps(func)
+        def factory() -> ToConvert:
+            return to_program(func, *other)
+    else:
+        if other:
+            raise RuntimeError(f"Trying to cast unsupported set of arguments: {func} and {other} to macrocode.")
+
+        name = func.__name__
+        factory = func
+
+    new_opcode_cls = type(
+        snake_case_to_pascal_case(name),
+        (MacroCode,),
+        {"__id__": name, "_handler": factory},
+    )
+
+    if (not callable(func)) or isinstance(func, MacroCode):
+        return cast(MacroCode, new_opcode_cls({}))
+
+    signature = inspect.signature(factory)
+
+    @wraps(factory)
     def create(*args: P.args, **kwargs: P.kwargs) -> MacroCode:
         binded_signature = signature.bind(*args, **kwargs)
         binded_signature.apply_defaults()
         return cast(MacroCode, new_opcode_cls(binded_signature.arguments))
 
     return cast(OpcodeFactory[P, MacroCode], create)
-
-
-def from_program(*program: ToConvert) -> MacroCode:
-    def _my_code() -> ToConvert:
-        return to_program(program)
-
-    _my_code.__name__ = build_name()
-    return macrocode(_my_code)()
 
 
 def build_name() -> str:
@@ -52,7 +68,8 @@ def build_name() -> str:
         raise ValueError("Cannot identify calling frame to construct branch name")
 
     module = inspect.getmodule(caller_frame)
+    module_name = module.__name__ if module else "<unknown>"
     line_no = caller_frame.f_lineno
     func_name = caller_frame.f_code.co_name
 
-    return f"{module}:{func_name}:{line_no}"
+    return f"{module_name}:{func_name}:{line_no}"

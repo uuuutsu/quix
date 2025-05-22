@@ -76,7 +76,7 @@ def to_program(data: ToConvert, *include: ToConvert) -> SmartProgram:
                 program.extend(new.build())
             return SmartProgram(program)
         case _:
-            raise ValueError(f"Trying to cast an unsupported data to OpCodeReturn. {type(data).__name__}: {data}")
+            raise ValueError(f"Trying to cast an unsupported data type {type(data).__name__!r} to Program. {data}")
 
 
 def convert[**P, R: ToConvert](func: Callable[P, R]) -> Callable[P, SmartProgram]:

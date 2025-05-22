@@ -1,6 +1,6 @@
 from quix.bootstrap.dtypes import Unit
 from quix.bootstrap.dtypes.const import Cell
-from quix.bootstrap.macrocode import from_program, macrocode
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes.call_z_unit import call_z_unit
 from quix.bootstrap.macrocodes.clear_unit import clear_unit
 from quix.bootstrap.macrocodes.move_unit import move_unit
@@ -23,14 +23,14 @@ def call_ge_unit(left: Unit, right: Unit, if_: CoreOpcode, else_: CoreOpcode) ->
     yield add(right, 1)
     yield call_z_unit(
         left_buffer,
-        from_program(
+        macrocode(
             move_unit(
                 right_buffer,
                 {right: Cell.from_value(1)},
             ),
             add(else_flag, 1),
         ),
-        from_program(
+        macrocode(
             add(left_buffer, -1),
             add(left, 1),
         ),

@@ -1,5 +1,5 @@
 from quix.bootstrap.dtypes.unit import Unit
-from quix.bootstrap.macrocode import from_program
+from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.macrocodes import call_z_unit
 from quix.bootstrap.program import to_program
 from quix.core.opcodes.opcodes import add
@@ -46,11 +46,11 @@ def test_call_z_unit_if_if() -> None:
     program = to_program(
         call_z_unit(
             u1,
-            from_program(
+            macrocode(
                 add(u2, 1),
                 call_z_unit(
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
@@ -72,16 +72,16 @@ def test_call_z_unit_if_else() -> None:
     program = to_program(
         call_z_unit(
             u1,
-            from_program(
+            macrocode(
                 add(u2, 1),
                 add(u1, 1),
                 call_z_unit(
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 5),
                         add(u1, -1),
                     ),
@@ -104,15 +104,15 @@ def test_call_z_unit_else_if() -> None:
         call_z_unit(
             u1,
             add(u2, -1),
-            from_program(
+            macrocode(
                 add(u1, -1),
                 call_z_unit(
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),
@@ -135,15 +135,15 @@ def test_call_z_unit_else_else() -> None:
         call_z_unit(
             u1,
             add(u2, -1),
-            from_program(
+            macrocode(
                 add(u1, 2),
                 call_z_unit(
                     u1,
-                    from_program(
+                    macrocode(
                         add(u2, 10),
                         add(u1, 4),
                     ),
-                    from_program(
+                    macrocode(
                         add(u2, 3),
                         add(u1, -1),
                     ),
