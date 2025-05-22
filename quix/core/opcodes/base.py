@@ -3,17 +3,19 @@ from __future__ import annotations
 import inspect
 from collections.abc import Callable
 from functools import wraps
-from typing import Any, ClassVar, cast, override
+from typing import Any, ClassVar, Self, cast, override
 
 from rich.repr import Result, rich_repr
 
 from quix.core.interfaces import Opcode, OpcodeFactory
 from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
+from quix.tools.state import statable
 
 CoreOpcodes: dict[str, type[CoreOpcode]] = {}
 
 
 @rich_repr
+@statable
 class CoreOpcode(Opcode):
     __slots__ = ("_args",)
 
@@ -43,6 +45,13 @@ class CoreOpcode(Opcode):
 
     def __rich_repr__(self) -> Result:
         yield from self._args.items()
+
+    def __store__(self) -> dict[str, Any]:
+        return self._args
+
+    @classmethod
+    def __load__(cls, data: dict[str, Any]) -> Self:
+        return cls(data)
 
 
 def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
