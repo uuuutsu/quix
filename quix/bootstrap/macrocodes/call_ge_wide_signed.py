@@ -28,7 +28,7 @@ def call_ge_wide_signed(left: Wide, right: Wide, if_: CoreOpcode, else_: CoreOpc
         call_eq_unit(
             left[-1],
             right[-1],
-            _recursive_call_ge_unit_flag(left.units[:-1], right.units[:-1], ge_flag),
+            _recursive_call_ge_wide_signed_unit_flag(left.units[:-1], right.units[:-1], ge_flag),
             NOP,
         ),
         add(ge_flag, -1),
@@ -39,7 +39,9 @@ def call_ge_wide_signed(left: Wide, right: Wide, if_: CoreOpcode, else_: CoreOpc
 
 
 @macrocode
-def _recursive_call_ge_unit_flag(left: tuple[Unit, ...], right: tuple[Unit, ...], ge_flag: Unit) -> ToConvert:
+def _recursive_call_ge_wide_signed_unit_flag(
+    left: tuple[Unit, ...], right: tuple[Unit, ...], ge_flag: Unit
+) -> ToConvert:
     if (len(left) == 0) or (len(right) == 0):
         return None
     return call_ge_unit(
@@ -48,7 +50,7 @@ def _recursive_call_ge_unit_flag(left: tuple[Unit, ...], right: tuple[Unit, ...]
         call_eq_unit(
             left[-1],
             right[-1],
-            _recursive_call_ge_unit_flag(left[:-1], right[:-1], ge_flag),
+            _recursive_call_ge_wide_signed_unit_flag(left[:-1], right[:-1], ge_flag),
             NOP,
         ),
         add(ge_flag, -1),

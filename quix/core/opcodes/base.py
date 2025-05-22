@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 from collections.abc import Callable
 from functools import wraps
@@ -7,6 +9,8 @@ from rich.repr import Result, rich_repr
 
 from quix.core.interfaces import Opcode, OpcodeFactory
 from quix.tools import pascal_case_to_snake_case, snake_case_to_pascal_case
+
+CoreOpcodes: dict[str, type[CoreOpcode]] = {}
 
 
 @rich_repr
@@ -18,6 +22,9 @@ class CoreOpcode(Opcode):
     def __init_subclass__(cls) -> None:
         if not hasattr(cls, "__id__"):
             cls.__id__ = pascal_case_to_snake_case(cls.__name__)
+        if cls.__id__ in CoreOpcodes:
+            raise ValueError(f"CoreOpcode with __id__ {cls.__id__!r} already exists.")
+        CoreOpcodes[cls.__id__] = cls
 
     def __init__(self, args: dict[str, Any]) -> None:
         self._args = args

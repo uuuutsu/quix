@@ -8,11 +8,11 @@ __all__ = (
     "CoreProgram",
     "Value",
     "Code",
-    "CoreOpcodes",
     "start_loop",
     "end_loop",
+    "CoreOpcodes",
 )
 
-from .base import CoreOpcode
+from .base import CoreOpcode, CoreOpcodes
 from .dtypes import Code, CoreProgram, Ref, Value
-from .opcodes import CoreOpcodes, add, end_loop, inject, input, output, start_loop
+from .opcodes import add, end_loop, inject, input, output, start_loop

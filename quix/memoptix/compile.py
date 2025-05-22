@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from logging import warning
 from typing import Literal, overload
 
-from quix.core.opcodes import CoreOpcode, CoreOpcodes, CoreProgram, Ref
+from quix.core.opcodes import CoreOpcode, CoreProgram, Ref
 from quix.memoptix.scheduler import (
     Array,
     BaseConstraint,
@@ -81,7 +81,7 @@ def get_ref_scopes(
     length: int = 0
 
     for opcode in program:
-        if opcode.__id__ == CoreOpcodes.END_LOOP:
+        if opcode.__id__ == "end_loop":
             ref, idx = stack.pop()
             loops.append((idx, curr_opcode_idx))
         elif (ref := opcode.args().get("ref")) is None:
@@ -103,7 +103,7 @@ def get_ref_scopes(
         elif ref not in rough_usages:
             rough_usages[ref] = curr_opcode_idx, None
 
-        if opcode.__id__ == CoreOpcodes.START_LOOP:
+        if opcode.__id__ == "start_loop":
             stack.append((ref, curr_opcode_idx))
 
         curr_opcode_idx += 1
