@@ -1,7 +1,7 @@
 [project]
 dependencies = [
   "bidict>=0.23.1",
-  "mip>=1.15.0",
+  "mip==1.16rc0",
   "multimethod>=2.0",
   "numpy>=2.2.5",
   "pyelftools>=0.32",
@@ -10,7 +10,7 @@ dependencies = [
 description = "Add your description here"
 name = "quix"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 version = "0.1.0"
 
 [dependency-groups]
