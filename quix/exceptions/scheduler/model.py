@@ -1,7 +1,12 @@
-from quix.memoptix.scheduler.owner import Owner
-from quix.memoptixv2.scheduler.tree import Node
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .base import SchedulerException
+
+if TYPE_CHECKING:
+    from quix.memoptix.scheduler.owner import Owner
+    from quix.memoptixv2.scheduler.tree.node import Node
 
 
 class IndexIsNotYetResolvedError(SchedulerException):

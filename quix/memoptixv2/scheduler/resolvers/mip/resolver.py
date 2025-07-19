@@ -31,4 +31,4 @@ class MIPResolver(Resolver):
         match status:
             case OptimizationStatus.INFEASIBLE:
                 raise RuntimeError(f"{model!r} cannot be optimized.")
-        return Layout(root, model.get_mapping())
+        return Layout(model.get_mapping(), node=root)

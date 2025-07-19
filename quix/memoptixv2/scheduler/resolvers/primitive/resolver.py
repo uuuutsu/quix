@@ -42,4 +42,4 @@ class PrimitiveResolver(Resolver):
         for node_ in set(flatten_node(node).keys()).difference(mapping):
             mapping[node_] = 0
 
-        return Layout(node, mapping)
+        return Layout(mapping, node=node)
