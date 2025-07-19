@@ -53,7 +53,7 @@ def macrocode[**P](
 
     signature = inspect.signature(factory)
 
-    @wraps(factory)
+    @wraps(factory)  # type: ignore
     def create(*args: P.args, **kwargs: P.kwargs) -> MacroCode:
         binded_signature = signature.bind(*args, **kwargs)
         binded_signature.apply_defaults()

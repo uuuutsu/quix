@@ -117,13 +117,13 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
     def __iter__(self) -> Iterator[I]:
         return self.value.__iter__()
 
-    def __divmod__[C: _DynamicInt[I]](self: C, other: C | int) -> tuple[C, C]:
+    def __divmod__(self, other: _DynamicInt[I] | int) -> tuple[_DynamicInt[I], _DynamicInt[I]]:
         return self._op(other, lambda x, y: x // y), self._op(other, lambda x, y: x % y)
 
-    def __sub__[C: _DynamicInt[I]](self: C, other: C | int) -> C:
+    def __sub__(self, other: _DynamicInt[I] | int) -> _DynamicInt[I]:
         return self._op(other, lambda x, y: x - y)
 
-    def _op[C: _DynamicInt[I]](self: C, other: C | int, func: Callable[[int, int], int]) -> C:
+    def _op(self, other: _DynamicInt[I] | int, func: Callable[[int, int], int]) -> _DynamicInt[I]:
         if isinstance(other, int):
             new_value = func(int(self), other)
             return self.from_value(self.wrap(new_value))

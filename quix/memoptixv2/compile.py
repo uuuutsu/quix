@@ -105,6 +105,7 @@ def create_nodes(program: CoreProgram, scopes: RefScopes) -> Iterable[Node]:
     mapping: dict[Ref, Node] = {}
 
     def _get_scope(ref: Ref, parent: Ref) -> tuple[int, int]:
+        # TODO: Handle hidden reference's scopes correctly. Either here or in `get_ref_scopes`
         return scopes.get(ref, scopes[parent])
 
     for opcode in program:
