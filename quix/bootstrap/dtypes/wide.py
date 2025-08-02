@@ -38,3 +38,6 @@ class Wide(DType):
         for idx in range(length):
             units.append(Unit(f"{name}_{idx}"))
         return cls(name, tuple(units))
+
+    def __hash__(self) -> int:
+        return hash(self.units)

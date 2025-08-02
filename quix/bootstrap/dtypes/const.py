@@ -95,17 +95,26 @@ class _Int(Const[int]):
     def wrap(cls, value: int) -> int:
         return _wrap(value, cls._MIN, cls._MAX)
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 
 @dtype
 class UCell(_Int):
     _MIN: ClassVar[int] = 0
     _MAX: ClassVar[int] = (1 << CELL_SIZE) - 1
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 
 @dtype
 class Cell(_Int):
     _MIN: ClassVar[int] = -(1 << CELL_SIZE - 1)
     _MAX: ClassVar[int] = (1 << CELL_SIZE - 1) - 1
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
 @dtype
@@ -117,13 +126,13 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
     def __iter__(self) -> Iterator[I]:
         return self.value.__iter__()
 
-    def __divmod__(self, other: _DynamicInt[I] | int) -> tuple[_DynamicInt[I], _DynamicInt[I]]:
+    def __divmod__(self, other: Self | int) -> tuple[Self, Self]:
         return self._op(other, lambda x, y: x // y), self._op(other, lambda x, y: x % y)
 
-    def __sub__(self, other: _DynamicInt[I] | int) -> _DynamicInt[I]:
+    def __sub__(self, other: Self | int) -> Self:
         return self._op(other, lambda x, y: x - y)
 
-    def _op(self, other: _DynamicInt[I] | int, func: Callable[[int, int], int]) -> _DynamicInt[I]:
+    def _op(self, other: Self | int, func: Callable[[int, int], int]) -> Self:
         if isinstance(other, int):
             new_value = func(int(self), other)
             return self.from_value(self.wrap(new_value))
@@ -168,9 +177,14 @@ class _DynamicInt[I: _Int](Const[tuple[I, ...]]):
         ints_ = tuple(int_cls.from_value(val) for val in value)
         return cls.from_value(ints_)
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 
 @dtype
-class UDynamic(_DynamicInt[UCell]): ...
+class UDynamic(_DynamicInt[UCell]):
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
 @dtype

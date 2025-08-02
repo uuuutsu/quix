@@ -29,8 +29,8 @@ class Section(BaseSection):
     start: int
     end: int
 
-    def decode(self, instr: int) -> int:
-        return get_bit_section(instr, self.start, self.end)
+    def decode(self, instruction: int) -> int:
+        return get_bit_section(instruction, self.start, self.end)
 
 
 @dataclass(slots=True)

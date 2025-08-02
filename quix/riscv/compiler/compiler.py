@@ -434,7 +434,7 @@ class Compiler:
 
     def ecall(self, imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
         cases: dict[UDynamic, CoreOpcode] = {
-            UDynamic.from_int(62, 1): self._ecall_lseek(),
+            UDynamic.from_int(62, 1): self._ecall_lseek(),  #
             UDynamic.from_int(64, 1): self._ecall_print(),
             UDynamic.from_int(57, 1): self._ecall_close(),
             UDynamic.from_int(93, 1): self._ecall_exit(),

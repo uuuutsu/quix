@@ -21,9 +21,9 @@ class Model:
     def add_var(
         self,
         owner: Owner | None,
-        lb: mip.numbers.Real = 0.0,
-        ub: mip.numbers.Real = mip.INF,
-        obj: mip.numbers.Real = 0.0,
+        lb: mip.numbers.Real = 0.0,  # type: ignore
+        ub: mip.numbers.Real = mip.INF,  # type: ignore
+        obj: mip.numbers.Real = 0.0,  # type: ignore
         var_type: str = mip.INTEGER,
         column: mip.Column | None = None,
     ) -> mip.Var:
@@ -35,7 +35,7 @@ class Model:
             ub=ub,
             obj=obj,
             var_type=var_type,
-            column=column,
+            column=column,  # type: ignore
         )
 
     def add_constr(
@@ -55,10 +55,10 @@ class Model:
 
     def optimize(
         self,
-        max_seconds: mip.numbers.Real = mip.INF,
+        max_seconds: mip.numbers.Real = mip.INF,  # type: ignore
         max_nodes: int = mip.INT_MAX,
         max_solutions: int = mip.INT_MAX,
-        max_seconds_same_incumbent: mip.numbers.Real = mip.INF,
+        max_seconds_same_incumbent: mip.numbers.Real = mip.INF,  # type: ignore
         max_nodes_same_incumbent: int = mip.INT_MAX,
         relax: bool = False,
         verbose: int = 0,
@@ -95,6 +95,6 @@ class Model:
             index = self.get_var_by_owner(owner)
             if index.x is None:
                 raise IndexIsNotYetResolvedError(owner)
-            indexes[owner] = int(index.x)
+            indexes[owner] = int(index.x)  # type: ignore
 
         return indexes

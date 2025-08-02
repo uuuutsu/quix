@@ -6,7 +6,7 @@ from quix.tools import statable
 
 @dataclass_transform()
 def dtype[C](cls: type[C]) -> type[C]:
-    return dataclass(slots=True, frozen=True)(cls)
+    return dataclass(frozen=True)(cls)
 
 
 @dtype

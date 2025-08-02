@@ -13,17 +13,17 @@ from quix.memoptix import mem_compile
 
 def run_with_output(code: ToConvert) -> str:
     core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
-    code = _compile_to_bf(core_program, mapping)
+    code_str = _compile_to_bf(core_program, mapping)
     output = StringIO()
-    Executor(code, output=output).run()
+    Executor(code_str, output=output).run()
     return output.getvalue()
 
 
 def run_with_tape(code: ToConvert) -> tuple[dict[Ref, int], list[int]]:
     core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
-    code = _compile_to_bf(core_program, mapping)
+    code_str = _compile_to_bf(core_program, mapping)
 
-    executor = Executor(code).run()
+    executor = Executor(code_str).run()
     memory = executor.memory.cells
 
     return mapping, memory
@@ -31,9 +31,9 @@ def run_with_tape(code: ToConvert) -> tuple[dict[Ref, int], list[int]]:
 
 def run(code: ToConvert) -> dict[Ref, int]:
     core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
-    code = _compile_to_bf(core_program, mapping)
-    # print(code, len(code))
-    executor = Executor(code).run()
+    code_str = _compile_to_bf(core_program, mapping)
+
+    executor = Executor(code_str).run()
     memory = executor.memory.cells
     values = {ref: memory[idx] for ref, idx in mapping.items()}
 

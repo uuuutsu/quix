@@ -85,12 +85,12 @@ def _soft_links(soft_links: dict[Owner, list[SoftLink]], model: Model) -> None:
         for constr in constrs:
             factor_var = model.add_var(
                 None,
-                lb=1,
+                lb=1.0,  # type: ignore
             )
 
             for to_, scale in constr.to_.items():
                 model.add_constr(
-                    (model.get_var_by_owner(owner) - model.get_var_by_owner(to_)) == (factor_var * scale),
+                    (model.get_var_by_owner(owner) - model.get_var_by_owner(to_)) == (factor_var * scale),  # type: ignore
                 )
 
 
@@ -105,13 +105,13 @@ def _do_not_intersect_array_expression(
     sec_cond_abs = model.add_var(None)
     sec_cond_neg = model.add_var(None)
 
-    model.add_constr((fir_cond_abs - fir_cond_neg) == (right - anchor - length + 2))
-    model.add_constr((sec_cond_abs - sec_cond_neg) == (anchor - right + 1))
+    model.add_constr((fir_cond_abs - fir_cond_neg) == (right - anchor - length + 2))  # type: ignore
+    model.add_constr((sec_cond_abs - sec_cond_neg) == (anchor - right + 1))  # type: ignore
 
-    model.add_sos([(fir_cond_abs, 1), (fir_cond_neg, 1)], 1)
-    model.add_sos([(sec_cond_abs, 1), (sec_cond_neg, 1)], 1)
+    model.add_sos([(fir_cond_abs, 1), (fir_cond_neg, 1)], 1)  # type: ignore
+    model.add_sos([(sec_cond_abs, 1), (sec_cond_neg, 1)], 1)  # type: ignore
 
-    model.add_constr(fir_cond_abs + sec_cond_abs >= 2)
+    model.add_constr(fir_cond_abs + sec_cond_abs >= 2)  # type: ignore
 
 
 def _do_not_intersect_unit_expression(left: mip.Var, right: mip.Var, model: Model) -> None:
@@ -119,5 +119,5 @@ def _do_not_intersect_unit_expression(left: mip.Var, right: mip.Var, model: Mode
     abs_neg = model.add_var(None)
 
     model.add_constr((left - right) == (abs_pos - abs_neg))
-    model.add_sos([(abs_pos, 1), (abs_neg, 1)], 1)
-    model.add_constr(abs_pos + abs_neg >= 1)
+    model.add_sos([(abs_pos, 1), (abs_neg, 1)], 1)  # type: ignore
+    model.add_constr(abs_pos + abs_neg >= 1)  # type: ignore
