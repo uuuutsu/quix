@@ -6,9 +6,9 @@ type Domain = set[type[BaseConstraint]]
 type ConstraintMapper = dict[type[BaseConstraint], dict[Node, list[BaseConstraint]]]
 
 
-def get_domain(node: Node) -> set[type[BaseConstraint]]:
+def get_domain(*nodes: Node) -> set[type[BaseConstraint]]:
     constraint_types = set()
-    for constrs in flatten_node(node).values():
+    for constrs in flatten_node(*nodes).values():
         for constr in constrs:
             constraint_types.add(type(constr))
     return constraint_types

@@ -18,17 +18,18 @@ class MIPResolver(Resolver):
     @override
     def __call__(self, root: Node) -> Layout:
         model = Model()
+        nodes = list(flatten_node(root))
 
-        for node in flatten_node(root):
+        for node in nodes:
             model.add_var(node)
         mappers = get_constraint_groups(root)
 
         expr_index(mappers.get(Index, {}), model)  # type: ignore
-        expr_lifecycle(mappers.get(Array, {}), model)  # type: ignore
+        expr_lifecycle(nodes, mappers.get(Array, {}), model)  # type: ignore
         expr_links(mappers.get(HardLink, {}), mappers.get(SoftLink, {}), model)  # type: ignore
 
         status = model.optimize()
         match status:
             case OptimizationStatus.INFEASIBLE:
                 raise RuntimeError(f"{model!r} cannot be optimized.")
-        return Layout(model.get_mapping(), node=root)
+        return Layout(model.get_mapping(), [root])

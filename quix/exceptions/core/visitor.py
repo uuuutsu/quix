@@ -9,6 +9,6 @@ class VisitorException(CoreException): ...
 
 
 class NoHandlerFoundException(VisitorException):
-    def __init__[O: Opcode](self, opcode: O, visitor: Any) -> None:
+    def __init__(self, opcode: Opcode, visitor: Any) -> None:
         self.opcode = opcode
         super().__init__(f"No handler found in {visitor} for opcode {opcode}.")

@@ -18,11 +18,11 @@ __all__ = (
     "get_domain",
     "get_constraint_groups",
     "flatten_node",
+    "Scheduler",
 )
-
-
 from .layout import Layout
 from .resolvers import MIPResolver, PrimitiveResolver, Resolver, ResolverRegistry, create_resolver_registry
+from .scheduler import Scheduler
 from .sliders import SimpleSlider, Slider, SliderRegistry, create_slider_registry
 from .tree import (
     Array,
