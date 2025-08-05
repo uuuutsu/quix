@@ -18,7 +18,7 @@ class SliderRegistry:
 
     def __call__(self, left: Layout, right: Layout) -> Layout:
         domains = [slider.__domain__ for slider in self._sliders]
-        match = self._matcher(get_domain(*left.nodes) | get_domain(*right.nodes), domains)
+        match = self._matcher(get_domain(*left.roots) | get_domain(*right.roots), domains)
 
         if match is None:
             raise RuntimeError(f"No slider found to handle: {left} + {right}")

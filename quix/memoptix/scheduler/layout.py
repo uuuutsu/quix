@@ -8,11 +8,11 @@ from quix.memoptix.scheduler.tree import Node
 class Layout:
     __slots__ = (
         "_mapping",
-        "nodes",
+        "roots",
     )
 
-    def __init__(self, mapping: dict[Node, int], nodes: list[Node]) -> None:
-        self.nodes = nodes
+    def __init__(self, mapping: dict[Node, int], roots: list[Node]) -> None:
+        self.roots = roots
         self._mapping: dict[Node, int] = mapping
 
     def mapping(self) -> dict[Node, int]:

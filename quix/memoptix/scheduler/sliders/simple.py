@@ -63,13 +63,13 @@ class SimpleSlider(Slider):
     __domain__ = {Index, SoftLink, HardLink, Array}
 
     def __call__(self, left: Layout, right: Layout) -> Layout:
-        left_nodes = list(flatten_node(*left.nodes).keys())
-        right_nodes = list(flatten_node(*right.nodes).keys())
+        left_nodes = list(flatten_node(*left.roots).keys())
+        right_nodes = list(flatten_node(*right.roots).keys())
         if set(left_nodes).intersection(set(right_nodes)):
             raise RuntimeError("Trees can't reference same node.")
 
-        left_constrs = get_constraint_groups(*left.nodes)
-        right_constrs = get_constraint_groups(*right.nodes)
+        left_constrs = get_constraint_groups(*left.roots)
+        right_constrs = get_constraint_groups(*right.roots)
         if not left_constrs.get(Index, {}):
             left_constrs, right_constrs = right_constrs, left_constrs
             left, right = right, left
@@ -90,7 +90,7 @@ class SimpleSlider(Slider):
                 raise RuntimeError(
                     f"Layouts {left} and {right} cannot be combined due to coliding lifecycles on enforced indexes."
                 )
-            return Layout(root_mapping | sliding_mapping, left.nodes + right.nodes)
+            return Layout(root_mapping | sliding_mapping, left.roots + right.roots)
 
         offset: int = 0
         while True:
@@ -99,4 +99,4 @@ class SimpleSlider(Slider):
             if new_offset != 0:
                 offset += new_offset
                 continue
-            return Layout(root_mapping | sliding_mapping, left.nodes + right.nodes)
+            return Layout(root_mapping | sliding_mapping, left.roots + right.roots)
