@@ -1,9 +1,9 @@
 from typing import override
 
-from quix.memoptixv2.scheduler.layout import Layout
-from quix.memoptixv2.scheduler.resolvers.base import Resolver
-from quix.memoptixv2.scheduler.tree import Array, Index, Node
-from quix.memoptixv2.scheduler.tree.flatten import flatten_node
+from quix.memoptix.scheduler.layout import Layout
+from quix.memoptix.scheduler.resolvers.base import Resolver
+from quix.memoptix.scheduler.tree import Array, Index, Node
+from quix.memoptix.scheduler.tree.flatten import flatten_node
 from quix.tools import intervals_intersects
 
 from .utils import extract_constraint_info, get_all_affected_nodes, order_ascend_with_array_in_the_back

@@ -1,6 +1,6 @@
-from quix.memoptixv2.scheduler.tree import Node
-from quix.memoptixv2.scheduler.tree.constraints import Array, Index
-from quix.memoptixv2.scheduler.tree.flatten import flatten_node
+from quix.memoptix.scheduler.tree import Node
+from quix.memoptix.scheduler.tree.constraints import Array, Index
+from quix.memoptix.scheduler.tree.flatten import flatten_node
 
 
 def extract_constraint_info(
@@ -12,14 +12,15 @@ def extract_constraint_info(
     indexes: dict[Node, int] = {}
     arrays: dict[Node, int] = {}
 
-    for node, constr in flatten_node(root).items():
-        match constr:
-            case Index():
-                indexes[node] = constr.index
-            case Array():
-                arrays[node] = constr.length
-            case _:
-                raise RuntimeError(f"Unknown constraint: {constr}")
+    for node, constrs in flatten_node(root).items():
+        for constr in constrs:
+            match constr:
+                case Index():
+                    indexes[node] = constr.index
+                case Array():
+                    arrays[node] = constr.length
+                case _:
+                    raise RuntimeError(f"Unknown constraint: {constr}")
 
     return indexes, arrays
 

@@ -1,4 +1,5 @@
 from quix.memoptix.scheduler.layout import Layout
+from quix.memoptix.scheduler.tree import get_domain
 from quix.memoptix.scheduler.utils import Matcher, inclusion_matcher
 
 from .base import Slider
@@ -17,7 +18,7 @@ class SliderRegistry:
 
     def __call__(self, left: Layout, right: Layout) -> Layout:
         domains = [slider.__domain__ for slider in self._sliders]
-        match = self._matcher(left.blueprint.domain | right.blueprint.domain, domains)
+        match = self._matcher(get_domain(*left.nodes) | get_domain(*right.nodes), domains)
 
         if match is None:
             raise RuntimeError(f"No slider found to handle: {left} + {right}")

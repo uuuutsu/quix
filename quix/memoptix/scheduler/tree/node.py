@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Self, overload
 
 from rich.repr import Result, rich_repr
 
@@ -8,7 +8,7 @@ from quix.core.opcodes.dtypes import Ref
 from quix.tools.unique import generate_unique_id
 
 if TYPE_CHECKING:
-    from quix.memoptixv2.scheduler.tree.constraints import BaseConstraint
+    from quix.memoptix.scheduler.tree.constraints import BaseConstraint
 
 
 @rich_repr
@@ -25,6 +25,14 @@ class Node:
         self.ref = ref or generate_unique_id()
         self.constraints: list[BaseConstraint] = []
         self.lifecycle = lifecycle
+
+    def add_constraint(self, constraint: BaseConstraint) -> Self:
+        for node in constraint.get_nodes():
+            if node is self:
+                raise RuntimeError(f"Self reference detected: {constraint}")
+
+        self.constraints.append(constraint)
+        return self
 
     def __hash__(self) -> int:
         return hash(self.ref)

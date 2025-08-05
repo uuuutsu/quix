@@ -1,16 +1,17 @@
 from abc import abstractmethod
 from typing import ClassVar, Protocol
 
-from quix.memoptix.scheduler.blueprint import Blueprint
-from quix.memoptix.scheduler.constraints import BaseConstraint
 from quix.memoptix.scheduler.layout import Layout
+from quix.memoptix.scheduler.tree import Node
+
+from .types import Domain
 
 
 class Resolver(Protocol):
     __slots__ = ()
 
-    __domain__: ClassVar[set[type[BaseConstraint]]]
+    __domain__: ClassVar[Domain]
 
     @abstractmethod
-    def __call__(self, blueprint: Blueprint) -> Layout:
+    def __call__(self, node: Node) -> Layout:
         raise NotImplementedError

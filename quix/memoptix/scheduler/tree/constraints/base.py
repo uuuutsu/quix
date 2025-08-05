@@ -4,7 +4,7 @@ from typing import Any, Self
 
 from rich.repr import Result, rich_repr
 
-from quix.memoptixv2.scheduler.tree.node import Node
+from quix.memoptix.scheduler.tree.node import Node
 from quix.tools.state import statable
 
 

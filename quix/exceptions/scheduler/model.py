@@ -5,18 +5,7 @@ from typing import TYPE_CHECKING
 from .base import SchedulerException
 
 if TYPE_CHECKING:
-    from quix.memoptix.scheduler.owner import Owner
-    from quix.memoptixv2.scheduler.tree.node import Node
-
-
-class IndexIsNotYetResolvedError(SchedulerException):
-    def __init__(self, owner: Owner) -> None:
-        super().__init__(f"Index of {owner} has not yet been resolved by the model.")
-
-
-class UnknownOwnerException(SchedulerException):
-    def __init__(self, owner: Owner) -> None:
-        super().__init__(f"Owner {owner} has not yet been registered in the model.")
+    from quix.memoptix.scheduler.tree.node import Node
 
 
 class UnknownNodeException(SchedulerException):

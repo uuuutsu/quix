@@ -1,14 +1,15 @@
 __all__ = (
-    "free",
+    "program_to_trees",
+    "get_ref_scopes",
+    "schedule",
+    "MemoptixOpcodes",
     "array",
+    "hard_link",
     "index",
     "soft_link",
-    "hard_link",
-    "MemoptixOpcodes",
-    #
-    "mem_compile",
-    "get_ref_scopes",
+    "free",
 )
 
-from .compile import get_ref_scopes, mem_compile
+from .compile import get_ref_scopes, program_to_trees
 from .opcodes import MemoptixOpcodes, array, free, hard_link, index, soft_link
+from .schedule import schedule

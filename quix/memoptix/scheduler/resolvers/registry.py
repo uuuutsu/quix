@@ -1,5 +1,5 @@
-from quix.memoptix.scheduler.blueprint import Blueprint
 from quix.memoptix.scheduler.layout import Layout
+from quix.memoptix.scheduler.tree import Node, get_domain
 from quix.memoptix.scheduler.utils import Matcher, inclusion_matcher
 
 from .base import Resolver
@@ -17,14 +17,15 @@ class ResolverRegistry:
         self._matcher = matcher
         self._resolvers: list[Resolver] = []
 
-    def __call__(self, blueprint: Blueprint) -> Layout:
+    def __call__(self, root: Node) -> Layout:
         domains = [resolver.__domain__ for resolver in self._resolvers]
-        match = self._matcher(blueprint.domain, domains)
+        root_domain = get_domain(root)
+        match = self._matcher(root_domain, domains)
 
         if match is None:
-            raise RuntimeError(f"No resolver was found to handle: {blueprint.domain}")
+            raise RuntimeError(f"No resolver was found to handle: {root_domain}")
 
-        return self._resolvers[match](blueprint)
+        return self._resolvers[match](root)
 
     def register(self, resolver: Resolver) -> None:
         self._resolvers.append(resolver)

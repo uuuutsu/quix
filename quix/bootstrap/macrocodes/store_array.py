@@ -7,6 +7,7 @@ from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, inject, start_loop
 
 
+# TODO: optimize storing by constant value `[-]++++[>+<-]`
 @macrocode
 def store_array(array: Array, to_store: Wide | UDynamic, index: Wide | UDynamic) -> ToConvert:
     if isinstance(index, UDynamic):

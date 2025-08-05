@@ -1,21 +1,21 @@
+from __future__ import annotations
+
 from rich.pretty import pretty_repr
 
-from quix.memoptix.scheduler.blueprint import Blueprint
-
-from .owner import Owner
+from quix.memoptix.scheduler.tree import Node
 
 
 class Layout:
     __slots__ = (
         "_mapping",
-        "blueprint",
+        "nodes",
     )
 
-    def __init__(self, blueprint: Blueprint, mapping: dict[Owner, int]) -> None:
-        self.blueprint = blueprint
-        self._mapping: dict[Owner, int] = mapping
+    def __init__(self, mapping: dict[Node, int], nodes: list[Node]) -> None:
+        self.nodes = nodes
+        self._mapping: dict[Node, int] = mapping
 
-    def mapping(self) -> dict[Owner, int]:
+    def mapping(self) -> dict[Node, int]:
         return self._mapping
 
     def __repr__(self) -> str:

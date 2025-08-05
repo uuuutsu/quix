@@ -8,11 +8,11 @@ from quix.core.compiler.pointer import BFPointer
 from quix.core.compiler.visitor import BFVisitor
 from quix.core.opcodes.dtypes import CoreProgram, Ref
 from quix.exec.simple import Executor
-from quix.memoptix import mem_compile
+from quix.memoptix.schedule import schedule
 
 
 def run_with_output(code: ToConvert) -> str:
-    core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
+    core_program, mapping = schedule(_to_program(code), garbage_collector=False)
     code_str = _compile_to_bf(core_program, mapping)
     output = StringIO()
     Executor(code_str, output=output).run()
@@ -20,7 +20,7 @@ def run_with_output(code: ToConvert) -> str:
 
 
 def run_with_tape(code: ToConvert) -> tuple[dict[Ref, int], list[int]]:
-    core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
+    core_program, mapping = schedule(_to_program(code), garbage_collector=False)
     code_str = _compile_to_bf(core_program, mapping)
 
     executor = Executor(code_str).run()
@@ -30,7 +30,7 @@ def run_with_tape(code: ToConvert) -> tuple[dict[Ref, int], list[int]]:
 
 
 def run(code: ToConvert) -> dict[Ref, int]:
-    core_program, mapping = mem_compile(_to_program(code), garbage_collector=False)
+    core_program, mapping = schedule(_to_program(code), garbage_collector=False)
     code_str = _compile_to_bf(core_program, mapping)
 
     executor = Executor(code_str).run()

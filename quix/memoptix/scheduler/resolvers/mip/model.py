@@ -2,38 +2,38 @@ from __future__ import annotations
 
 import mip  # type: ignore
 
-from quix.exceptions.scheduler import IndexIsNotYetResolvedError, UnknownOwnerException
-from quix.memoptix.scheduler.owner import Owner
+from quix.exceptions.scheduler import NodeIndexIsNotYetResolvedError, UnknownNodeException
+from quix.memoptix.scheduler.tree import Node
 from quix.tools import silence
 
 
-def owner_to_str_key(owner: Owner) -> str:
-    return str(hash(owner))
+def node_to_str_key(node: Node) -> str:
+    return str(hash(node))
 
 
 class Model:
-    __slots__ = ("_mip_model", "_owners")
+    __slots__ = ("_mip_model", "_nodes")
 
     def __init__(self) -> None:
         self._mip_model = mip.Model()
-        self._owners: list[Owner] = []
+        self._nodes: list[Node] = []
 
     def add_var(
         self,
-        owner: Owner | None,
-        lb: mip.numbers.Real = 0.0,  # type: ignore
-        ub: mip.numbers.Real = mip.INF,  # type: ignore
-        obj: mip.numbers.Real = 0.0,  # type: ignore
+        node: Node | None,
+        lb: float = 0.0,
+        ub: float = float("inf"),
+        obj: float = 0.0,
         var_type: str = mip.INTEGER,
         column: mip.Column | None = None,
     ) -> mip.Var:
-        if owner:
-            self._owners.append(owner)
+        if node:
+            self._nodes.append(node)
         return self._mip_model.add_var(
-            "" if owner is None else owner_to_str_key(owner),
-            lb=lb,
-            ub=ub,
-            obj=obj,
+            "" if node is None else node_to_str_key(node),
+            lb=lb,  # type: ignore
+            ub=ub,  # type: ignore
+            obj=obj,  # type: ignore
             var_type=var_type,
             column=column,  # type: ignore
         )
@@ -83,18 +83,18 @@ class Model:
             relax=relax,
         )
 
-    def get_var_by_owner(self, owner: Owner) -> mip.Var:
-        var = self._mip_model.var_by_name(owner_to_str_key(owner))
+    def get_var_by_node(self, node: Node) -> mip.Var:
+        var = self._mip_model.var_by_name(node_to_str_key(node))
         if var is None:
-            raise UnknownOwnerException(owner)
+            raise UnknownNodeException(node)
         return var
 
-    def get_mapping(self) -> dict[Owner, int]:
+    def get_mapping(self) -> dict[Node, int]:
         indexes = {}
-        for owner in self._owners:
-            index = self.get_var_by_owner(owner)
+        for node in self._nodes:
+            index = self.get_var_by_node(node)
             if index.x is None:
-                raise IndexIsNotYetResolvedError(owner)
-            indexes[owner] = int(index.x)  # type: ignore
+                raise NodeIndexIsNotYetResolvedError(node)
+            indexes[node] = int(index.x)  # type: ignore
 
         return indexes

@@ -1,21 +1,9 @@
 import math
 from collections.abc import Callable
 
-from quix.memoptix.scheduler.blueprint import Blueprint
-from quix.memoptix.scheduler.constraints import BaseConstraint
-from quix.memoptix.scheduler.owner import Owner
+from quix.memoptix.scheduler.tree import Domain
 
-type ConstraintMapper = dict[type[BaseConstraint], dict[Owner, list[BaseConstraint]]]
-type Domain = set[type[BaseConstraint]]
 type Matcher = Callable[[Domain, list[Domain]], int | None]
-
-
-def get_constraint_mappers(blueprint: Blueprint) -> ConstraintMapper:
-    mappers: ConstraintMapper = {}
-
-    for owner, constr in blueprint.iter_constr():
-        mappers.setdefault(type(constr), {}).setdefault(owner, []).append(constr)
-    return mappers
 
 
 def inclusion_matcher(to_match: Domain, registry: list[Domain]) -> int | None:

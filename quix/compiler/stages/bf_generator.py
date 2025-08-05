@@ -7,7 +7,7 @@ from quix.core.compiler.visitor import BFVisitor
 from quix.core.interfaces.writable import Writable
 
 from .base import Stage
-from .mem_compile import Blueprint
+from .scheduler import Blueprint
 
 
 @dataclass(slots=True)

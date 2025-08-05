@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from quix.memoptix.scheduler.owner import Owner
+from quix.memoptix.scheduler.tree.node import Node
 
 from .base import BaseConstraint
 
@@ -9,5 +9,5 @@ from .base import BaseConstraint
 class Array(BaseConstraint):
     length: int
 
-    def get_owners(self) -> set[Owner]:
+    def get_nodes(self) -> set[Node]:
         return set()

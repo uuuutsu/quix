@@ -1,15 +1,18 @@
 from dataclasses import dataclass
 from typing import override
 
-from quix.memoptixv2.scheduler.tree.node import Node
+from quix.memoptix.scheduler.tree.node import Node
 
 from .base import BaseConstraint
 
 
 @dataclass(slots=True, frozen=True)
-class SoftLink(BaseConstraint):
-    to_: dict[Node, int]
+class HardLink(BaseConstraint):
+    to_: Node
+    distance: int
 
     @override
     def get_nodes(self) -> set[Node]:
-        return set(self.to_.keys())
+        return {
+            self.to_,
+        }

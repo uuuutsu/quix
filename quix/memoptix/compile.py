@@ -2,39 +2,20 @@ from collections.abc import Iterable
 from logging import warning
 from typing import Literal, overload
 
-from quix.core.opcodes import CoreOpcode, CoreProgram, Ref
-from quix.memoptix.scheduler import (
-    Array,
-    BaseConstraint,
-    Blueprint,
-    HardLink,
-    Index,
-    LifeCycle,
-    Owner,
-    Scheduler,
-    SoftLink,
-    create_resolver_registry,
-    create_slider_registry,
-)
+from quix.core.opcodes.dtypes import CoreProgram, Ref
+from quix.memoptix.opcodes import MemoptixOpcodes
+from quix.memoptix.scheduler.tree import Array, HardLink, Index, Node, SoftLink, create_node
 
-from .opcodes import MemoptixOpcodes
 from .utils import find_optimal_usage_scope
 
+type RefScopes = dict[Ref, tuple[int, int]]
 
-def mem_compile(program: CoreProgram, garbage_collector: bool = True) -> tuple[CoreProgram, dict[Ref, int]]:
+
+def program_to_trees(program: CoreProgram, garbage_collector: bool = True) -> list[Node]:
     scopes = get_ref_scopes(program, garbage_collector)
-    owners = create_owners(list(scopes.keys()))
-
-    constrs = create_constraints(program, owners)
-    cycle_constrs = create_lifecycle_constraints(owners, scopes)
-    constraints = merge_constraints(constrs, cycle_constrs)
-
-    blueprints = create_blueprints(constraints)
-    layout = Scheduler(create_resolver_registry(), create_slider_registry()).schedule(*blueprints)
-
-    memory = {owner.ref: index for owner, index in layout.mapping().items()}
-
-    return strip_program(program), memory
+    nodes = create_nodes(program, scopes)
+    roots = get_roots(nodes)
+    return roots
 
 
 @overload
@@ -43,10 +24,7 @@ def get_ref_scopes(
     garbage_collector: bool = True,
     *,
     close: Literal[True] = True,
-) -> dict[
-    Ref,
-    tuple[int, int],
-]: ...
+) -> RefScopes: ...
 @overload
 def get_ref_scopes(
     program: CoreProgram,
@@ -123,43 +101,17 @@ def get_ref_scopes(
     return adjusted_usages
 
 
-def create_owners(refs: Iterable[Ref]) -> dict[Ref, Owner]:
-    mapping: dict[Ref, Owner] = {}
+def create_nodes(program: CoreProgram, scopes: RefScopes) -> Iterable[Node]:
+    mapping: dict[Ref, Node] = {}
 
-    for ref in refs:
-        mapping[ref] = Owner(None, ref=ref)
+    def _get_scope(ref: Ref, parent: Ref) -> tuple[int, int]:
+        # TODO: Handle hidden reference's scopes correctly. Either here or in `get_ref_scopes`
+        return scopes.get(ref, scopes[parent])
 
-    return mapping
-
-
-def merge_constraints(
-    left: dict[Owner, list[BaseConstraint]], right: dict[Owner, list[BaseConstraint]]
-) -> dict[Owner, list[BaseConstraint]]:
-    constrs: dict[Owner, list[BaseConstraint]] = left
-    for owner, right_constrs in right.items():
-        if owner in constrs:
-            constrs[owner].extend(right_constrs)
-        else:
-            constrs[owner] = right_constrs
-    return constrs
-
-
-def create_lifecycle_constraints(
-    mapping: dict[Ref, Owner],
-    lifecycles: dict[Ref, tuple[int, int]],
-) -> dict[Owner, list[BaseConstraint]]:
-    constrs: dict[Owner, list[BaseConstraint]] = {}
-    for ref, cycle in lifecycles.items():
-        own_constrs = constrs.setdefault(mapping[ref], [])
-        own_constrs.append(LifeCycle(*cycle))
-    return constrs
-
-
-def create_constraints(
-    program: CoreProgram,
-    mapping: dict[Ref, Owner],
-) -> dict[Owner, list[BaseConstraint]]:
-    constrs: dict[Owner, list[BaseConstraint]] = {}
+    def _get_node(ref: Ref, parent: Ref) -> Node:
+        if ref not in mapping:
+            mapping[ref] = create_node(_get_scope(ref, parent), ref=ref, name=None)
+        return mapping[ref]
 
     for opcode in program:
         args = opcode.args()
@@ -167,82 +119,52 @@ def create_constraints(
         if (ref := args.pop("ref", None)) is None:
             continue
 
-        own_constrs = constrs.setdefault(mapping[ref], [])
         match opcode.__id__:
             case MemoptixOpcodes.INDEX:
-                own_constrs.append(Index(**args))
+                _get_node(ref, ref).add_constraint(Index(**args))
+
             case MemoptixOpcodes.ARRAY:
-                own_constrs.append(Array(**args))
+                _get_node(ref, ref).add_constraint(Array(**args))
+
             case MemoptixOpcodes.HARD_LINK:
-                hard_to_ = mapping[args.pop("to_")]
-                own_constrs.append(HardLink(hard_to_, **args))
+                to_ = args.pop("to_")
+                _get_node(ref, ref).add_constraint(HardLink(_get_node(to_, ref), **args))
+
             case MemoptixOpcodes.SOFT_LINK:
-                soft_to_: dict[Owner, int] = {mapping[ref]: scale for ref, scale in args["to_"].items()}
-                own_constrs.append(SoftLink(soft_to_))
+                to_refs: dict[Ref, int] = args.pop("to_")
+                to_nodes: dict[Node, int] = {}
+                for to_ref, scale in to_refs.items():
+                    to_nodes[_get_node(to_ref, ref)] = scale
+                _get_node(ref, ref).add_constraint(SoftLink(to_=to_nodes))
 
-    return constrs
+            case _:
+                _get_node(ref, ref)
 
-
-def create_blueprints(constraints: dict[Owner, list[BaseConstraint]]) -> list[Blueprint]:
-    domain2constr: list[
-        dict[
-            tuple[type[BaseConstraint], ...],
-            dict[Owner, list[BaseConstraint]],
-        ]
-    ] = []
-
-    for constr_set in group_constraints_by_owners(constraints):
-        constr_mapping: dict[
-            tuple[type[BaseConstraint], ...],
-            dict[Owner, list[BaseConstraint]],
-        ] = {}
-        for owner, constrs in constr_set.items():
-            domain = tuple(type(constr) for constr in constrs)
-            constr_mapping.setdefault(domain, {})[owner] = constrs
-        domain2constr.append(constr_mapping)
-
-    blueprints: list[Blueprint] = []
-    array_bps: list[Blueprint] = []
-    for constr_mapping in domain2constr:
-        new_blueprint = Blueprint()
-        is_array: bool = False
-        for domain, constr_set in constr_mapping.items():
-            for owner, constrs in constr_set.items():
-                new_blueprint.add_constraints(owner, *constrs)
-
-            is_array = Array in domain
-
-        (array_bps if is_array else blueprints).append(new_blueprint)
-
-    return blueprints + array_bps
+    return mapping.values()
 
 
-def group_constraints_by_owners(
-    constraints: dict[Owner, list[BaseConstraint]],
-) -> list[dict[Owner, list[BaseConstraint]]]:
-    owner2mapping: dict[Owner, dict[Owner, list[BaseConstraint]]] = {}
-    roots: list[Owner] = []
+def get_roots(nodes: Iterable[Node]) -> list[Node]:
+    seen: set[Node] = set()
+    roots: list[Node] = []
 
-    for owner, constrs in constraints.items():
-        if owner not in owner2mapping:
-            owner2mapping[owner] = {}
-            roots.append(owner)
+    for node in _flatten_nodes(*nodes):
+        seen.add(node)
 
-        mapping = owner2mapping[owner]
-        mapping[owner] = constrs
+    for node in nodes:
+        if node not in seen:
+            roots.append(node)
 
-        for constr in constrs:
-            for related_owner in constr.get_owners():
-                owner2mapping[related_owner] = mapping
-
-    unique_list = [owner2mapping[owner] for owner in roots]
-    return unique_list
+    return roots
 
 
-def strip_program(program: CoreProgram) -> CoreProgram:
-    new_program: list[CoreOpcode] = []
-    for opcode in program:
-        if opcode.__id__ in MemoptixOpcodes:
-            continue
-        new_program.append(opcode)
-    return new_program
+def _flatten_nodes(*nodes: Node, add_root: bool = False) -> set[Node]:
+    if not nodes:
+        return set()
+
+    seen: set[Node] = set()
+    for node in nodes:
+        for constr in node.constraints:
+            seen.update(_flatten_nodes(*constr.get_nodes(), add_root=True))
+        if add_root:
+            seen.add(node)
+    return seen

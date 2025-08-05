@@ -1,7 +1,7 @@
-from quix.memoptix.scheduler.blueprint import Blueprint
 from quix.memoptix.scheduler.layout import Layout
 from quix.memoptix.scheduler.resolvers.registry import ResolverRegistry
 from quix.memoptix.scheduler.sliders.registry import SliderRegistry
+from quix.memoptix.scheduler.tree import Node
 
 
 class Scheduler:
@@ -14,10 +14,10 @@ class Scheduler:
         self._resolver_registry = resolver_registry
         self._slider_registry = slider_registry
 
-    def schedule(self, *bps: Blueprint) -> Layout:
+    def schedule(self, *nodes: Node) -> Layout:
         layouts = []
-        for bp in bps:
-            layouts.append(self._resolver_registry(bp))
+        for node in nodes:
+            layouts.append(self._resolver_registry(node))
 
         while len(layouts) > 1:
             layouts.append(self._slider_registry(layouts.pop(), layouts.pop()))
