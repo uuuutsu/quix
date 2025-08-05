@@ -698,6 +698,7 @@ MigrationBackup/
 dev/**
 test.py
 **/test.py
+main.py
 
 # MacOS file system
 .DS_Store

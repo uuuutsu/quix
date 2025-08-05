@@ -20,10 +20,17 @@ class Node:
         "lifecycle",
     )
 
-    def __init__(self, lifecycle: tuple[int, int], name: str | None = None, *, ref: Ref | None = None) -> None:
+    def __init__(
+        self,
+        lifecycle: tuple[int, int],
+        name: str | None = None,
+        *,
+        ref: Ref | None = None,
+        constraints: list[BaseConstraint] | None = None,
+    ) -> None:
         self.name = name
         self.ref = ref or generate_unique_id()
-        self.constraints: list[BaseConstraint] = []
+        self.constraints: list[BaseConstraint] = constraints or []
         self.lifecycle = lifecycle
 
     def add_constraint(self, constraint: BaseConstraint) -> Self:
