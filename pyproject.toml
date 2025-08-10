@@ -24,7 +24,7 @@ dev = [
 ]
 
 [project.scripts]
-quix = "quix.cli.cli:app"
+quix = "quix.cli.main:app"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -81,7 +81,7 @@ python_files = "tests/*.py"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool. hatch.buildl]
+[tool.hatch.buildl]
 packages = ["quix"]
 
 [tool.uv.sources]

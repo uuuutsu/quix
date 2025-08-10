@@ -1,4 +1,5 @@
 import importlib
+from typing import Final
 
 import typer
 from typer import Exit, Option, secho
@@ -9,6 +10,8 @@ from quix.cli.utils.error_handler import _error_exit
 from quix.core.opcodes.base import CoreOpcode
 
 app = typer.Typer()
+
+MAX_PRINT_SIZE: Final[int] = 128
 
 
 def get_var(module: str) -> list[CoreOpcode] | None:
@@ -21,7 +24,7 @@ def get_var(module: str) -> list[CoreOpcode] | None:
         _error_exit(message="Incorrect path format. Use --help for more information", exception=e)
         return None
     try:
-        imported_module = importlib.__import__(module_name)
+        imported_module = importlib.import_module(module_name)
         if module:
             var: list[CoreOpcode] = getattr(imported_module, var_name)
         return var
@@ -42,36 +45,31 @@ def ass(
         raise Exit(code=1)
 
     opcodes: list[CoreOpcode] | None = get_var(path)
+
     if not opcodes:
         _error_exit(message="Specified path does not contain opcodes", exception=ValueError(f"{path} does not exist"))
         raise Exit(code=1)
 
-    if not isinstance(opcodes, CoreOpcode) and not isinstance(opcodes, list):
-        _error_exit(
-            message=f"{path} does not contain opcodes.",
-            exception=TypeError(f"{opcodes} type is {type(opcodes)}. CoreOpcode expected"),
-        )
-        return None
+    result = bf_compiler.compile_seq(opcodes, garbage_collector)
 
-    formatted_opcodes = opcodes if isinstance(opcodes, list) else [opcodes]
-
-    result = bf_compiler.compile_seq(formatted_opcodes, garbage_collector)
     if not result:
         secho("Unable to compile opcodes")
         raise Exit(code=1)
 
-    bf_code, layout = result[0], result[1]
+    bf_code, layout = result
 
-    secho(bf_code)
+    if len(bf_code) <= MAX_PRINT_SIZE:
+        secho(bf_code)
+    else:
+        secho("Output length is too big. Saving output in 'output.bf'")
+        output = "output"
 
+    formatted_layout = {str(key): value for key, value in layout.items()}
     if memory_layout:
-        layout_name = f"{memory_layout}.txt"
-        # I save it as txt for now but i will fix it when i get home
-        datatool.save_file(layout_name, str(layout))
+        datatool.save_json(memory_layout, formatted_layout)
 
     if output:
-        output_name = f"{output}.bf"
-        datatool.save_file(output_name, bf_code)
+        datatool.save_file(file_name=output, extension="bf", data=bf_code)
 
 
 @app.command("build")

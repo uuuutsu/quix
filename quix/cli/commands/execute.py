@@ -21,8 +21,7 @@ def execute_code(executor: Executor, output: Optional[str] = None, stats: Option
     code_output = executor_output.getvalue()
 
     if output:
-        output_name = f"{output}.txt"
-        datatool.save_file(output_name, code_output)
+        datatool.save_file(output, code_output)
     if stats:
         exc_time = time.time() - start
         memory_state = executor.memory.cells
@@ -37,7 +36,7 @@ def execute_code(executor: Executor, output: Optional[str] = None, stats: Option
 def run_exec(
     file: str = Option(None, "--file", "-f", help="Path to source file"),
     code: str = Option(None, "--code", "-c", help="Inline code"),
-    memory: int = Option(64, "--memory", "-m", help="Maximum memory cells (bytes)"),
+    memory: int = Option(256, "--memory", "-m", help="Maximum memory cells"),
     executor: str = Option("simple", "--executor", "-e", help="Executor used to compile the code"),
     output: str = Option(None, "--output", "-o", help="Write the output of the program to a file"),
     stats: str = Option(None, "--stats", "-s", help="Store execution stats in a file"),
@@ -57,7 +56,7 @@ def run_exec(
     if executor:
         match executor.lower():
             case "simple":
-                memory_size = Memory(size=memory * 8)
+                memory_size = Memory(size=memory)
                 code_executor = Executor(executable_code, memory=memory_size)
             case _:
                 secho("Use --help to see available executor options.")

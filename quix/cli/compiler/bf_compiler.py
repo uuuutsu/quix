@@ -7,7 +7,6 @@ from quix.cli.utils.error_handler import _error_exit
 from quix.core.compiler.layout import BFMemoryLayout
 from quix.core.compiler.pointer import BFPointer
 from quix.core.compiler.visitor import BFVisitor
-from quix.core.opcodes.base import CoreOpcode
 from quix.core.opcodes.dtypes import CoreProgram, Ref
 from quix.memoptix import mem_compile
 
@@ -31,19 +30,12 @@ def compile(code: ToConvert, gc: bool = False) -> tuple[str, BFMemoryLayout]:
     return _compile_to_bf(core_program, mapping), BFMemoryLayout(mapping)
 
 
-def compile_seq(opcodes: list[CoreOpcode], gc: bool = False) -> tuple[str, list[BFMemoryLayout]] | None:
+def compile_seq(opcodes: ToConvert, gc: bool = False) -> tuple[str, BFMemoryLayout] | None:
     """
     Compiles sequence of opcodes to BrainFuck
     """
     try:
-        compiled = []
-        full_layout = []
-
-        for opcode in opcodes:
-            bf_compiled, layout = compile(code=opcode, gc=gc)
-            compiled.append(bf_compiled)
-            full_layout.append(layout)
-        return "".join(compiled), full_layout
+        return compile(opcodes, gc)
 
     except Exception as e:
         _error_exit(message="Unable to compile opcodes", exception=e)
