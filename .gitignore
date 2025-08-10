@@ -707,4 +707,9 @@ main.py
 # useless self reassurance
 .VSCodeCounter
 
+# cli test output files
+mem.json
+*.bf
+testcli.py
+
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,vs,jupyternotebooks,c,c++
