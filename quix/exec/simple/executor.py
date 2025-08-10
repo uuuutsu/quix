@@ -55,4 +55,4 @@ class Executor:
                     self.output.write(chr(self.memory.load()))
                     return
 
-                print(chr(self.memory.load()), end="")
+                print(chr(self.memory.load()), end="", flush=True)

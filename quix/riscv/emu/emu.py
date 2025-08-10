@@ -220,13 +220,12 @@ class Emulator:
 
     def ecall(self, imm: Imm, rs1: Register, rd: Register) -> None:
         sys_call_number = self.registers[17]  # Assuming a0 (x17) holds the system call number
-        print(sys_call_number)
         if sys_call_number == 93:  # exit
             raise SystemExit(self.registers[10])  # Assuming a0 (x10) holds the exit code
         elif sys_call_number == 64:  # print
             addr = self.registers[11]
             while (addr - self.registers[11]) < self.registers[12]:
-                print(chr(self.memory[addr]), end="")
+                print(chr(self.memory[addr]), end="", flush=True)
                 addr += 1
 
             self.registers[10] = addr - self.registers[11]

@@ -698,6 +698,7 @@ MigrationBackup/
 dev/**
 test.py
 **/test.py
+test.*
 main.py
 
 # MacOS file system

@@ -1,0 +1,46 @@
+FROM ubuntu:24.04 AS builder
+ARG DEBIAN_FRONTEND=noninteractive
+ARG JOBS=4
+ARG RISCV_PREFIX=/opt/riscv
+ARG ARCH=rv32ia
+ARG ABI=ilp32
+ARG RISCV_GNU_TOOLCHAIN_REF=master
+
+ENV PATH=${RISCV_PREFIX}/bin:/usr/local/bin:/usr/bin:/bin
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      autoconf automake autotools-dev curl python3 python3-pip python3-tomli \
+      libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo \
+      gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
+      libglib2.0-dev libslirp-dev ca-certificates file xz-utils ccache \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV CCACHE_DIR=/ccache
+RUN mkdir -p ${CCACHE_DIR} && chmod 777 ${CCACHE_DIR}
+ENV CC="ccache gcc" CXX="ccache g++"
+
+WORKDIR /src
+RUN git init riscv-gnu-toolchain
+WORKDIR /src/riscv-gnu-toolchain
+RUN git remote add origin https://github.com/riscv/riscv-gnu-toolchain \
+ && git fetch --depth=1 origin ${RISCV_GNU_TOOLCHAIN_REF} \
+ && git checkout FETCH_HEAD
+
+WORKDIR /src/riscv-gnu-toolchain
+RUN --mount=type=cache,target=/var/cache/distfiles \
+    ./configure --prefix=${RISCV_PREFIX} --with-arch=${ARCH} --with-abi=${ABI}
+
+RUN --mount=type=cache,target=/ccache \
+    make ${JOBS:+-j${JOBS}} linux
+
+FROM ubuntu:24.04 AS runtime
+ARG RISCV_PREFIX=/opt/riscv
+ENV PATH=${RISCV_PREFIX}/bin:$PATH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libgmp10 libmpfr6 libmpc3 zlib1g libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder ${RISCV_PREFIX} ${RISCV_PREFIX}
+
+WORKDIR /work
