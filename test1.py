@@ -3,4 +3,4 @@ from quix.core.opcodes import add
 
 value = Str.from_value("Hello, World!")
 
-add(value, 1)
+program = add(value, 1)

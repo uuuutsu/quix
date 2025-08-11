@@ -8,7 +8,7 @@ from quix.core.compiler.layout import BFMemoryLayout
 from quix.core.compiler.pointer import BFPointer
 from quix.core.compiler.visitor import BFVisitor
 from quix.core.opcodes.dtypes import CoreProgram, Ref
-from quix.memoptix import mem_compile
+from quix.memoptix import schedule
 
 
 def _compile_to_bf(code: CoreProgram, mapping: dict[Ref, int]) -> str:
@@ -25,7 +25,7 @@ def _to_program(code: ToConvert) -> CoreProgram:
 
 
 def compile(code: ToConvert, gc: bool = False) -> tuple[str, BFMemoryLayout]:
-    core_program, mapping = mem_compile(_to_program(code), garbage_collector=gc)
+    core_program, mapping = schedule(_to_program(code), garbage_collector=gc)
 
     return _compile_to_bf(core_program, mapping), BFMemoryLayout(mapping)
 
