@@ -53,6 +53,9 @@ class CoreOpcode(Opcode):
     def __load__(cls, data: dict[str, Any]) -> Self:
         return cls(data)
 
+    def type_is(self, type: str) -> bool:
+        return type == self.__id__
+
 
 def opcode[**P](func: Callable[P, None]) -> OpcodeFactory[P, CoreOpcode]:
     new_opcode_cls = type(

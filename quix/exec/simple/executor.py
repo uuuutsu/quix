@@ -21,6 +21,9 @@ class Executor:
         if isinstance(self.code, io.StringIO):
             self.code = self.code.getvalue()
 
+        if self.output is None:
+            self.output = io.StringIO()
+
         self.jump_map = build_jump_map(self.code)
         while self.pc < len(self.code):
             self._execute_command(self.code[self.pc])
@@ -54,5 +57,3 @@ class Executor:
                 if self.output:
                     self.output.write(chr(self.memory.load()))
                     return
-
-                print(chr(self.memory.load()), end="", flush=True)

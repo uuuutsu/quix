@@ -6,6 +6,7 @@ dependencies = [
   "numpy>=2.2.5",
   "pyelftools>=0.32",
   "rich>=14.0.0",
+  "typer>=0.16.0",
 ]
 description = "Add your description here"
 name = "quix"
@@ -18,8 +19,12 @@ dev = [
   "mypy>=1.15.0",
   "pre-commit>=4.2.0",
   "pytest>=8.3.5",
+  "quix",
   "ruff>=0.11.6",
 ]
+
+[project.scripts]
+quix = "quix.cli.main:app"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -71,3 +76,13 @@ unsafe-fixes = true
 [tool.pytest.ini_options]
 norecursedirs = "dev/*"
 python_files = "tests/*.py"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.buildl]
+packages = ["quix"]
+
+[tool.uv.sources]
+quix = { workspace = true }
