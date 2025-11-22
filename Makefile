@@ -11,6 +11,7 @@ assemble:
 			-c $(SRC) \
 			-march=rv32i \
 			-mabi=ilp32 \
+			-mno-relax \
 			-o output.o
 
 lint:
@@ -18,5 +19,6 @@ lint:
 		riscv32-unknown-linux-gnu-ld \
 			-static \
 			-nostdlib \
+			-no-pie \
 			-o output.elf \
 			$(SRC)
