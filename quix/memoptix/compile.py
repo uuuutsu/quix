@@ -103,6 +103,7 @@ def get_ref_scopes(
 
 def create_nodes(program: CoreProgram, scopes: RefScopes) -> Iterable[Node]:
     mapping: dict[Ref, Node] = {}
+    roots_to_array_length: dict[Ref, int] = {}
 
     def _get_scope(ref: Ref, parent: Ref) -> tuple[int, int]:
         # TODO: Handle hidden reference's scopes correctly. Either here or in `get_ref_scopes`
@@ -124,7 +125,13 @@ def create_nodes(program: CoreProgram, scopes: RefScopes) -> Iterable[Node]:
                 _get_node(ref, ref).add_constraint(Index(**args))
 
             case MemoptixOpcodes.ARRAY:
-                _get_node(ref, ref).add_constraint(Array(**args))
+                constr = Array(**args)
+                _get_node(ref, ref).add_constraint(constr)
+
+                if ref in roots_to_array_length:
+                    roots_to_array_length[ref] += constr.length
+                else:
+                    roots_to_array_length[ref] = constr.length
 
             case MemoptixOpcodes.HARD_LINK:
                 to_ = args.pop("to_")
@@ -140,7 +147,13 @@ def create_nodes(program: CoreProgram, scopes: RefScopes) -> Iterable[Node]:
             case _:
                 _get_node(ref, ref)
 
-    return mapping.values()
+    roots: list[Node] = []
+    for ref in sorted(roots_to_array_length.keys(), key=lambda x: roots_to_array_length[x]):
+        roots.append(mapping[ref])
+    for node in mapping.values():
+        if node not in roots:
+            roots.insert(0, node)
+    return roots
 
 
 def get_roots(nodes: Iterable[Node]) -> list[Node]:

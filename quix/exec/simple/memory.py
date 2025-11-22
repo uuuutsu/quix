@@ -17,7 +17,8 @@ class Memory:
 
     def increment_ptr(self) -> None:
         if self._pointer == self._size - 1:
-            self._array.append(0)
+            self._array.extend([0] * 100)
+            self._size += 100
         self._pointer += 1
 
     def decrement_ptr(self) -> None:

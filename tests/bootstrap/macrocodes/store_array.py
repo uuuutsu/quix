@@ -7,17 +7,17 @@ from .utils import run_with_tape
 
 
 def test_store_array_int_by_int() -> None:
-    a1, u1 = Array("a1", length=10), Unit("u1")
+    a1, u1 = Array("a1", length=20), Unit("u1")
     program = to_program(
         init_array(a1),
-        store_array(a1, UDynamic.from_int(257, 2), UDynamic.from_int(5)),
+        store_array(a1, UDynamic.from_int(257, 2), UDynamic.from_int(15)),
         add(u1, 5),
     )
 
     indexes, tape = run_with_tape(program)
 
-    assert tape[indexes[a1] + 13] == 1
-    assert tape[indexes[a1] + 15] == 1
+    assert tape[indexes[a1] + 33] == 1
+    assert tape[indexes[a1] + 35] == 1
     assert tape[indexes[u1]] == 5
 
     assert sum(tape) == 7

@@ -3,13 +3,28 @@ from quix.bootstrap.dtypes.const import UDynamic
 from quix.bootstrap.dtypes.unit import Unit
 from quix.bootstrap.dtypes.wide import Wide
 from quix.bootstrap.macrocode import macrocode
+from quix.bootstrap.macrocodes.assign_wide import assign_wide
+from quix.bootstrap.macrocodes.clear_wide import clear_wide
+from quix.bootstrap.macrocodes.consts import CONSTANT_AS_WIDE_WHEN_LT
+from quix.bootstrap.macrocodes.free_wide import free_wide
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, end_loop, inject, start_loop
 
 
-# TODO: optimize storing by constant value `[-]++++[>+<-]`
+# TODO: erase buffered index during the operation instead of after
 @macrocode
 def store_array(array: Array, to_store: Wide | UDynamic, index: Wide | UDynamic) -> ToConvert:
+    if isinstance(index, UDynamic) and int(index) > CONSTANT_AS_WIDE_WHEN_LT:
+        index_buff = Wide.from_length(f"{index}_index_buff", index.size)
+        yield assign_wide(index_buff, index)
+        yield _store_array(array, to_store, index_buff)
+        yield clear_wide(index_buff)
+        return free_wide(index_buff)
+
+    return _store_array(array, to_store, index)
+
+
+def _store_array(array: Array, to_store: Wide | UDynamic, index: Wide | UDynamic) -> ToConvert:
     if isinstance(index, UDynamic):
         return _array_store_by_int(array, to_store, index)
 
@@ -71,6 +86,47 @@ def _array_move_by_wide_index(array: Array, index: Wide) -> ToConvert:
         yield _go_by_index_in_current_cell(array, step)
 
     return _go_by_value_backward(array, rollback)
+
+
+# def _array_move_by_wide_index_with_power(array: Array, index: Wide, power: int, step: int) -> ToConvert:
+#     yield comment("START\n")
+
+#     yield _array_move_by_unit(array, index[0])
+#     yield comment("END UNIT\n")
+
+#     if index[1:]:
+#         yield _move_to_origin_with_trace(array)
+#         yield _array_move_by_wide_index_with_power(
+#             array,
+#             index,
+#             power=1,
+#             step=256 * (array.granularity + 1),
+#         )
+#     return comment("END\n")
+#     index_buff = Wide.from_length(f"{index}_index_buff", index.size)
+#     yield assign_wide(index_buff, index)
+
+#     def _iterative_array_jump() -> ToConvert:
+#         yield dec_wide(index_buff)
+#         yield _go_by_value_forward(array, array.granularity + 1)
+#         yield add(array, power)
+#         yield _go_by_value_backward(array, array.granularity + 1)
+#         yield _move_value_from_control_by_trace(array, (array.granularity + 1) * 2)
+#         yield _go_by_value_forward(array, (array.granularity + 1) * 2)
+#         yield _go_by_index_in_current_cell(array, step, ceil(power / step))
+#         yield comment("END LOOP\n")
+#         yield _go_by_value_backward(array, (array.granularity + 1) * 2)
+#         yield _move_to_origin_with_trace(array)
+#         return None
+
+#     yield loop_wide(index_buff, _iterative_array_jump())
+#     yield free(index_buff)
+
+#     yield comment("END\n")
+
+#     yield _go_by_value_forward(array, array.granularity + 1)
+#     yield _move_from_origin_by_trace(array)
+#     return None
 
 
 def _store_value_at_current_position(array: Array, unit: Unit, offset: int) -> ToConvert:

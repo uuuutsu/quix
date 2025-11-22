@@ -6,7 +6,10 @@ from quix.bootstrap.macrocode import macrocode
 from quix.bootstrap.program import ToConvert
 from quix.core.opcodes.opcodes import add, inject
 
+from .assign_wide import assign_wide
 from .clear_wide import clear_wide
+from .consts import CONSTANT_AS_WIDE_WHEN_LT
+from .free_wide import free_wide
 from .store_array import (
     _array_move_by_wide_index,
     _array_set_control_unit,
@@ -21,6 +24,17 @@ from .store_array import (
 
 @macrocode
 def load_array(array: Array, load_in: Wide, index: Wide | UDynamic) -> ToConvert:
+    if isinstance(index, UDynamic) and int(index) > CONSTANT_AS_WIDE_WHEN_LT:
+        index_buff = Wide.from_length(f"{index}_index_buff", index.size)
+        yield assign_wide(index_buff, index)
+        yield _load_array(array, load_in, index_buff)
+        yield clear_wide(index_buff)
+        return free_wide(index_buff)
+    return _load_array(array, load_in, index)
+
+
+@macrocode
+def _load_array(array: Array, load_in: Wide, index: Wide | UDynamic) -> ToConvert:
     yield clear_wide(load_in)
 
     if isinstance(index, UDynamic):
