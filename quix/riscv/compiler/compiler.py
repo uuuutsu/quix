@@ -37,9 +37,8 @@ from quix.exceptions.core.visitor import NoHandlerFoundException
 from quix.memoptix.opcodes import free
 from quix.riscv.compiler.utils import is_signed
 from quix.riscv.loader.decoder.utils import get_bit_section
+from quix.riscv.loader.opcodes import Imm, Register, RISCVOpcode
 from quix.riscv.loader.state import State
-from quix.riscv.opcodes.base import RISCVOpcode
-from quix.riscv.opcodes.dtypes import Imm, Register
 
 from .runtime import CPU, Layout, Memory
 

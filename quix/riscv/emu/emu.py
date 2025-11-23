@@ -4,7 +4,7 @@ import numpy as np
 
 from quix.riscv.loader import State
 from quix.riscv.loader.decoder.utils import get_bit_section
-from quix.riscv.opcodes import Imm, Register
+from quix.riscv.loader.opcodes import Imm, Register
 
 from .memory import Memory
 

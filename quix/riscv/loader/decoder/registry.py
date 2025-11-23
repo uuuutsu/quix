@@ -3,7 +3,8 @@ from functools import wraps
 from inspect import signature
 
 from quix.core.interfaces.opcode import OpcodeFactory
-from quix.riscv.opcodes import (
+from quix.riscv.loader.opcodes import (
+    RISCVOpcode,
     add,
     addi,
     and_,
@@ -56,7 +57,6 @@ from quix.riscv.opcodes import (
     xor,
     xori,
 )
-from quix.riscv.opcodes.base import RISCVOpcode
 
 from .decoder import InstructionData
 from .opcodes import (

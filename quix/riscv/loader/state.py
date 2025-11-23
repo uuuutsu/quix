@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from elftools.elf.sections import Section
 
-from quix.riscv.opcodes.base import RISCVOpcode
+from .opcodes import RISCVOpcode
 
 
 @dataclass

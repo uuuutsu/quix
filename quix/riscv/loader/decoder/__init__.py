@@ -1,4 +1,4 @@
-from quix.riscv.opcodes.base import RISCVOpcode
+from quix.riscv.loader.opcodes import RISCVOpcode
 
 from .decoder import Decoder
 from .opcodes import OpCode_To_Decoder

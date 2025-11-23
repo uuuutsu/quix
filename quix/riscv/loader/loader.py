@@ -3,9 +3,8 @@ from io import BytesIO
 from elftools.elf.elffile import ELFFile
 from elftools.elf.sections import Section
 
-from quix.riscv.opcodes.base import RISCVOpcode
-
 from .decoder import decode
+from .opcodes import RISCVOpcode
 from .state import State
 
 
