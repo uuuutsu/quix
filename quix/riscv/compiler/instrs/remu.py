@@ -5,5 +5,5 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def remu(**kwargs: Any) -> ToConvert:
+def riscv_remu(**kwargs: Any) -> ToConvert:
     return None

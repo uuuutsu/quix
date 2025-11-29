@@ -9,7 +9,7 @@ from quix.memoptix.opcodes import free
 
 
 @macrocode
-def jalr(imm: UDynamic, rs1: Wide, rd: Wide, pc: Wide) -> ToConvert:
+def riscv_jalr(imm: UDynamic, rs1: Wide, rd: Wide, pc: Wide) -> ToConvert:
     yield assign_wide(rd, pc)
     yield add_wide(rd, UDynamic.from_int(4, 4), rd)
     yield assign_wide(pc, rs1)

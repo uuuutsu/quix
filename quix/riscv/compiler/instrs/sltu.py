@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def sltu(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_sltu(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     yield call_lt_wide(
         rs1,
         rs2,

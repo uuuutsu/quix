@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def jal(imm: UDynamic, rd: Wide, pc: Wide) -> ToConvert:
+def riscv_jal(imm: UDynamic, rd: Wide, pc: Wide) -> ToConvert:
     yield assign_wide(rd, pc)
     yield add_wide(rd, UDynamic.from_int(4, 4), rd)
     return add_wide(pc, imm, pc)

@@ -6,6 +6,6 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def lui(imm: UDynamic, rd: Wide) -> ToConvert:
+def riscv_lui(imm: UDynamic, rd: Wide) -> ToConvert:
     yield assign_wide(rd, imm)
     return None

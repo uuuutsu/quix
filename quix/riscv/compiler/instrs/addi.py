@@ -8,7 +8,7 @@ from .utils import is_signed
 
 
 @macrocode
-def addi(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
+def riscv_addi(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
     if is_signed(imm):
         yield sub_wide(rs1, imm, rd)
     else:

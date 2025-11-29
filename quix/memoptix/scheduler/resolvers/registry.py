@@ -1,3 +1,6 @@
+from rich.console import Console
+from rich.pretty import pprint
+
 from quix.memoptix.scheduler.layout import Layout
 from quix.memoptix.scheduler.tree import Node, get_domain
 from quix.memoptix.scheduler.utils import Matcher, inclusion_matcher
@@ -25,7 +28,12 @@ class ResolverRegistry:
         if match is None:
             raise RuntimeError(f"No resolver was found to handle: {root_domain}")
 
-        return self._resolvers[match](root)
+        try:
+            return self._resolvers[match](root)
+        except Exception as e:
+            pprint(root, console=Console(file=open("root.txt", "w")))
+            print(self._resolvers[match])
+            raise e
 
     def register(self, resolver: Resolver) -> None:
         self._resolvers.append(resolver)

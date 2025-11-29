@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def bge(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
+def riscv_bge(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
     return call_ge_wide_signed(
         rs1,
         rs2,

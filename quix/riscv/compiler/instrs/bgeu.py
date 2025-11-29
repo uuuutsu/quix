@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def bgeu(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
+def riscv_bgeu(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
     return call_ge_wide(
         rs1,
         rs2,

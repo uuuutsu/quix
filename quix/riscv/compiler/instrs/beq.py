@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def beq(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
+def riscv_beq(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
     return call_eq_wide(
         rs1,
         rs2,

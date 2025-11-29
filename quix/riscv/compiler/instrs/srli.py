@@ -7,7 +7,7 @@ from quix.riscv.loader.decoder.utils import get_bit_section
 
 
 @macrocode
-def srli(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
+def riscv_srli(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
     if get_bit_section(int(imm), 10, 10):
         yield div_wide(
             rs1,

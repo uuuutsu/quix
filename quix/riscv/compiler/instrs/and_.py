@@ -5,6 +5,6 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def and_(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_and(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     yield and_wide(rs1, rs2, rd)
     return None

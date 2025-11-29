@@ -21,7 +21,7 @@ from quix.core.opcodes.opcodes import output
 
 
 @macrocode
-def ecall(
+def riscv_ecall(
     imm: UDynamic,
     rs1: Wide,
     rd: Wide,

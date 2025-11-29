@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def sw(imm: UDynamic, rs1: Wide, rs2: Wide, memory: Array) -> ToConvert:
+def riscv_sw(imm: UDynamic, rs1: Wide, rs2: Wide, memory: Array) -> ToConvert:
     yield add_wide(rs1, imm, rs1)
     yield store_array(memory, rs2, rs1)
     return None

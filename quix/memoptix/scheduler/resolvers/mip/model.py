@@ -6,17 +6,20 @@ from quix.exceptions.scheduler import NodeIndexIsNotYetResolvedError, UnknownNod
 from quix.memoptix.scheduler.tree import Node
 from quix.tools import silence
 
+MAX_NUMBER_OF_SOS_CONSTRAINTS = 1024
+
 
 def node_to_str_key(node: Node) -> str:
     return str(hash(node))
 
 
 class Model:
-    __slots__ = ("_mip_model", "_nodes")
+    __slots__ = ("_mip_model", "_nodes", "_sos_constrs")
 
     def __init__(self) -> None:
         self._mip_model = mip.Model()
         self._nodes: list[Node] = []
+        self._sos_constrs: int = 0
 
     def add_var(
         self,
@@ -51,7 +54,10 @@ class Model:
         )
 
     def add_sos(self, sos: list[tuple[mip.Var, mip.numbers.Real]], sos_type: int) -> None:
+        if self._sos_constrs >= MAX_NUMBER_OF_SOS_CONSTRAINTS:
+            raise ValueError(f"Maximum number of SOS constraints ({MAX_NUMBER_OF_SOS_CONSTRAINTS}) reached.")
         self._mip_model.add_sos(sos=sos, sos_type=sos_type)
+        self._sos_constrs += 1
 
     def optimize(
         self,

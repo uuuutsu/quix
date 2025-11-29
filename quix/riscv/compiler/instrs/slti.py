@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def slti(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
+def riscv_slti(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
     imm_wide = Wide.from_length("imm", 4)
     yield assign_wide(imm_wide, imm)
     yield call_lt_wide_signed(

@@ -6,6 +6,6 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def slli(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
+def riscv_slli(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
     yield mul_wide(rs1, UDynamic.from_int(2 ** (int(imm) & 0x1F), 4), rd)
     return None

@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def sra(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_sra(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     yield mul_wide(UDynamic.from_int(2, 4), rs2, rs2)
     yield div_wide(
         rs1,

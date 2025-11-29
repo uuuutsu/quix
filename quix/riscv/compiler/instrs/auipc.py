@@ -6,6 +6,6 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def auipc(imm: UDynamic, rd: Wide, pc: Wide) -> ToConvert:
+def riscv_auipc(imm: UDynamic, rd: Wide, pc: Wide) -> ToConvert:
     yield add_wide(pc, imm, rd)
     return None

@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def lhu(imm: UDynamic, rs1: Wide, rd: Wide, memory: Array) -> ToConvert:
+def riscv_lhu(imm: UDynamic, rs1: Wide, rd: Wide, memory: Array) -> ToConvert:
     yield add_wide(imm, rs1, rs1)
     yield clear_wide(Wide("rd_upper", rd[2:]))
     yield load_array(memory, Wide("lsb", rd[:2]), rs1)

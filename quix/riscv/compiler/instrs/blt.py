@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def blt(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
+def riscv_blt(imm: UDynamic, rs1: Wide, rs2: Wide, pc: Wide) -> ToConvert:
     return call_lt_wide_signed(
         rs1,
         rs2,

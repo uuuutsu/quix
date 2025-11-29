@@ -5,5 +5,5 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def rem(**kwargs: Any) -> ToConvert:
+def riscv_rem(**kwargs: Any) -> ToConvert:
     return None

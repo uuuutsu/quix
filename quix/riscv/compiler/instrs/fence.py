@@ -4,5 +4,5 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def fence(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_fence(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     pass

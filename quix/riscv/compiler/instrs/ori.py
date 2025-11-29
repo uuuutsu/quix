@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def ori(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
+def riscv_ori(imm: UDynamic, rs1: Wide, rd: Wide) -> ToConvert:
     yield assign_wide(rd, imm)
     yield or_wide(rs1, rd, rd)
     return None

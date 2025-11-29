@@ -6,7 +6,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def slt(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_slt(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     yield call_lt_wide_signed(
         rs1,
         rs2,

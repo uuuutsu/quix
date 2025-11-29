@@ -7,7 +7,7 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def sb(imm: UDynamic, rs1: Wide, rs2: Wide, memory: Array) -> ToConvert:
+def riscv_sb(imm: UDynamic, rs1: Wide, rs2: Wide, memory: Array) -> ToConvert:
     yield add_wide(rs1, imm, rs1)
     yield store_array(memory, Wide("lsb", (rs2[0],)), rs1)
     return None
