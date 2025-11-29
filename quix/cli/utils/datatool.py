@@ -22,8 +22,7 @@ def save_file(file_name: str, data: Any, extension: str = "txt") -> None:
         _error_exit(f"Failed to write to file {file}", e)
 
 
-def read_file(file_name: str, extension: str = "txt") -> str | None:
-    file = format_name(file_name, extension)
+def read_file(file: str) -> str | None:
     try:
         with open(file) as f:
             return f.read()

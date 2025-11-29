@@ -1,22 +1,24 @@
-.PHONY: lint build
+.PHONY: lint build compile
 
 TOOL_NAME = riscv
 
 build:
 	docker build -t $(TOOL_NAME) -f docker/Dockerfile.riscv .
 
-assemble:
+compile:
 	docker run --rm -v "${PWD}":/work -w /work $(TOOL_NAME) \
-		riscv32-unknown-linux-gnu-gcc \
-			-c $(SRC) \
-			-march=rv32i \
+		riscv32-unknown-elf-gcc \
+			$(SRC) \
+			-march=rv32ia \
 			-mabi=ilp32 \
 			-mno-relax \
+			--static \
+			--no-pie \
 			-o output.o
 
 lint:
 	docker run --rm -v "${PWD}":/work -w /work $(TOOL_NAME) \
-		riscv32-unknown-linux-gnu-ld \
+		riscv32-unknown-elf-ld \
 			-static \
 			-nostdlib \
 			-no-pie \

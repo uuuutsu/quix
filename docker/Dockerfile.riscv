@@ -28,10 +28,10 @@ RUN git remote add origin https://github.com/riscv/riscv-gnu-toolchain \
 
 WORKDIR /src/riscv-gnu-toolchain
 RUN --mount=type=cache,target=/var/cache/distfiles \
-    ./configure --prefix=${RISCV_PREFIX} --with-arch=${ARCH} --with-abi=${ABI}
+    ./configure --prefix=${RISCV_PREFIX} --with-arch=${ARCH} --with-abi=${ABI} --with-multilib-generator="rv32ia-ilp32--" --disable-linux
 
 RUN --mount=type=cache,target=/ccache \
-    make ${JOBS:+-j${JOBS}} linux
+    make ${JOBS:+-j${JOBS}}
 
 FROM ubuntu:24.04 AS runtime
 ARG RISCV_PREFIX=/opt/riscv
