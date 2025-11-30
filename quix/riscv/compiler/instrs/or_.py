@@ -5,6 +5,6 @@ from quix.bootstrap.program import ToConvert
 
 
 @macrocode
-def riscv_or(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
+def riscv_or_(rs1: Wide, rs2: Wide, rd: Wide) -> ToConvert:
     yield or_wide(rs1, rs2, rd)
     return None

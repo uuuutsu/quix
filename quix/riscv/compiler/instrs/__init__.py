@@ -2,7 +2,7 @@ from typing import Any
 
 from .add import riscv_add
 from .addi import riscv_addi
-from .and_ import riscv_and
+from .and_ import riscv_and_
 from .andi import riscv_andi
 from .auipc import riscv_auipc
 from .beq import riscv_beq
@@ -21,7 +21,7 @@ from .lh import riscv_lh
 from .lhu import riscv_lhu
 from .lui import riscv_lui
 from .lw import riscv_lw
-from .or_ import riscv_or
+from .or_ import riscv_or_
 from .ori import riscv_ori
 from .rem import riscv_rem
 from .remu import riscv_remu
@@ -47,7 +47,7 @@ __all__ = (
     "is_signed",
     "riscv_add",
     "riscv_addi",
-    "riscv_and",
+    "riscv_and_",
     "riscv_andi",
     "riscv_auipc",
     "riscv_beq",
@@ -66,7 +66,7 @@ __all__ = (
     "riscv_lhu",
     "riscv_lui",
     "riscv_lw",
-    "riscv_or",
+    "riscv_or_",
     "riscv_ori",
     "riscv_rem",
     "riscv_remu",
