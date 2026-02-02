@@ -80,35 +80,40 @@ class Compiler:
         return end_loop()
 
     def _execute(self, opcode: RISCVOpcode) -> CoreOpcode:
+        # TODO: Make sure memory/registers/pc that are passed to custom handlers are shallow
+        # TODO: Add pre-instruction initialization and data cleanup
+        # TODO: Init memory and registers
+        # TODO: Make sure PC is correctly managed
+
         artifact = self._execute_opcode(opcode)
         return inject(None, artifact.code.code.getvalue(), None)
 
     def _execute_opcode(self, opcode: RISCVOpcode) -> Artifact:
-        new_args = self._assemble_args(opcode)
+        opcode_vars = self._assemble_vars(opcode)
 
         if custom_handler := get_instr(opcode.__id__):
-            program = custom_handler(**new_args)
+            program = custom_handler(**opcode_vars)
         else:
             raise NoHandlerFoundException(opcode, self)
 
         main_body = compile(program, gc=True, name=str(opcode))
         return main_body
 
-    def _assemble_args(self, opcode: RISCVOpcode) -> dict[str, Any]:
-        new_args: dict[str, Any] = {}
+    def _assemble_vars(self, opcode: RISCVOpcode) -> dict[str, Any]:
+        opcode_vars: dict[str, Any] = {}
 
         for name, value in opcode.args().items():
             if isinstance(value, Imm):
-                new_args[name] = _imm_to_const(value)
+                opcode_vars[name] = _imm_to_const(value)
             elif isinstance(value, Register):
-                new_args[name] = Wide.from_length(f"{name}_buff", 4)
+                opcode_vars[name] = Wide.from_length(f"{name}_buff", 4)
             else:
                 raise ValueError(f"Unknown argument type: {type(value)}")
 
         if custom_handler := get_instr(opcode.__id__):
             for name in signature(custom_handler).parameters:
                 if name in ("memory", "pc", "exit"):
-                    new_args[name] = getattr(self, name)
+                    opcode_vars[name] = getattr(self, name)
                 if name.startswith("x"):
-                    new_args[name] = self.registers[int(name[1:])]
-        return new_args
+                    opcode_vars[name] = self.registers[int(name[1:])]
+        return opcode_vars
