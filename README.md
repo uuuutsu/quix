@@ -23,15 +23,8 @@ cd quix
 
 # Install with uv (recommended)
 uv sync
-
-# Or with pip
-pip install -e .
+uv run pre-commit install
 ```
-
-### Requirements
-
-- Python 3.12
-- Dependencies: `pyelftools`, `mip`, `numpy`, `typer`, `rich`
 
 ### Usage
 
@@ -100,7 +93,7 @@ The compiler maintains the execution context:
 Macrocodes are high-level operations that recursively expand into primitive core opcodes.
 
 ```
-    Macrocode                          Core Opcodes
+    Macrocode                          Core Opcodes (Example)
     ─────────                          ────────────
     add_unit(a, b, result)    -->      clear(result)
                                        copy(a, {result: 1})
@@ -130,7 +123,7 @@ Before generating Brainfuck, we need to assign each variable to a physical memor
     Time: 0  2  4  6  8  10  12  14
 ```
 
-The scheduler analyzes variable lifetimes and allocates cells, reusing memory when lifetimes don't overlap. This minimizes the total tape size—critical for Brainfuck performance.
+The scheduler analyzes variable lifetimes and allocates cells, reusing memory (We assume that variable's value is 0 at the end of its lifetime) when lifetimes don't overlap. This minimizes the total tape size—critical for Brainfuck performance.
 
 **Key files:** `quix/memoptix/schedule.py`, `quix/memoptix/scheduler/`
 
@@ -221,7 +214,7 @@ Allows random access by index, essential for implementing RISC-V memory operatio
 
 ```python
 memory = Array("mem", length=256)  # 256-element array
-# Access: memory[index] -> Unit
+# Access: memory[index] -> Unit (Actual compile time Unit indexing is not actually supported due to memory optimizations)
 ```
 
 ### The 6 Core Opcodes
@@ -317,35 +310,19 @@ Allocated: Cell 0-3: x1, Cell 4-7: x2, Cell 8-11: x3, Cell 12: carry, ...
 ## Caveats & Limitations
 
 **Current limitations:**
-- No floating-point support (RISC-V F/D extensions)
-- No system calls or interrupts
-- Memory size is fixed at compile time
+- No full risc-v compilation yet
+- Memory size is fixed at 256
 - No dynamic linking
 
 **Performance:**
 - Generated Brainfuck is verbose by nature
-- Complex programs produce very large BF files
-- Execution is slow (it's Brainfuck, after all)
+- Complex programs produce very large BF files (mainly due to unoptimized array operations)
 
 **Known TODOs:**
-- CSR instructions not implemented
-- Atomic operations not supported
-- Compressed instructions (RVC) not decoded
-
+- Optimize array macrocodes
+- Finish RISC-V 32I compilation
+ 
 ## Development
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest tests/bootstrap/macrocodes/add_wide.py
-
-# Run with verbose output
-pytest -v
-```
 
 ### Project Structure for Tests
 
@@ -360,33 +337,12 @@ tests/
 
 ```bash
 # Format and lint
-ruff check --fix .
-ruff format .
+uv run ruff check --fix .
+uv run ruff format .
 
 # Type checking
-mypy quix/
+uv run mypy quix/
 ```
-
-### Adding a New RISC-V Instruction
-
-1. Create a handler in `quix/riscv/compiler/instrs/`:
-
-```python
-@macrocode
-def riscv_newop(rs1: Wide, imm: UDynamic, rd: Wide) -> ToConvert:
-    # Implementation using macrocodes
-    yield some_macrocode(rs1, rd)
-```
-
-2. The compiler will auto-discover it via the `riscv_{name}` naming convention.
-
-## Troubleshooting
-
-### `NameError: name 'cbclib' is not defined`
-
-This error is linked to mismatches between `python-mip`, `cbclib` and their binaries. Try:
-- Upgrading `gcc` and `gfortran`
-- See the [full thread](https://github.com/coin-or/python-mip/issues/335)
 
 ## License
 
